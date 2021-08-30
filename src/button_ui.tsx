@@ -1,7 +1,9 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from '@material-ui/core/Button';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 import { ISignal, Signal } from '@lumino/signaling';
 
@@ -11,22 +13,43 @@ export interface IProgramInfo {
 }
 
 interface ButtonProps {
-  children?: React.ReactNode;
-  index?: any;
-  value?: any;
-  title?: any;
+    children?: React.ReactNode;
+    index?: any;
+    value?: any;
+    title?: any;
+    start?: any;
 }
 
-function ButtonUi(props: ButtonProps) {
-  const { children, value, index, title, ...other } = props;
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        progress_program: {
+            width: '100%',
+            '& > * + *': {
+                marginTop: theme.spacing(2),
+            },
+        },
+    }),
+);
 
-  return (
-    <div {...other}>
-      <Button variant="outlined" color="primary" href="#outlined-buttons">
-	    {title}
-      </Button>
-    </div>
-  );
+function ButtonUi(props: ButtonProps) {
+    const { children, value, index, title, start, ...other } = props;
+
+    const classes = useStyles();
+
+    useEffect(() => {
+        console.log("props.start");
+    }, [props.start]);
+
+    return (
+        <div {...other}>
+            <div className={classes.progress_program}>
+                { start && <LinearProgress /> }
+            </div>
+            <Button variant="outlined" color="primary" href="#outlined-buttons">
+	            {title}
+            </Button>
+        </div>
+    );
 }
 
  
@@ -34,35 +57,40 @@ function ButtonUi(props: ButtonProps) {
  * A Counter Lumino Widget that wraps a CounterComponent.
  */
 export class ButtonUiWidget extends ReactWidget {
-  
-  /**
-   * Constructs a new CounterWidget.
-   */
-  constructor( attributes: ButtonProps = {} ) {
-    super();
-    this.addClass('jp-ReactWidget');
-	
-	this.node.addEventListener('click', () => {
-      this._stateChanged.emit(this._info);
-    });
-	
-	this._title = attributes.title;
-  }
+    state = {
+        _start: 0,
+        _title: ""
+    }
+    /**
+    * Constructs a new CounterWidget.
+    */
+    constructor(attributes: ButtonProps = {}) {
+        super();
+        this.addClass('jp-ReactWidget');
 
-  private _info: IProgramInfo = {
-    filename: "",
-	type: ""
-  };
+        this.node.addEventListener('click', () => {
+            this._stateChanged.emit(this._info);
+        });
+        this.state._title = attributes.title;
+    }
 
-  render(): JSX.Element {
-    return <ButtonUi title={this._title}/>;
-  }
-  
-  private _stateChanged = new Signal<ButtonUiWidget, IProgramInfo>(this);
+    private _info: IProgramInfo = {
+        filename: "",
+        type: ""
+    };
 
-  public get stateChanged(): ISignal<ButtonUiWidget, IProgramInfo> {
-    return this._stateChanged;
-  }
-  
-  private _title = '';
+    render(): JSX.Element {
+        return < ButtonUi title={this.state._title} start={this.state._start} />;
+    }
+
+    private _stateChanged = new Signal<ButtonUiWidget, IProgramInfo>(this);
+
+    public get stateChanged(): ISignal<ButtonUiWidget, IProgramInfo> {
+       return this._stateChanged;
+    }
+
+    public set setStart(value: number) {
+        this.state._start = value;
+        this.update();
+    }
 }

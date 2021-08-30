@@ -128,12 +128,14 @@ const extension: JupyterFrontEndPlugin<void> = {
 	function logMessage(emitter: ButtonUiWidget, info: IProgramInfo): void {
       console.log(emitter);
 
+	  emitter.setStart = 1;
+	  console.log("qmao set start 1");
 
 	  let fullPath = (document.getElementById("contained-button-file") as HTMLInputElement).value;
 	  let packrat = fullPath.replace(/^.*[\\\/]/, '')
 
 
-      startProgram(packrat, "packrat");
+      startProgram(packrat, "packrat").then(function(configResponse) {emitter.setStart = 0;});
     }
   }
 };
