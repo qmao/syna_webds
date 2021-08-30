@@ -76,30 +76,36 @@ export default function VerticalTabs(
     };
 
 
-    const upload_hex = async (files: React.ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
-        console.log(files);
-        try {
-            const dataToSend = { type: "hex", filename: "aaa", dir: "default" };
-            const reply = await requestAPI<any>('upload', {
-                body: JSON.stringify(dataToSend),
-                method: 'POST',
-            });
-            console.log(reply);
-            setLoading(false);
-            return reply;
-        } catch (error) {
-            if (error) {
-                return error.message
+    const upload_hex = async (event: React.ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
+        console.log(event);
+
+        if (event.currentTarget.files) {
+            const formData = new FormData();
+            formData.append("fileToUpload", event.currentTarget.files[0]);
+
+            try {
+                //const dataToSend = { type: "hex", filename: "aaa", dir: "default" };
+                const reply = await requestAPI<any>('upload', {
+                    body: formData,
+                    method: 'POST',
+                });
+                console.log(reply);
+                setLoading(false);
+                return reply;
+            } catch (error) {
+                if (error) {
+                    return error.message
+                }
             }
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event.currentTarget.files);
         props.onFileChange(event);
         setLoading(true);
-
+       
         upload_hex(event);
     };
 

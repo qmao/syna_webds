@@ -5,7 +5,7 @@ from jupyter_server.utils import url_path_join
 
 from pathlib import Path
 
-from io import StringIO
+import logging
 
 import os
 
@@ -45,43 +45,38 @@ class UploadHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-        print("UploadHandler GET")
+        file_name = 'qmao.qmao'
+        buf_size = 4096
+        self.set_header('Content-Type', 'application/octet-stream')
+        self.set_header('Content-Disposition', 'attachment; filename=' + file_name)
+        with open(file_name, 'r') as f:
+            while True:
+                data = f.read(buf_size)
+                if not data:
+                    break
+                self.write(data)
         self.finish(json.dumps({
-            "data": "This is upload endpoint!"
-        }))
+            "data": "file is created la!"
+        }))  
+
 
     @tornado.web.authenticated
     def post(self):
-        # input_data is a dictionary with a key "filename"
-        print("UploadHandler POST")
+        print(self.request)
+        print(self.request.files)
+        print(self.request.files.items())
+        for field_name, files in self.request.files.items():
+            for info in files:
+                filename, content_type = info["filename"], info["content_type"]
+                body = info["body"]
+                logging.info(
+                    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
+                )
+                print(filename)
+                print(content_type)
+                print(body)
 
-        ## type
-        ## filename
-        ## dir
-        ## content
-
-        path = '/'
-        directory_contents = os.listdir(path)
-        print(directory_contents)
-
-        input_data = self.get_json_body()
-        print(input_data)
-
-##        files = input_data["target"]
- ##       result = []
-  ##      for file in files:
-   ##       f = file['body']
-   ##       print(f)
-   ##       f = f.decode('uft-8')
-    ##      print(f)
-    ##      f = StringIO(f, newline='')
-
-    ##    if input_data["type"] == 'hex':
-    ##        txt = Path(input_data["filename"]).read_text()
-    ##        print(txt)
-
-        data = {"filename": "file:{}".format(input_data["filename"]), "type": "type:{}".format(input_data["type"])}
-        self.finish(json.dumps(data))
+        self.write("OK")
         
 
 def setup_handlers(web_app):
