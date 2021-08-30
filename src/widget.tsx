@@ -82,9 +82,8 @@ export default function VerticalTabs(
         if (event.currentTarget.files) {
             const formData = new FormData();
             formData.append("fileToUpload", event.currentTarget.files[0]);
-
+            console.log(formData);
             try {
-                //const dataToSend = { type: "hex", filename: "aaa", dir: "default" };
                 const reply = await requestAPI<any>('upload', {
                     body: formData,
                     method: 'POST',

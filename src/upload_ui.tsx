@@ -27,7 +27,7 @@ export default function UploadButtons(
   return (
     <div className={classes.root}>
       <input
-        accept="image/*"
+        accept=".hex"
         className={classes.input}
         id="contained-button-file"
         multiple

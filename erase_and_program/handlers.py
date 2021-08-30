@@ -10,8 +10,16 @@ import logging
 import os
 
 import tornado
+import uuid
+from werkzeug import secure_filename
+import grp, pwd
 
-class RouteHandler(APIHandler):
+import sys
+sys.path.append("/usr/local/syna/python")
+from touchcomm import TouchComm
+from programmer import AsicProgrammer
+
+class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
@@ -27,15 +35,23 @@ class RouteHandler(APIHandler):
         input_data = self.get_json_body()
         print(input_data)
 
-        if input_data["type"] == 'upload':
-            txt = Path(input_data["filename"]).read_text()
-            print(txt)
+        print("start to erase and program!!!")
+        ####PR3319382.hex
         
-        path = '/'
-        directory_contents = os.listdir(path)
-        print(directory_contents)
+        filename = os.path.join('/packrat', input_data["filename"])
+        print(filename)
 
-        data = {"filename": "file:{}".format(input_data["filename"]), "type": "type:{}".format(input_data["type"])}
+        AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
+        print("Erase and program done!!!")
+        
+        tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
+        if(tc):
+            id = tc.identify()
+            print(id)
+            tc.close()
+            tc = None
+
+        data = id
         self.finish(json.dumps(data))
 
 
@@ -45,16 +61,7 @@ class UploadHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-        file_name = 'qmao.qmao'
-        buf_size = 4096
-        self.set_header('Content-Type', 'application/octet-stream')
-        self.set_header('Content-Disposition', 'attachment; filename=' + file_name)
-        with open(file_name, 'r') as f:
-            while True:
-                data = f.read(buf_size)
-                if not data:
-                    break
-                self.write(data)
+        print(self.request)
         self.finish(json.dumps({
             "data": "file is created la!"
         }))  
@@ -63,18 +70,32 @@ class UploadHandler(APIHandler):
     @tornado.web.authenticated
     def post(self):
         print(self.request)
-        print(self.request.files)
-        print(self.request.files.items())
+
         for field_name, files in self.request.files.items():
-            for info in files:
-                filename, content_type = info["filename"], info["content_type"]
-                body = info["body"]
+            print(field_name)
+            for f in files:
+                filename, content_type = f["filename"], f["content_type"]
+                body = f["body"]
                 logging.info(
                     'POST "%s" "%s" %d bytes', filename, content_type, len(body)
                 )
                 print(filename)
                 print(content_type)
-                print(body)
+
+
+                ## save file
+                save_father_path = '/packrat'
+                ##img_path = os.path.join(save_father_path, str(uuid.uuid1()) + '.' + secure_filename(f.filename).split('.')[-1])
+
+                ### regular expression to find packrat number
+                if not os.path.exists(save_father_path):
+                    os.makedirs(save_father_path)
+
+                file_path = os.path.join(save_father_path, filename)
+                print(file_path)
+
+                with open(file_path, 'wb') as f:
+                    f.write(body)
 
         self.write("OK")
         
@@ -83,10 +104,10 @@ def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]
-    route_pattern = url_path_join(base_url, "webds-api", "start-program")
+    program_pattern = url_path_join(base_url, "webds-api", "start-program")
     
     upload_pattern = url_path_join(base_url, "webds-api", "upload")
 
-    handlers = [(route_pattern, RouteHandler), (upload_pattern, UploadHandler)]
+    handlers = [(program_pattern, ProgramHandler), (upload_pattern, UploadHandler)]
 
     web_app.add_handlers(host_pattern, handlers)

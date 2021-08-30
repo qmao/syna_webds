@@ -124,11 +124,16 @@ const extension: JupyterFrontEndPlugin<void> = {
         category: category
       });
     }
-	
+
 	function logMessage(emitter: ButtonUiWidget, info: IProgramInfo): void {
       console.log(emitter);
 
-      startProgram("PR1234567", "packrat");
+
+	  let fullPath = (document.getElementById("contained-button-file") as HTMLInputElement).value;
+	  let packrat = fullPath.replace(/^.*[\\\/]/, '')
+
+
+      startProgram(packrat, "packrat");
     }
   }
 };
