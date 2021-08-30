@@ -6,8 +6,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-
 import UploadButtons from './upload_ui'
+import { ISignal, Signal } from '@lumino/signaling';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -54,17 +54,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export default function VerticalTabs() {
+export default function VerticalTabs(
+    props: {
+        onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    }
+) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
-
-  const handleChangeFile = (e: React.FormEvent<HTMLInputElement>) => {
-	console.log(e.currentTarget.files);
-  }
 
   return (
     <div className={classes.root}>
@@ -81,7 +81,7 @@ export default function VerticalTabs() {
         <Tab label="Cache" {...a11yProps(2)} />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <UploadButtons onChange={handleChangeFile}/>
+        <UploadButtons onChange={props.onFileChange}/>
       </TabPanel>
       <TabPanel value={value} index={1}>
         Packrat
@@ -102,12 +102,23 @@ export class TabPanelUiWidget extends ReactWidget {
   /**
    * Constructs a new CounterWidget.
    */
-  constructor() {
-    super();
-    this.addClass('jp-ReactWidget');
-  }
+    constructor() {
+        super();
+        this.addClass('jp-ReactWidget');
+    }
 
-  render(): JSX.Element {
-    return <VerticalTabs />;
-  }
+    handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
+        console.log(e.currentTarget.files);
+        this._valueChanged.emit(e);
+    }
+
+    render(): JSX.Element {
+          return <VerticalTabs onFileChange={this.handleChangeFile} />;
+    }
+
+    public get valueChanged(): ISignal<this, React.ChangeEvent<HTMLInputElement>> {
+        return this._valueChanged;
+    }
+
+    private _valueChanged = new Signal<this, React.ChangeEvent<HTMLInputElement>>(this);
 }

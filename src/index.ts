@@ -21,6 +21,8 @@ import { TabPanelUiWidget } from './widget'
 
 import { ButtonUiWidget, IProgramInfo } from './button_ui'
 
+import { UploadProgress } from './upload_progress'
+
 /**
  * The command IDs used by the server extension plugin.
  */
@@ -99,6 +101,9 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 		main_widget.addWidget(dock);
 
+		let progress = new UploadProgress();
+		main_widget.addWidget(progress);
+		
 		
 		shell.add(main_widget, 'main');
 
