@@ -5,6 +5,8 @@ from jupyter_server.utils import url_path_join
 
 from pathlib import Path
 
+from io import StringIO
+
 import os
 
 import tornado
@@ -43,6 +45,7 @@ class UploadHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
+        print("UploadHandler GET")
         self.finish(json.dumps({
             "data": "This is upload endpoint!"
         }))
@@ -50,16 +53,32 @@ class UploadHandler(APIHandler):
     @tornado.web.authenticated
     def post(self):
         # input_data is a dictionary with a key "filename"
-        input_data = self.get_json_body()
-        print(input_data)
+        print("UploadHandler POST")
 
-        if input_data["type"] == 'upload':
-            txt = Path(input_data["filename"]).read_text()
-            print(txt)
-        
+        ## type
+        ## filename
+        ## dir
+        ## content
+
         path = '/'
         directory_contents = os.listdir(path)
         print(directory_contents)
+
+        input_data = self.get_json_body()
+        print(input_data)
+
+##        files = input_data["target"]
+ ##       result = []
+  ##      for file in files:
+   ##       f = file['body']
+   ##       print(f)
+   ##       f = f.decode('uft-8')
+    ##      print(f)
+    ##      f = StringIO(f, newline='')
+
+    ##    if input_data["type"] == 'hex':
+    ##        txt = Path(input_data["filename"]).read_text()
+    ##        print(txt)
 
         data = {"filename": "file:{}".format(input_data["filename"]), "type": "type:{}".format(input_data["type"])}
         self.finish(json.dumps(data))
@@ -69,10 +88,10 @@ def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]
-    route_pattern = url_path_join(base_url, "erase-and-program", "start_program")
+    route_pattern = url_path_join(base_url, "webds-api", "start-program")
     
-    upload_pattern = url_path_join(base_url, "upload", "upload")
-        
+    upload_pattern = url_path_join(base_url, "webds-api", "upload")
+
     handlers = [(route_pattern, RouteHandler), (upload_pattern, UploadHandler)]
 
     web_app.add_handlers(host_pattern, handlers)

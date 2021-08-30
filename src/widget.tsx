@@ -7,7 +7,9 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import UploadButtons from './upload_ui'
-import { ISignal, Signal } from '@lumino/signaling';
+//import { ISignal, Signal } from '@lumino/signaling';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { requestAPI } from './handler';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,6 +54,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
   },
+  progress: {
+    display: 'flex',
+        '& > * + *': {
+            marginLeft: theme.spacing(2),
+      },
+  },
 }));
 
 export default function VerticalTabs(
@@ -59,49 +67,82 @@ export default function VerticalTabs(
         onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 ) {
-  const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+    const classes = useStyles();
+    const [value, setValue] = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
+    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setValue(newValue);
+    };
 
-  return (
-    <div className={classes.root}>
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs example"
-        className={classes.tabs}
-      >
-        <Tab label="Upload" {...a11yProps(0)} />
-        <Tab label="Packrat" {...a11yProps(1)} />
-        <Tab label="Cache" {...a11yProps(2)} />
-      </Tabs>
-      <TabPanel value={value} index={0}>
-        <UploadButtons onChange={props.onFileChange}/>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        Packrat
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        Cache
-      </TabPanel>
-    </div>
-  );
+
+    const upload_hex = async (files: React.ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
+        console.log(files);
+        try {
+            const dataToSend = { type: "hex", filename: "aaa", dir: "default" };
+            const reply = await requestAPI<any>('upload', {
+                body: JSON.stringify(dataToSend),
+                method: 'POST',
+            });
+            console.log(reply);
+            setLoading(false);
+            return reply;
+        } catch (error) {
+            if (error) {
+                return error.message
+            }
+        }
+        setLoading(false);
+    }
+
+    const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(event.currentTarget.files);
+        props.onFileChange(event);
+        setLoading(true);
+
+        upload_hex(event);
+    };
+
+    return (
+        <div className={classes.root}>
+            <Tabs
+                orientation="vertical"
+
+                variant="scrollable"
+                value={value}
+                onChange={handleChange}
+                aria-label="Vertical tabs example"
+                className={classes.tabs}
+            >
+                <Tab label="Upload" {...a11yProps(0)} />
+                <Tab label="Packrat" {...a11yProps(1)} />
+                <Tab label="Cache" {...a11yProps(2)} />
+            </Tabs>
+            <TabPanel value={value} index={0}>
+                <UploadButtons onChange={onFileChange} />
+                <div className={classes.progress}>
+                    { loading && <CircularProgress id="progress" /> }
+                </div>
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                Packrat
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                Cache
+            </TabPanel>
+        </div>
+    );
 }
 
 
  
 /**
- * A Counter Lumino Widget that wraps a CounterComponent.
- */
+* A Counter Lumino Widget that wraps a CounterComponent.
+*/
 export class TabPanelUiWidget extends ReactWidget {
-  /**
-   * Constructs a new CounterWidget.
-   */
+/**
+* Constructs a new CounterWidget.
+*/
     constructor() {
         super();
         this.addClass('jp-ReactWidget');
@@ -109,16 +150,18 @@ export class TabPanelUiWidget extends ReactWidget {
 
     handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
         console.log(e.currentTarget.files);
-        this._valueChanged.emit(e);
+        //this._valueChanged.emit(e);
     }
 
     render(): JSX.Element {
-          return <VerticalTabs onFileChange={this.handleChangeFile} />;
+        return <VerticalTabs onFileChange={this.handleChangeFile} />;
     }
 
+    /*
     public get valueChanged(): ISignal<this, React.ChangeEvent<HTMLInputElement>> {
         return this._valueChanged;
     }
 
     private _valueChanged = new Signal<this, React.ChangeEvent<HTMLInputElement>>(this);
+    */
 }

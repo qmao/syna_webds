@@ -21,7 +21,6 @@ import { TabPanelUiWidget } from './widget'
 
 import { ButtonUiWidget, IProgramInfo } from './button_ui'
 
-import { UploadProgress } from './upload_progress'
 
 /**
  * The command IDs used by the server extension plugin.
@@ -100,14 +99,10 @@ const extension: JupyterFrontEndPlugin<void> = {
 		main_widget.addClass('main-widget');
 
 		main_widget.addWidget(dock);
-
-		let progress = new UploadProgress();
-		main_widget.addWidget(progress);
-		
 		
 		shell.add(main_widget, 'main');
 
-		requestAPI<any>('start_program')
+		requestAPI<any>('start-program')
           .then(data => {
           console.log(data);
 
@@ -143,7 +138,7 @@ async function startProgram(file_name: string, file_type: string): Promise<strin
 	 // POST request
     const dataToSend = { filename: file_name, type: file_type };
     try {
-      const reply = await requestAPI<any>('start_program', {
+      const reply = await requestAPI<any>('start-program', {
         body: JSON.stringify(dataToSend),
         method: 'POST',
       });

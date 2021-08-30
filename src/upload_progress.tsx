@@ -21,7 +21,7 @@ export default function UploadProgressReact() {
 
     return (
         <div className={classes.root}>
-            <CircularProgress />
+            <CircularProgress id="progress"/>
         </div>
     );
 }
