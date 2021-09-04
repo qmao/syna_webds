@@ -1,9 +1,12 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 import { ISignal, Signal } from '@lumino/signaling';
 
@@ -17,7 +20,10 @@ interface ButtonProps {
     index?: any;
     value?: any;
     title?: any;
-    start?: any;
+    progress?: any;
+    alert?: any;
+    severity?: any;
+    message?: any;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,23 +37,40 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-function ButtonUi(props: ButtonProps) {
-    const { children, value, index, title, start, ...other } = props;
+function Alert(props: AlertProps) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
+function ButtonUi(props: ButtonProps) {
+    const { children, value, index, title, progress, alert, ...other } = props;
+    const [ isAlert, setAlert ] = useState(false);
     const classes = useStyles();
 
     useEffect(() => {
         console.log("props.start");
-    }, [props.start]);
+        setAlert(alert);
+    }, [props.progress]);
+
+    const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAlert(false);
+    };
 
     return (
         <div {...other}>
             <div className={classes.progress_program}>
-                { start && <LinearProgress /> }
+                { progress && <LinearProgress /> }
             </div>
             <Button variant="outlined" color="primary" href="#outlined-buttons">
 	            {title}
             </Button>
+            <Snackbar open={isAlert} autoHideDuration={3000} onClose={handleClose} >
+                <Alert severity={props.severity}>
+                    { props.message }
+                </Alert>
+            </Snackbar>
         </div>
     );
 }
@@ -58,8 +81,11 @@ function ButtonUi(props: ButtonProps) {
  */
 export class ButtonUiWidget extends ReactWidget {
     state = {
-        _start: 0,
-        _title: ""
+        _progress: false,
+        _title: "",
+        _alert: false,
+        _severity: "",
+        _message: ""
     }
     /**
     * Constructs a new CounterWidget.
@@ -80,7 +106,9 @@ export class ButtonUiWidget extends ReactWidget {
     };
 
     render(): JSX.Element {
-        return < ButtonUi title={this.state._title} start={this.state._start} />;
+        return < ButtonUi title={this.state._title} progress={this.state._progress} alert={this.state._alert}
+            severity={this.state._severity} message={this.state._message}
+        />;
     }
 
     private _stateChanged = new Signal<ButtonUiWidget, IProgramInfo>(this);
@@ -89,8 +117,18 @@ export class ButtonUiWidget extends ReactWidget {
        return this._stateChanged;
     }
 
-    public set setStart(value: number) {
-        this.state._start = value;
+    //fixme should use signal instead
+    public setStart() {
+        this.state._alert = false;
+        this.state._progress = true;
+        this.update();
+    }
+
+    public setStop(severity: string, message: string) {
+        this.state._alert = true;
+        this.state._progress = false;
+        this.state._severity = severity;
+        this.state._message = message;
         this.update();
     }
 }

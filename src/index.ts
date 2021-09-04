@@ -5,7 +5,7 @@ import {
 
 import { requestAPI } from './handler';
 
-import { ICommandPalette, Dialog } from '@jupyterlab/apputils';
+import { ICommandPalette } from '@jupyterlab/apputils';
 
 import { StackedPanel, StackedLayout, BoxPanel, Panel } from '@lumino/widgets';
 
@@ -126,16 +126,24 @@ const extension: JupyterFrontEndPlugin<void> = {
     }
 
 	function logMessage(emitter: ButtonUiWidget, info: IProgramInfo): void {
-      console.log(emitter);
-
-	  emitter.setStart = 1;
-	  console.log("qmao set start 1");
 
 	  let fullPath = (document.getElementById("contained-button-file") as HTMLInputElement).value;
 	  let packrat = fullPath.replace(/^.*[\\\/]/, '')
 
+	  emitter.setStart();
 
-      startProgram(packrat, "packrat").then(function(configResponse) {emitter.setStart = 0;});
+      startProgram(packrat, "packrat")
+	  .then(res =>
+	    {
+          console.log(res);
+          emitter.setStop("success", res);
+	    })
+	  .catch((error) => 
+	    {
+	      console.log(error,'Promise error');
+          emitter.setStop("error", error);
+	    }
+	  )
     }
   }
 };
@@ -143,6 +151,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 async function startProgram(file_name: string, file_type: string): Promise<string> {
 	 // POST request
+	let reply_str = "";
     const dataToSend = { filename: file_name, type: file_type };
     try {
       const reply = await requestAPI<any>('start-program', {
@@ -150,24 +159,25 @@ async function startProgram(file_name: string, file_type: string): Promise<strin
         method: 'POST',
       });
       console.log(reply);
-	  let reply_str = JSON.stringify(reply);
+	  reply_str = JSON.stringify(reply);
 	  
+	  /*
 	  let dialog = new Dialog({
         title: reply_str,
         focusNodeSelector: 'input',
         buttons: [Dialog.okButton({ label: 'TBC' })]
       });
 
-    await dialog.launch();
-	
-	  
-    } catch (reason) {
+      await dialog.launch();
+	  */
+    } catch (e) {
       console.error(
-        `Error on POST ${dataToSend}.\n${reason}`
+        `Error on POST ${dataToSend}.\n${e}`
       );
+      return Promise.reject((e as Error).message);
     }
 
-	return Promise.resolve("done");
+	return Promise.resolve(reply_str);
 }
 
 /*

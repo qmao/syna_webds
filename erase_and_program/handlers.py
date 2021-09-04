@@ -41,6 +41,9 @@ class ProgramHandler(APIHandler):
         filename = os.path.join('/packrat', input_data["filename"])
         print(filename)
 
+        if not os.path.isfile(filename):
+            raise Exception(filename)
+
         AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
         print("Erase and program done!!!")
         
