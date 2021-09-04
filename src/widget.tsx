@@ -1,6 +1,6 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -70,12 +70,18 @@ export default function VerticalTabs(
 ) {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
+    const [filelist, setFileList] = React.useState([""]);
     const [loading, setLoading] = React.useState(false);
+
+    useEffect(() => {
+        console.log("tab switch: ", value);
+        if (value == 2)
+            get_hex_list();
+    }, [value]);
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setValue(newValue);
     };
-
 
     const upload_hex = async (event: React.ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
         console.log(event);
@@ -101,6 +107,42 @@ export default function VerticalTabs(
         }
     }
 
+    const get_hex_list = async (): Promise<string | undefined> => {
+        console.log(event);
+        const dataToSend = { action:"get-list", extension: "hex" };
+        try {
+            const reply = await requestAPI<any>('manage-file', {
+                body: JSON.stringify(dataToSend),
+                method: 'POST',
+            });
+            console.log(reply);
+            setFileList(reply);
+            return reply;
+        } catch (error) {
+            if (error) {
+                return error.message
+            }
+        }
+    }
+
+    const delete_hex = async (filename: string): Promise<string | undefined> => {
+        console.log(event);
+        const dataToSend = { action: "delete", extension: "hex", file: filename };
+        try {
+            const reply = await requestAPI<any>('manage-file', {
+                body: JSON.stringify(dataToSend),
+                method: 'POST',
+            });
+            console.log(reply);
+            setFileList(reply);
+            return reply;
+        } catch (error) {
+            if (error) {
+                return error.message
+            }
+        }
+    }
+
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event.currentTarget.files);
         props.onFileChange(event);
@@ -109,7 +151,11 @@ export default function VerticalTabs(
         upload_hex(event);
     };
 
-    const num = ["qqq", "bbb", "ccc", "ddd", "eee"];
+    const onFileDelete = (file: string, index: number) => {
+        console.log(file);
+        delete_hex(file);
+    };
+
 
     return (
         <div className={classes.root}>
@@ -137,7 +183,7 @@ export default function VerticalTabs(
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <div>
-                    <FileList list={num}/>
+                    <FileList list={filelist} onDelete={onFileDelete}/>
                 </div>
             </TabPanel>
         </div>

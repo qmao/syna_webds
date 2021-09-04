@@ -13,11 +13,27 @@ import tornado
 import uuid
 from werkzeug import secure_filename
 import grp, pwd
+import glob
 
 import sys
 sys.path.append("/usr/local/syna/python")
 from touchcomm import TouchComm
 from programmer import AsicProgrammer
+
+packrat_root = "/packrat"
+
+def GetFileList(extension):
+    filelist = []
+    os.chdir(packrat_root)
+    for file in glob.glob("*." + extension):
+        print(file)
+        filelist += [str(file)]
+
+    # printing result
+    print("The list after appending is : " + str(filelist))
+    jsonString = json.dumps(filelist)
+    return jsonString
+
 
 class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -102,6 +118,45 @@ class UploadHandler(APIHandler):
 
         self.write("OK")
         
+        
+        
+class GetListHandler(APIHandler):
+    # The following decorator should be present on all verb methods (head, get, post,
+    # patch, put, delete, options) to ensure only authorized user can request the
+    # Jupyter server
+    @tornado.web.authenticated
+    def get(self):
+        print(self.request)
+        self.finish(json.dumps({
+            "data": "file is created la!"
+        }))  
+
+
+    @tornado.web.authenticated
+    def post(self):
+
+        input_data = self.get_json_body()
+        print(input_data)
+        
+        action = input_data["action"]
+        print(action)
+        extension = input_data["extension"]
+        print(extension)
+
+        if ( action == 'get-list'):
+            filelist = GetFileList(extension)
+            self.finish(filelist)
+
+        elif (action == 'delete'):
+            filename = input_data["file"]
+            print("delete file: ", filename)
+            os.remove(packrat_root + "/" + filename)
+            
+            filelist = GetFileList(extension)
+            self.finish(filelist)  
+
+        self.write(action, "unknown")   # 0 is the default case if x is not found
+
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -111,6 +166,8 @@ def setup_handlers(web_app):
     
     upload_pattern = url_path_join(base_url, "webds-api", "upload")
 
-    handlers = [(program_pattern, ProgramHandler), (upload_pattern, UploadHandler)]
+    get_list_pattern = url_path_join(base_url, "webds-api", "manage-file")
+    
+    handlers = [(program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (get_list_pattern, GetListHandler)]
 
     web_app.add_handlers(host_pattern, handlers)
