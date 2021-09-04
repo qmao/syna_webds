@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import UploadButtons from './upload_ui'
 //import { ISignal, Signal } from '@lumino/signaling';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import FileList from './filelist'
 import { requestAPI } from './handler';
 
 interface TabPanelProps {
@@ -108,6 +109,8 @@ export default function VerticalTabs(
         upload_hex(event);
     };
 
+    const num = ["qqq", "bbb", "ccc", "ddd", "eee"];
+
     return (
         <div className={classes.root}>
             <Tabs
@@ -133,7 +136,9 @@ export default function VerticalTabs(
                 Packrat
             </TabPanel>
             <TabPanel value={value} index={2}>
-                Cache
+                <div>
+                    <FileList list={num}/>
+                </div>
             </TabPanel>
         </div>
     );
