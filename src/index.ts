@@ -11,7 +11,6 @@ import { StackedPanel, StackedLayout, BoxPanel, Panel } from '@lumino/widgets';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-
 import {
   IDocumentManager,
 } from '@jupyterlab/docmanager';
@@ -99,7 +98,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 		main_widget.addClass('main-widget');
 
 		main_widget.addWidget(dock);
-		
+
 		shell.add(main_widget, 'main');
 
 		requestAPI<any>('start-program')

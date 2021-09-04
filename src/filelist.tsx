@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-
 export default function FileList(
     props: {
         list: string[];
@@ -30,10 +29,12 @@ export default function FileList(
     }
 ) {
     const classes = useStyles();
-    const [select, setSelect] = React.useState('female');
+    const [select, setSelect] = React.useState('unset');
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelect((event.target as HTMLInputElement).value);
+        setSelect(event.target.defaultValue);
+        //window.packrat = event.target.defaultValue;
+        console.log(window);
     };
 
     const handleToggle = (value: string, index: number) => () => {
@@ -42,7 +43,7 @@ export default function FileList(
     };
 
     return (
-        <RadioGroup aria-label="gender" name="gender1" value={select} onChange={handleChange}>
+        <RadioGroup aria-label="Hex File" name="select-hex" value={select} onChange={handleChange}>
             <List className={classes.filelist}>
                 {props.list.map((value, index) => {
                     return (

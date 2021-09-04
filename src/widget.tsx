@@ -161,12 +161,12 @@ export default function VerticalTabs(
         <div className={classes.root}>
             <Tabs
                 orientation="vertical"
-
                 variant="scrollable"
                 value={value}
                 onChange={handleChange}
                 aria-label="Vertical tabs example"
                 className={classes.tabs}
+                id="tabs"
             >
                 <Tab label="Upload" {...a11yProps(0)} />
                 <Tab label="Packrat" {...a11yProps(1)} />
