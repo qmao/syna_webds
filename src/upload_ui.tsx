@@ -42,7 +42,7 @@ export default function UploadButtons(
           }}
 		  startIcon={<mostUsedIcon.react />}
 		>
-          Upload
+          Choose File
         </Button>
       </label>
     </div>

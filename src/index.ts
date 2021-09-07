@@ -28,6 +28,12 @@ namespace CommandIDs {
   export const get = 'webds:erase-and-program';
 }
 
+declare const window: Window &
+   typeof globalThis & {
+     FB: any
+   }
+
+	
 /**
  * Initialization data for the @webds/erase_and_program extension.
  */
@@ -126,6 +132,7 @@ const extension: JupyterFrontEndPlugin<void> = {
 
 	function logMessage(emitter: ButtonUiWidget, info: IProgramInfo): void {
 
+	  console.log(window);
 	  let fullPath = (document.getElementById("contained-button-file") as HTMLInputElement).value;
 	  let packrat = fullPath.replace(/^.*[\\\/]/, '')
 

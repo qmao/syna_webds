@@ -134,7 +134,6 @@ class GetListHandler(APIHandler):
 
     @tornado.web.authenticated
     def post(self):
-
         input_data = self.get_json_body()
         print(input_data)
         
@@ -146,16 +145,15 @@ class GetListHandler(APIHandler):
         if ( action == 'get-list'):
             filelist = GetFileList(extension)
             self.finish(filelist)
-
         elif (action == 'delete'):
             filename = input_data["file"]
             print("delete file: ", filename)
             os.remove(packrat_root + "/" + filename)
-            
-            filelist = GetFileList(extension)
-            self.finish(filelist)  
 
-        self.write(action, "unknown")   # 0 is the default case if x is not found
+            filelist = GetFileList(extension)
+            self.finish(filelist)
+        else:
+            self.write(action, "unknown")   # 0 is the default case if x is not found
 
 
 def setup_handlers(web_app):
