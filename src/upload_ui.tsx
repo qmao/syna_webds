@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import { mostUsedIcon } from './icons';
+import BackupIcon from '@material-ui/icons/Backup';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -40,7 +40,7 @@ export default function UploadButtons(
             setCounter(counter + 1);
 			console.log(counter);
           }}
-		  startIcon={<mostUsedIcon.react />}
+          startIcon={<BackupIcon />}
 		>
           Choose File
         </Button>

@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,7 +55,7 @@ export default function FileList(
                             </ListItemIcon>
                             <ListItemSecondaryAction>
                                 <IconButton edge="end" aria-label="comments" onClick={() => props.onDelete(value, index)}>
-
+                                    <DeleteForeverIcon />
                                 </IconButton>
                             </ListItemSecondaryAction>
                         </ListItem>

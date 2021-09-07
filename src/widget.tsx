@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import UploadButtons from './upload_ui'
 //import { ISignal, Signal } from '@lumino/signaling';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import TextField from '@material-ui/core/TextField';
 import FileList from './filelist'
 import { requestAPI } from './handler';
 
@@ -60,7 +61,13 @@ const useStyles = makeStyles((theme: Theme) => ({
         '& > * + *': {
             marginLeft: theme.spacing(2),
       },
-  },
+    },
+   text: {
+        '& > *': {
+            margin: theme.spacing(1),
+            width: '25ch',
+        },
+    },
 }));
 
 export default function VerticalTabs(
@@ -179,7 +186,9 @@ export default function VerticalTabs(
                 </div>
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Packrat
+                <div className={classes.text}>
+                    <TextField id="filled-basic" label="Packrat" />
+                </div>
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <div>
