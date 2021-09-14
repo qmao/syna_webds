@@ -7,7 +7,7 @@ import { requestAPI } from './handler';
 
 import { ICommandPalette } from '@jupyterlab/apputils';
 
-import { StackedPanel, StackedLayout, BoxPanel, Panel } from '@lumino/widgets';
+import { Panel } from '@lumino/widgets';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
@@ -17,8 +17,6 @@ import {
 
 
 import { TabPanelUiWidget } from './widget'
-
-import { ButtonUiWidget, IProgramInfo } from './button_ui'
 
 
 /**
@@ -54,7 +52,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     const command = CommandIDs.get;
     const category = 'WebDS';
 
-	let dock: BoxPanel;
+
 	
     commands.addCommand(command, {
       label: 'Erase and Program',
@@ -82,28 +80,19 @@ const extension: JupyterFrontEndPlugin<void> = {
 		*/
 		
 		
-		dock = new BoxPanel({direction: 'top-to-bottom', alignment:'center' });
-		dock.id = 'dock';
+
+
 		
 		//qmao
 		let tabpanel_all = new TabPanelUiWidget();
-		dock.addWidget(tabpanel_all);
-		
-		let button_program = new ButtonUiWidget( {title: 'Program'} );
-		button_program.stateChanged.connect(logMessage, this);
-		let panel_start = new Panel();	
-		panel_start.addClass('start-panel');
-		panel_start.addWidget(button_program);
-		dock.addWidget(panel_start);
 
-		let main_layout = new StackedLayout({fitPolicy: 'set-no-constraint'});
-		const main_widget = new StackedPanel({layout: main_layout});
+		const main_widget = new Panel();
 		main_widget.id = 'erase_and_program';
 		main_widget.title.label = 'Program';
 		main_widget.title.closable = true;
 		main_widget.addClass('main-widget');
 
-		main_widget.addWidget(dock);
+		main_widget.addWidget(tabpanel_all);
 
 		shell.add(main_widget, 'main');
 
@@ -130,6 +119,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       });
     }
 
+/*
 	function logMessage(emitter: ButtonUiWidget, info: IProgramInfo): void {
 
 	  console.log(window);
@@ -151,40 +141,10 @@ const extension: JupyterFrontEndPlugin<void> = {
 	    }
 	  )
     }
+	*/
   }
 };
 
-
-async function startProgram(file_name: string, file_type: string): Promise<string> {
-	 // POST request
-	let reply_str = "";
-    const dataToSend = { filename: file_name, type: file_type };
-    try {
-      const reply = await requestAPI<any>('start-program', {
-        body: JSON.stringify(dataToSend),
-        method: 'POST',
-      });
-      console.log(reply);
-	  reply_str = JSON.stringify(reply);
-	  
-	  /*
-	  let dialog = new Dialog({
-        title: reply_str,
-        focusNodeSelector: 'input',
-        buttons: [Dialog.okButton({ label: 'TBC' })]
-      });
-
-      await dialog.launch();
-	  */
-    } catch (e) {
-      console.error(
-        `Error on POST ${dataToSend}.\n${e}`
-      );
-      return Promise.reject((e as Error).message);
-    }
-
-	return Promise.resolve(reply_str);
-}
 
 /*
 function download(url: string, filename: string) {

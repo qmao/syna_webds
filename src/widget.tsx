@@ -6,12 +6,14 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import UploadButtons from './upload_ui'
-//import { ISignal, Signal } from '@lumino/signaling';
+import UploadButtons from './upload'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 import FileList from './filelist'
 import { requestAPI } from './handler';
+import ButtonProgram from './program'
+import Paper from '@material-ui/core/Paper';
+import { UserContext } from './context';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -19,25 +21,6 @@ interface TabPanelProps {
   value: any;
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
 
 function a11yProps(index: any) {
   return {
@@ -48,14 +31,13 @@ function a11yProps(index: any) {
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    flexGrow: 1,
+    flexDirection: 'column',
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
-    height: 224,
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
-  },
+    },
   progress: {
     display: 'flex',
         '& > * + *': {
@@ -68,7 +50,43 @@ const useStyles = makeStyles((theme: Theme) => ({
             width: '25ch',
         },
     },
+    program: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
+    paper_tab: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+        display: 'flex',
+    },
+    paper_program: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+        display: 'flex',
+        justifyContent: 'center'
+    },
 }));
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`vertical-tabpanel-${index}`}
+            aria-labelledby={`vertical-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={0} >
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+}
 
 export default function VerticalTabs(
     props: {
@@ -79,10 +97,10 @@ export default function VerticalTabs(
     const [value, setValue] = React.useState(0);
     const [filelist, setFileList] = React.useState([""]);
     const [loading, setLoading] = React.useState(false);
+    const [packrat, setPackrat] = React.useState("");
 
     useEffect(() => {
-        console.log("tab switch: ", value);
-        if (value == 2)
+        if (value == 0)
             get_hex_list();
     }, [value]);
 
@@ -90,32 +108,48 @@ export default function VerticalTabs(
         setValue(newValue);
     };
 
-    const upload_hex = async (event: React.ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
-        console.log(event);
+    const upload_hex = async (file: File): Promise<string | undefined> => {
+        console.log("upload_hex:", event);
 
-        if (event.currentTarget.files) {
+        if (file) {
+            setLoading(true);
+
             const formData = new FormData();
-            formData.append("fileToUpload", event.currentTarget.files[0]);
+            formData.append("fileToUpload", file);
+            let filename = file.name;
             console.log(formData);
             try {
                 const reply = await requestAPI<any>('upload', {
                     body: formData,
                     method: 'POST',
                 });
+                
                 console.log(reply);
                 setLoading(false);
+                setFileList(reply);
+
+                // set select packrat
+                console.log(reply);
+
+                reply.forEach((element: any) => {
+                    if (element.includes(filename)) {
+                        console.log("include test: ", element);
+                        setPackrat(element);
+                    }
+                });
+
                 return reply;
             } catch (error) {
                 if (error) {
                     return error.message
                 }
+                setLoading(false);
             }
-            setLoading(false);
         }
     }
 
     const get_hex_list = async (): Promise<string | undefined> => {
-        console.log(event);
+        console.log("get_hex_list:", event);
         const dataToSend = { action:"get-list", extension: "hex" };
         try {
             const reply = await requestAPI<any>('manage-file', {
@@ -133,7 +167,7 @@ export default function VerticalTabs(
     }
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
-        console.log(event);
+        console.log("delete_hex:", event);
         const dataToSend = { action: "delete", extension: "hex", file: filename };
         try {
             const reply = await requestAPI<any>('manage-file', {
@@ -151,51 +185,62 @@ export default function VerticalTabs(
     }
 
     const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event.currentTarget.files);
-        props.onFileChange(event);
-        setLoading(true);
-       
-        upload_hex(event);
+        console.log("onFileChange:", event.currentTarget.files);
+
+        if (event.currentTarget.files) {
+            props.onFileChange(event);      //???
+            upload_hex(event.currentTarget.files[0]);
+        }
     };
 
     const onFileDelete = (file: string, index: number) => {
-        console.log(file);
+        console.log("onFileDelete:", file);
         delete_hex(file);
     };
 
+    const onFileSelect = (file: string) => {
+        console.log("onFileSelect:", file);
+        setPackrat(file);
+    };
 
     return (
+        <UserContext.Provider
+            value={{ packrat: packrat }}
+        >
         <div className={classes.root}>
-            <Tabs
-                orientation="vertical"
-                variant="scrollable"
-                value={value}
-                onChange={handleChange}
-                aria-label="Vertical tabs example"
-                className={classes.tabs}
-                id="tabs"
-            >
-                <Tab label="Upload" {...a11yProps(0)} />
-                <Tab label="Packrat" {...a11yProps(1)} />
-                <Tab label="Cache" {...a11yProps(2)} />
-            </Tabs>
-            <TabPanel value={value} index={0}>
-                <UploadButtons onChange={onFileChange} />
-                <div className={classes.progress}>
-                    { loading && <CircularProgress id="progress" /> }
-                </div>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <div className={classes.text}>
-                    <TextField id="filled-basic" label="Packrat" />
-                </div>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <div>
-                    <FileList list={filelist} onDelete={onFileDelete}/>
-                </div>
-            </TabPanel>
+            <Paper className={classes.paper_tab}>
+                <Tabs
+                    orientation="vertical"
+                    variant="scrollable"
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="Vertical tabs example"
+                    className={classes.tabs}
+                    id="tabs"
+                >
+                    <Tab label="Cache" {...a11yProps(0)} />
+                    <Tab label="Packrat" {...a11yProps(1)} />
+                </Tabs>
+                    <TabPanel value={value} index={0}>
+                        <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
+                        <Box display="flex" flexDirection="row-reverse" p={1} m={0} bgcolor="background.paper">
+                            <UploadButtons onChange={onFileChange} />
+                            <div className={classes.progress}>
+                                {loading && <CircularProgress id="progress" />}
+                            </div>
+                        </Box>
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                        <div className={classes.text}>
+                            <TextField id="filled-basic" label="Packrat" />
+                        </div>
+                </TabPanel>
+            </Paper>
+            <Paper className={classes.paper_program}>
+                <ButtonProgram title="PROGRAM"/>
+            </Paper>
         </div>
+        </UserContext.Provider>
     );
 }
 
@@ -215,18 +260,9 @@ export class TabPanelUiWidget extends ReactWidget {
 
     handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
         console.log(e.currentTarget.files);
-        //this._valueChanged.emit(e);
     }
 
     render(): JSX.Element {
         return <VerticalTabs onFileChange={this.handleChangeFile} />;
     }
-
-    /*
-    public get valueChanged(): ISignal<this, React.ChangeEvent<HTMLInputElement>> {
-        return this._valueChanged;
-    }
-
-    private _valueChanged = new Signal<this, React.ChangeEvent<HTMLInputElement>>(this);
-    */
 }
