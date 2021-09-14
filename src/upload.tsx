@@ -18,7 +18,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function UploadButtons(
   props: {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        title?: string;
   })
 {
   const classes = useStyles();
@@ -38,11 +39,11 @@ export default function UploadButtons(
         <Button variant="contained" color="default" component="span"
 		  onClick={(): void => {
             setCounter(counter + 1);
-			console.log(counter);
+              console.log(counter);
+              (document.getElementById("contained-button-file") as HTMLInputElement).value = "";
           }}
-          startIcon={<BackupIcon />}
-		>
-          Choose File
+          startIcon={<BackupIcon />}>
+          {props.title}
         </Button>
       </label>
     </div>
