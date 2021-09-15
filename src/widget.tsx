@@ -15,6 +15,7 @@ import ButtonProgram from './program'
 import Paper from '@material-ui/core/Paper';
 import { UserContext } from './context';
 
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: any;
@@ -34,6 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
+    width: 650,
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
@@ -50,11 +52,6 @@ const useStyles = makeStyles((theme: Theme) => ({
             width: '25ch',
         },
     },
-    program: {
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    },
     paper_tab: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
@@ -64,7 +61,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        margin: theme.spacing(1)
     },
 }));
 
@@ -207,20 +205,20 @@ export default function VerticalTabs(
         <UserContext.Provider
             value={{ packrat: packrat }}
         >
-        <div className={classes.root}>
-            <Paper className={classes.paper_tab}>
-                <Tabs
-                    orientation="vertical"
-                    variant="scrollable"
-                    value={value}
-                    onChange={handleChange}
-                    aria-label="Vertical tabs example"
-                    className={classes.tabs}
-                    id="tabs"
-                >
-                    <Tab label="Cache" {...a11yProps(0)} />
-                    <Tab label="Packrat" {...a11yProps(1)} />
-                </Tabs>
+            <Paper className={classes.root} elevation={3}>
+                <Paper className={classes.paper_tab} elevation={0}>
+                    <Tabs
+                        orientation="vertical"
+                        variant="scrollable"
+                        value={value}
+                        onChange={handleChange}
+                        aria-label="Vertical tabs example"
+                        className={classes.tabs}
+                        id="tabs"
+                    >
+                        <Tab label="Cache" {...a11yProps(0)} />
+                        <Tab label="Packrat" {...a11yProps(1)} />
+                    </Tabs>
                     <TabPanel value={value} index={0}>
                         <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
                         <Box display="flex" flexDirection="row-reverse" p={1} m={0} bgcolor="background.paper">
@@ -229,17 +227,15 @@ export default function VerticalTabs(
                                 {loading && <CircularProgress id="progress" />}
                             </div>
                         </Box>
-                </TabPanel>
-                <TabPanel value={value} index={1}>
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>
                         <div className={classes.text}>
                             <TextField id="filled-basic" label="Packrat" />
                         </div>
-                </TabPanel>
+                    </TabPanel>
+                </Paper>
+                <ButtonProgram title="PROGRAM" />
             </Paper>
-            <Paper className={classes.paper_program}>
-                <ButtonProgram title="PROGRAM"/>
-            </Paper>
-        </div>
         </UserContext.Provider>
     );
 }

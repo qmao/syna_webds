@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -7,6 +6,8 @@ import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { AlertTitle } from '@material-ui/lab';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
+import Fab from '@material-ui/core/Fab';
+import NavigationIcon from '@material-ui/icons/Navigation';
 
 export interface IProgramInfo {
   filename: string;
@@ -28,9 +29,17 @@ const useStyles = makeStyles((theme: Theme) =>
         progress_program: {
             width: '100%',
             '& > * + *': {
-                marginTop: theme.spacing(2),
+                margin: theme.spacing(2),
             },
+            left: theme.spacing(50),
         },
+        extendedIcon: {
+            marginRight: theme.spacing(1),
+        },
+        program: {
+            left: theme.spacing(20),
+            margin: theme.spacing(1),
+        }
     }),
 );
 
@@ -131,13 +140,12 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     return (
-        <div {...other}>
-            <div className={classes.progress_program}>
-                { progress && <LinearProgress /> }
-            </div>
-            <Button variant="outlined" color="primary" href="#outlined-buttons" onClick={onClick} disabled={disable}>
-	            {title}
-            </Button>
+        <div className={classes.progress_program} {...other}>
+            { progress && <LinearProgress /> }
+            <Fab variant="extended" color="primary" onClick={onClick} disabled={disable} className={classes.program}>
+                <NavigationIcon className={classes.extendedIcon} />
+                {title}
+            </Fab>
             <Snackbar open={isAlert} /*autoHideDuration={3000} onClose={handleClose}*/ >
                 <Alert severity={severity} onClose={handleClose}>
                     <AlertTitle> {result} </AlertTitle>
