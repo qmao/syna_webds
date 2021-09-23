@@ -14,6 +14,7 @@ import { requestAPI } from './handler';
 import ButtonProgram from './program'
 import Paper from '@material-ui/core/Paper';
 import { UserContext } from './context';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 interface TabPanelProps {
@@ -31,22 +32,26 @@ function a11yProps(index: any) {
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    flexDirection: 'column',
-    backgroundColor: theme.palette.background.paper,
-    display: 'flex',
-    width: 650,
-  },
-  tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
+    root: {
+        flexDirection: 'column',
+        backgroundColor: theme.palette.background.paper,
+        display: 'flex',
+        minWidth: 600,
+        maxHeight: 500,
     },
-  progress: {
-    display: 'flex',
+    tabs: {
+        borderRight: `1px solid ${theme.palette.divider}`,
+        '&:focus': {
+            backgroundColor: 'yellow'
+        }
+    },
+    progress: {
+        display: 'flex',
         '& > * + *': {
-            marginLeft: theme.spacing(2),
-      },
+             marginLeft: theme.spacing(2),
+        },
     },
-   text: {
+    text: {
         '& > *': {
             margin: theme.spacing(1),
             width: '25ch',
@@ -57,20 +62,32 @@ const useStyles = makeStyles((theme: Theme) => ({
         backgroundColor: theme.palette.background.paper,
         display: 'flex',
     },
-    paper_program: {
+    program: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
         display: 'flex',
-        justifyContent: 'center',
-        margin: theme.spacing(1)
+        margin: theme.spacing(1),
+        flexDirection: "row",
+        marginLeft: theme.spacing(40),
+    },
+    upload: {
+        display: 'flex',
+        flexDirection: "row-reverse",
+        padding: theme.spacing(0),
+        margin: theme.spacing(0),
+        bgcolor: "background.paper",
+    },
+    tabpanel: {
+        minWidth: 380,
     },
 }));
 
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
-
+    const classes = useStyles();
     return (
         <div
+            className={classes.tabpanel}
             role="tabpanel"
             hidden={value !== index}
             id={`vertical-tabpanel-${index}`}
@@ -78,7 +95,7 @@ function TabPanel(props: TabPanelProps) {
             {...other}
         >
             {value === index && (
-                <Box p={0} >
+                <Box p={2} >
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -202,10 +219,11 @@ export default function VerticalTabs(
     };
 
     return (
+        <div className={classes.root}>
         <UserContext.Provider
             value={{ packrat: packrat }}
         >
-            <Paper className={classes.root} elevation={3}>
+            <Paper elevation={0}>
                 <Paper className={classes.paper_tab} elevation={0}>
                     <Tabs
                         orientation="vertical"
@@ -214,29 +232,39 @@ export default function VerticalTabs(
                         onChange={handleChange}
                         aria-label="Vertical tabs example"
                         className={classes.tabs}
+                        textColor="primary"
+                        indicatorColor="primary"
                         id="tabs"
-                    >
-                        <Tab label="Cache" {...a11yProps(0)} />
-                        <Tab label="Packrat" {...a11yProps(1)} />
+                        >
+                            <Tooltip title="Choose a HEX file on RPi4 packrat cache">
+                                <Tab label="Files" {...a11yProps(0)} />
+                            </Tooltip>
+                            <Tooltip title="Choose a HEX on Packrat server">
+                                <Tab label="Packrat" {...a11yProps(1)} />
+                            </Tooltip>
                     </Tabs>
                     <TabPanel value={value} index={0}>
                         <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
-                        <Box display="flex" flexDirection="row-reverse" p={1} m={0} bgcolor="background.paper">
+                        <Box className={classes.upload}>
                             <UploadButtons onChange={onFileChange} />
                             <div className={classes.progress}>
-                                {loading && <CircularProgress id="progress" />}
+                               {loading && <CircularProgress id="progress" />}
                             </div>
                         </Box>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <div className={classes.text}>
-                            <TextField id="filled-basic" label="Packrat" />
+                            <TextField id="filled-basic" label="Packrat"
+                                    disabled helperText="This feature is temporarily unavailable." />
                         </div>
                     </TabPanel>
-                </Paper>
-                <ButtonProgram title="PROGRAM" />
+                 </Paper>
+                 <Box className={classes.program}>
+                     <ButtonProgram title="PROGRAM" />
+                 </Box>
             </Paper>
-        </UserContext.Provider>
+            </UserContext.Provider>
+            </div>
     );
 }
 
@@ -251,7 +279,7 @@ export class TabPanelUiWidget extends ReactWidget {
 */
     constructor() {
         super();
-        this.addClass('jp-ReactWidget');
+        this.addClass('content-widget');
     }
 
     handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {

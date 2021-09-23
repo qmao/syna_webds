@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import BackupIcon from '@material-ui/icons/Backup';
 import Tooltip from '@material-ui/core/Tooltip';
-
+import IconButton from '@material-ui/core/IconButton';
+import Avatar from '@material-ui/core/Avatar';
+import BackupIcon from '@material-ui/icons/Backup';
+import { blue } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -14,6 +15,15 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         input: {
             display: 'none',
+        },
+        upload: {
+            width: theme.spacing(5),
+            height: theme.spacing(5),
+
+            backgroundColor: blue[400],
+            '&:hover': {
+                backgroundColor: blue[500]
+            }
         },
     }),
 );
@@ -39,15 +49,17 @@ export default function UploadButtons(
             />
             <label htmlFor="contained-button-file">
                 <Tooltip title="Click button to upload a hex file to RPi4" arrow>
-                    <Button variant="contained" color="default" component="span"
+                    <IconButton aria-label="delete" color="default" component="span"
                         onClick={(): void => {
                             setCounter(counter + 1);
                             console.log(counter);
                             (document.getElementById("contained-button-file") as HTMLInputElement).value = "";
                         }}
-                        startIcon={<BackupIcon />}>
-                        {props.title}
-                    </Button>
+                    >
+                        <Avatar alt="Remy Sharp" className={classes.upload}>
+                            <BackupIcon />
+                        </Avatar>
+                    </IconButton>
                 </Tooltip>
             </label>
         </div>

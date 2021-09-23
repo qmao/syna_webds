@@ -1,8 +1,8 @@
 import { LabIcon } from '@jupyterlab/ui-components';
 
-import mostUsedSvg from '../style/icons/grade.svg';
+import extensionProgramSvg from '../style/icons/extensionProgram.svg';
 
-export const mostUsedIcon = new LabIcon({
-  name: 'enhLauncher:most-used',
-  svgstr: mostUsedSvg
+export const extensionProgramIcon = new LabIcon({
+  name: 'webDS:extension-program',
+  svgstr: extensionProgramSvg
 });

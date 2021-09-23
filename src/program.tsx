@@ -7,7 +7,8 @@ import { AlertTitle } from '@material-ui/lab';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 import Fab from '@material-ui/core/Fab';
-import NavigationIcon from '@material-ui/icons/Navigation';
+import FlashOnIcon from '@material-ui/icons/FlashOn';
+import { blue } from '@material-ui/core/colors';
 
 export interface IProgramInfo {
   filename: string;
@@ -26,19 +27,28 @@ interface ButtonProps {
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        progress_program: {
+        root: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+        },
+        progress: {
             width: '100%',
             '& > * + *': {
                 margin: theme.spacing(2),
             },
-            left: theme.spacing(50),
         },
         extendedIcon: {
             marginRight: theme.spacing(1),
         },
         program: {
-            left: theme.spacing(20),
-            margin: theme.spacing(1),
+            margin: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            color: '#fff',
+            backgroundColor: blue[400],
+            '&:hover': {
+                backgroundColor: blue[500]
+            }
         }
     }),
 );
@@ -140,10 +150,12 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     return (
-        <div className={classes.progress_program} {...other}>
-            { progress && <LinearProgress /> }
-            <Fab variant="extended" color="primary" onClick={onClick} disabled={disable} className={classes.program}>
-                <NavigationIcon className={classes.extendedIcon} />
+        <div className={classes.root} {...other}>
+            <div className={classes.progress} {...other}>
+                {progress && <LinearProgress />}
+            </div>
+            <Fab variant="extended" size="medium" onClick={onClick} disabled={disable} className={classes.program}>
+                <FlashOnIcon className={classes.extendedIcon} />
                 {title}
             </Fab>
             <Snackbar open={isAlert} /*autoHideDuration={3000} onClose={handleClose}*/ >

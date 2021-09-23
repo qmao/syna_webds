@@ -7,8 +7,6 @@ import { requestAPI } from './handler';
 
 import { ICommandPalette } from '@jupyterlab/apputils';
 
-import { Panel } from '@lumino/widgets';
-
 import { ILauncher } from '@jupyterlab/launcher';
 
 import {
@@ -17,6 +15,10 @@ import {
 
 
 import { TabPanelUiWidget } from './widget'
+
+import { StackedPanel } from '@lumino/widgets';
+
+import { extensionProgramIcon } from './icons';
 
 
 /**
@@ -57,6 +59,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     commands.addCommand(command, {
       label: 'Erase and Program',
       caption: 'Erase and Program',
+	  icon: extensionProgramIcon,
       execute: async () => {
 
 
@@ -78,21 +81,16 @@ const extension: JupyterFrontEndPlugin<void> = {
 		  console.log(files);
 		}
 		*/
-		
-		
 
-
-		
 		//qmao
 		let tabpanel_all = new TabPanelUiWidget();
 
-		const main_widget = new Panel();
+		const main_widget = new StackedPanel();
+		main_widget.addWidget(tabpanel_all);
 		main_widget.id = 'erase_and_program';
 		main_widget.title.label = 'Program';
 		main_widget.title.closable = true;
 		main_widget.addClass('main-widget');
-
-		main_widget.addWidget(tabpanel_all);
 
 		shell.add(main_widget, 'main');
 

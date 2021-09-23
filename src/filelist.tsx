@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -10,6 +10,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { UserContext } from './context';
+import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -18,9 +20,16 @@ const useStyles = makeStyles((theme: Theme) =>
             width: '100%',
             position: 'relative',
             overflow: 'auto',
+            maxHeight: 250,
         },
     }),
 );
+
+const ListItemWithWiderSecondaryAction = withStyles({
+    secondaryAction: {
+        paddingRight: 45
+    }
+})(ListItem);
 
 export default function FileList(
     props: {
@@ -45,23 +54,27 @@ export default function FileList(
     };
 
     return (
+        <Paper className={classes.filelist} elevation={0}>
         <RadioGroup aria-label="Hex File" name="select-hex" value={context.packrat} onChange={handleChange} >
-            <List className={classes.filelist}>
+            <List >
                 { props.list.map((value, index) => {
                     return (
-                        <ListItem key={value} role={undefined} dense button onClick={handleToggle(value, index)}>
+                        <ListItemWithWiderSecondaryAction key={value} role={undefined} dense button onClick={handleToggle(value, index)}>
                             <ListItemIcon>
-                                <FormControlLabel value={value} control={<Radio />} label={value} />
+                                <FormControlLabel value={value} control={<Radio color='primary'/>} label={value} />
                             </ListItemIcon>
                             <ListItemSecondaryAction>
-                                <IconButton edge="end" aria-label="comments" onClick={() => props.onDelete(value, index)}>
-                                    <DeleteForeverIcon />
-                                </IconButton>
+                                <Tooltip title="Remove the HEX file">
+                                    <IconButton edge="end" aria-label="comments" onClick={() => props.onDelete(value, index)}>
+                                        <DeleteForeverIcon />
+                                    </IconButton>
+                                </Tooltip>
                             </ListItemSecondaryAction>
-                        </ListItem>
+                        </ListItemWithWiderSecondaryAction>
                     );
                 })}
             </List>
-        </RadioGroup>
+            </RadioGroup>
+        </Paper>
     );
 }
