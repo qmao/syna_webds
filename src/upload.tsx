@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
 import BackupIcon from '@material-ui/icons/Backup';
-import { blue } from '@material-ui/core/colors';
+import webdsTheme from './webdsTheme';
+import {
+  ThemeProvider,
+} from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: typeof webdsTheme) =>
     createStyles({
         root: {
             '& > *': {
@@ -19,11 +22,6 @@ const useStyles = makeStyles((theme: Theme) =>
         upload: {
             width: theme.spacing(5),
             height: theme.spacing(5),
-
-            backgroundColor: blue[400],
-            '&:hover': {
-                backgroundColor: blue[500]
-            }
         },
     }),
 );
@@ -34,10 +32,11 @@ export default function UploadButtons(
         title?: string;
   })
 {
-    const classes = useStyles();
+    const classes = useStyles(webdsTheme);
     const [counter, setCounter] = useState(0);
 
     return (
+	<ThemeProvider theme={webdsTheme}>
         <div className={classes.root}>
             <input
                 accept=".hex"
@@ -49,7 +48,7 @@ export default function UploadButtons(
             />
             <label htmlFor="contained-button-file">
                 <Tooltip title="Click button to upload a hex file to RPi4" arrow>
-                    <IconButton aria-label="delete" color="default" component="span"
+                    <IconButton aria-label="delete" component="span"
                         onClick={(): void => {
                             setCounter(counter + 1);
                             console.log(counter);
@@ -63,5 +62,6 @@ export default function UploadButtons(
                 </Tooltip>
             </label>
         </div>
+		</ThemeProvider>
     );
 }

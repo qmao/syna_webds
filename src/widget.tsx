@@ -1,20 +1,25 @@
 import { ReactWidget } from '@jupyterlab/apputils';
-
 import React, { useEffect } from 'react';
-import { makeStyles, Theme } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import UploadButtons from './upload'
-import CircularProgress from '@material-ui/core/CircularProgress';
-import TextField from '@material-ui/core/TextField';
-import FileList from './filelist'
+
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
+import { ThemeProvider } from "@mui/material/styles";
+
+import { makeStyles } from '@material-ui/core/styles';
+
 import { requestAPI } from './handler';
-import ButtonProgram from './program'
-import Paper from '@material-ui/core/Paper';
 import { UserContext } from './context';
-import Tooltip from '@material-ui/core/Tooltip';
+import FileList from './filelist'
+import ButtonProgram from './program'
+import UploadButtons from './upload'
+
+import webdsTheme from './webdsTheme';
 
 
 interface TabPanelProps {
@@ -31,50 +36,47 @@ function a11yProps(index: any) {
   };
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((webdsTheme) => ({
     root: {
         flexDirection: 'column',
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: webdsTheme.palette.background.paper,
         display: 'flex',
         minWidth: 600,
         maxHeight: 500,
     },
     tabs: {
-        borderRight: `1px solid ${theme.palette.divider}`,
-        '&:focus': {
-            backgroundColor: 'yellow'
-        }
+        borderRight: `1px solid ${webdsTheme.palette.divider}`,
     },
     progress: {
         display: 'flex',
         '& > * + *': {
-             marginLeft: theme.spacing(2),
+             marginLeft: webdsTheme.spacing(2),
         },
     },
     text: {
         '& > *': {
-            margin: theme.spacing(1),
+            margin: webdsTheme.spacing(1),
             width: '25ch',
         },
     },
     paper_tab: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: webdsTheme.palette.background.paper,
         display: 'flex',
     },
     program: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: webdsTheme.palette.background.paper,
         display: 'flex',
-        margin: theme.spacing(1),
+        margin: webdsTheme.spacing(1),
         flexDirection: "row",
-        marginLeft: theme.spacing(40),
+        marginLeft: webdsTheme.spacing(40),
     },
     upload: {
         display: 'flex',
         flexDirection: "row-reverse",
-        padding: theme.spacing(0),
-        margin: theme.spacing(0),
+        padding: webdsTheme.spacing(0),
+        margin: webdsTheme.spacing(0),
         bgcolor: "background.paper",
     },
     tabpanel: {
@@ -110,7 +112,7 @@ export default function VerticalTabs(
 ) {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
-    const [filelist, setFileList] = React.useState([""]);
+    const [filelist, setFileList] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [packrat, setPackrat] = React.useState("");
 
@@ -175,9 +177,9 @@ export default function VerticalTabs(
             setFileList(reply);
             return reply;
         } catch (error) {
-            if (error) {
-                return error.message
-            }
+			console.log(error);
+			setFileList([]);
+            return error.message
         }
     }
 
@@ -220,6 +222,7 @@ export default function VerticalTabs(
 
     return (
         <div className={classes.root}>
+		<ThemeProvider theme={webdsTheme}>
         <UserContext.Provider
             value={{ packrat: packrat }}
         >
@@ -264,6 +267,7 @@ export default function VerticalTabs(
                  </Box>
             </Paper>
             </UserContext.Provider>
+			</ThemeProvider>
             </div>
     );
 }

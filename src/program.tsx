@@ -1,14 +1,14 @@
 import React, { useState, useContext } from 'react';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import Snackbar from '@material-ui/core/Snackbar';
+import LinearProgress from '@mui/material/LinearProgress';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { AlertTitle } from '@material-ui/lab';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
-import Fab from '@material-ui/core/Fab';
+import Fab from '@mui/material/Fab';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
-import { blue } from '@material-ui/core/colors';
+import webdsTheme from './webdsTheme';
 
 export interface IProgramInfo {
   filename: string;
@@ -25,7 +25,7 @@ interface ButtonProps {
     onFinish?: any;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: typeof webdsTheme) =>
     createStyles({
         root: {
             display: 'flex',
@@ -44,11 +44,8 @@ const useStyles = makeStyles((theme: Theme) =>
         program: {
             margin: theme.spacing(2),
             marginBottom: theme.spacing(2),
-            color: '#fff',
-            backgroundColor: blue[400],
-            '&:hover': {
-                backgroundColor: blue[500]
-            }
+			backgroundColor: theme.palette.background.default,
+			color: theme.palette.primary.main,
         }
     }),
 );
@@ -154,7 +151,7 @@ export default function ButtonProgram(props: ButtonProps) {
             <div className={classes.progress} {...other}>
                 {progress && <LinearProgress />}
             </div>
-            <Fab variant="extended" size="medium" onClick={onClick} disabled={disable} className={classes.program}>
+            <Fab variant="extended" size="medium" onClick={onClick} disabled={disable} className={classes.program} color="primary">
                 <FlashOnIcon className={classes.extendedIcon} />
                 {title}
             </Fab>

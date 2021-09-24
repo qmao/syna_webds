@@ -1,4 +1,6 @@
-
+.content-widget {
+  overflow: auto;
+}
 
 .content-wrapper {
   min-width: 50px;
