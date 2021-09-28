@@ -9,12 +9,11 @@ include install.json
 include ts*.json
 include yarn.lock
 
-graft erase_and_program/labextension
+graft qmaotest/labextension
 
 # Javascript files
 graft src
 graft style
-graft schema
 prune **/node_modules
 prune lib
 prune binder

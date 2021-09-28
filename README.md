@@ -1,12 +1,12 @@
-# erase_and_program
+# qmaotest
 
-![Github Actions Status](https://github.com/qmao/erase_and_program/workflows/Build/badge.svg)
+![Github Actions Status](https://github.com/github_username/qmaotest/workflows/Build/badge.svg)
 
-Erase and Program
+A JupyterLab extension.
 
 
-This extension is composed of a Python package named `erase_and_program`
-for the server extension and a NPM package named `@webds/erase_and_program`
+This extension is composed of a Python package named `qmaotest`
+for the server extension and a NPM package named `qmaotest`
 for the frontend extension.
 
 
@@ -19,7 +19,7 @@ for the frontend extension.
 To install the extension, execute:
 
 ```bash
-pip install erase_and_program
+pip install qmaotest
 ```
 
 ## Uninstall
@@ -27,7 +27,7 @@ pip install erase_and_program
 To remove the extension, execute:
 
 ```bash
-pip uninstall erase_and_program
+pip uninstall qmaotest
 ```
 
 
@@ -60,13 +60,13 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the erase_and_program directory
+# Change directory to the qmaotest directory
 # Install package in development mode
 pip install -e .
 # Link your development version of the extension with JupyterLab
 jupyter labextension develop . --overwrite
 # Server extension must be manually installed in develop mode
-jupyter server extension enable erase_and_program
+jupyter server extension enable qmaotest
 # Rebuild extension Typescript source after making changes
 jlpm run build
 ```
@@ -92,10 +92,14 @@ jupyter lab build --minimize=False
 
 ```bash
 # Server extension must be manually disabled in develop mode
-jupyter server extension disable erase_and_program
-pip uninstall erase_and_program
+jupyter server extension disable qmaotest
+pip uninstall qmaotest
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `@webds/erase_and_program` within that folder.
+folder is located. Then you can remove the symlink named `qmaotest` within that folder.
+
+### Packaging the extension
+
+See [RELEASE](RELEASE.md)

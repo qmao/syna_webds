@@ -17,11 +17,11 @@ import glob
 import re
 
 import sys
-sys.path.append("/usr/local/syna/python")
+sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 from programmer import AsicProgrammer
 
-packrat_cache = "/usr/local/syna/cache/packrat"
+packrat_cache = "/var/cache/syna/packrat"
 
 def GetFileList(extension):
     filelist = []

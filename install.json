@@ -1,5 +1,5 @@
 {
   "packageManager": "python",
-  "packageName": "erase_and_program",
-  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package erase_and_program"
+  "packageName": "@webds/erase_and_program",
+  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package qmaotest"
 }
