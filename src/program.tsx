@@ -2,17 +2,18 @@ import React, { useState, useContext } from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Snackbar from '@mui/material/Snackbar';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import { AlertTitle } from '@material-ui/lab';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 import Fab from '@mui/material/Fab';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import webdsTheme from './webdsTheme';
 
+
 export interface IProgramInfo {
-  filename: string;
-  type: string
+    filename: string;
+    type: string
 }
 
 interface ButtonProps {
@@ -44,21 +45,17 @@ const useStyles = makeStyles((theme: typeof webdsTheme) =>
         program: {
             margin: theme.spacing(2),
             marginBottom: theme.spacing(2),
-			backgroundColor: theme.palette.background.default,
-			color: theme.palette.primary.main,
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.primary.main,
         }
     }),
 );
 
-function Alert(props: AlertProps) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 export default function ButtonProgram(props: ButtonProps) {
     const { children, value, index, title, alert, ...other } = props;
-    const [isAlert, setAlert] = useState(false);
     const [progress, setProgress] = useState(false);
     const [message, setMessage] = useState("");
+    const [isAlert, setAlert] = useState(false);
     const [disable, setDisable] = useState(false);
     const [severity, setSeverity] = useState<'error' | 'info' | 'success' | 'warning'>('info');
     const [result, setResult] = useState("");
@@ -155,12 +152,12 @@ export default function ButtonProgram(props: ButtonProps) {
                 <FlashOnIcon className={classes.extendedIcon} />
                 {title}
             </Fab>
-            <Snackbar open={isAlert} /*autoHideDuration={3000} onClose={handleClose}*/ >
+            <Snackbar open={isAlert} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} >
                 <Alert severity={severity} onClose={handleClose}>
                     <AlertTitle> {result} </AlertTitle>
-                    { message }
+                    {message}
                 </Alert>
-            </Snackbar>
+                </Snackbar>
         </div>
     );
 }
