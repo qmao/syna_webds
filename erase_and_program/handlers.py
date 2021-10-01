@@ -21,9 +21,37 @@ sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 from programmer import AsicProgrammer
 
+import shutil
+
 packrat_cache = "/var/cache/syna/packrat"
+workspace = '/home/pi/jupyter/workspace'
+workspacke_cache = workspace + '/packrat' + '/hex'
+
+def UpdateHexLink():
+    if os.path.exists(workspacke_cache):
+        try:
+            shutil.rmtree(workspacke_cache)
+        except OSError as e:
+            print("Error: %s - %s." % (e.filename, e.strerror))
+
+    os.makedirs(workspacke_cache)
+
+    for packrat in os.listdir(packrat_cache):
+        print(packrat)
+        dirpath = packrat_cache + '/' + packrat
+        for fname in os.listdir(dirpath):
+            if fname.endswith('.hex'):
+                print(dirpath)
+                os.symlink(dirpath, workspacke_cache + '/' + packrat)
+                break
+
+def UpdateWorkspakce():
+    UpdateHexLink()
 
 def GetFileList(extension, packrat=""):
+
+    UpdateWorkspakce()
+
     filelist = []
     os.chdir(packrat_cache)
     for file in glob.glob("**/*." + extension):

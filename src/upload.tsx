@@ -47,7 +47,7 @@ export default function UploadButtons(
                 onChange={props.onChange}
             />
             <label htmlFor="contained-button-file">
-                <Tooltip title="Click button to upload a hex file to RPi4" arrow>
+                <Tooltip placement="right-end" title="Click button to upload a hex file to RPi4" arrow>
                     <IconButton aria-label="delete" component="span"
                         onClick={(): void => {
                             setCounter(counter + 1);

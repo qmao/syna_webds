@@ -238,10 +238,10 @@ export default function VerticalTabs(
                         indicatorColor="primary"
                         id="tabs"
                         >
-                            <Tooltip title="Choose a HEX file on RPi4 packrat cache">
+                            <Tooltip placement="left-start" title="Choose a HEX file on RPi4 packrat cache">
                                 <Tab label="Files" {...a11yProps(0)} />
                             </Tooltip>
-                            <Tooltip title="Choose a HEX on Packrat server">
+                            <Tooltip placement="left-start" title="Choose a HEX on Packrat server">
                                 <Tab label="Packrat" {...a11yProps(1)} />
                             </Tooltip>
                     </Tabs>
