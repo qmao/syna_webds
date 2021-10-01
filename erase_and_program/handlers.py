@@ -38,7 +38,7 @@ def GetFileList(extension):
 def GetSymbolValue(symbol, content):
     find=r'(?<='+ symbol + r'=").*(?=")'
     x = re.findall(find, content)
-    print(len(x))
+
     if (len(x) > 0):
         return x[0]
     else:
@@ -114,14 +114,16 @@ class UploadHandler(APIHandler):
                 ## save file
                 ## img_path = os.path.join(save_father_path, str(uuid.uuid1()) + '.' + secure_filename(f.filename).split('.')[-1])
 
-                packrat_dir = GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
-                print(packrat_dir)
+                packrat_id = GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
+                print(packrat_id)
 
-                path = os.path.join(packrat_cache, packrat_dir)
+                path = os.path.join(packrat_cache, packrat_id)
                 if not os.path.exists(path):
                     os.makedirs(path)
 
-                file_path = os.path.join(path, filename)
+                packrat_filename="PR" + packrat_id + ".hex"
+
+                file_path = os.path.join(path, packrat_filename)
                 print(file_path)
 
                 with open(file_path, 'wb') as f:
