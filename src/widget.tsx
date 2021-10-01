@@ -133,7 +133,7 @@ export default function VerticalTabs(
 
             const formData = new FormData();
             formData.append("fileToUpload", file);
-            let filename = file.name;
+
             console.log(formData);
             try {
                 const reply = await requestAPI<any>('upload', {
@@ -143,13 +143,19 @@ export default function VerticalTabs(
                 
                 console.log(reply);
                 setLoading(false);
-                setFileList(reply);
+
+                let filelist = reply['filelist'];
+                setFileList(filelist);
 
                 // set select packrat
-                console.log(reply);
+                console.log(reply['filelist']);
+                console.log(reply['upload']);
 
-                reply.forEach((element: any) => {
-                    if (element.includes(filename)) {
+                console.log("test reply: ", reply['upload']);
+                filelist.forEach((element: any) => {
+                    console.log("element!!!!: ", element);
+                
+                    if (element.includes(reply['upload'])) {
                         console.log("include test: ", element);
                         setPackrat(element);
                     }

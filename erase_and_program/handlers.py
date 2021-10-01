@@ -23,6 +23,20 @@ from programmer import AsicProgrammer
 
 packrat_cache = "/var/cache/syna/packrat"
 
+def GetFileListTest(extension, packrat):
+    filelist = []
+    os.chdir(packrat_cache)
+    for file in glob.glob("**/*." + extension):
+        print(file)
+        filelist += [str(file)]
+
+    data = json.loads("{}")
+    data["filelist"] = filelist
+    data["upload"] = packrat
+
+    jsonString = json.dumps(data)
+    return jsonString
+    
 def GetFileList(extension):
     filelist = []
     os.chdir(packrat_cache)
@@ -129,8 +143,11 @@ class UploadHandler(APIHandler):
                 with open(file_path, 'wb') as f:
                     f.write(body)
 
-                filelist = GetFileList('hex')
-                self.finish(filelist)
+                data = GetFileListTest('hex', packrat_filename)
+
+                print("HEHEHEHE11122")
+                print(data)
+                self.finish(data)
 
 class GetListHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
