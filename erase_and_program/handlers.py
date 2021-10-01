@@ -11,7 +11,7 @@ import os
 
 import tornado
 import uuid
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 import grp, pwd
 import glob
 import re
