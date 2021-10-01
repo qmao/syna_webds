@@ -148,15 +148,8 @@ export default function VerticalTabs(
                 setFileList(filelist);
 
                 // set select packrat
-                console.log(reply['filelist']);
-                console.log(reply['upload']);
-
-                console.log("test reply: ", reply['upload']);
                 filelist.forEach((element: any) => {
-                    console.log("element!!!!: ", element);
-                
                     if (element.includes(reply['upload'])) {
-                        console.log("include test: ", element);
                         setPackrat(element);
                     }
                 });
@@ -180,7 +173,7 @@ export default function VerticalTabs(
                 method: 'POST',
             });
             console.log(reply);
-            setFileList(reply);
+            setFileList(reply['filelist']);
             return reply;
         } catch (error) {
 			console.log(error);
@@ -198,7 +191,7 @@ export default function VerticalTabs(
                 method: 'POST',
             });
             console.log(reply);
-            setFileList(reply);
+            setFileList(reply['filelist']);
             return reply;
         } catch (error) {
             if (error) {

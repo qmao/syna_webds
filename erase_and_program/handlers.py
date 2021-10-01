@@ -23,7 +23,7 @@ from programmer import AsicProgrammer
 
 packrat_cache = "/var/cache/syna/packrat"
 
-def GetFileListTest(extension, packrat):
+def GetFileList(extension, packrat=""):
     filelist = []
     os.chdir(packrat_cache)
     for file in glob.glob("**/*." + extension):
@@ -35,18 +35,6 @@ def GetFileListTest(extension, packrat):
     data["upload"] = packrat
 
     jsonString = json.dumps(data)
-    return jsonString
-    
-def GetFileList(extension):
-    filelist = []
-    os.chdir(packrat_cache)
-    for file in glob.glob("**/*." + extension):
-        print(file)
-        filelist += [str(file)]
-
-    # printing result
-    print("The list after appending is : " + str(filelist))
-    jsonString = json.dumps(filelist)
     return jsonString
 
 def GetSymbolValue(symbol, content):
@@ -143,9 +131,8 @@ class UploadHandler(APIHandler):
                 with open(file_path, 'wb') as f:
                     f.write(body)
 
-                data = GetFileListTest('hex', packrat_filename)
+                data = GetFileList('hex', packrat_filename)
 
-                print("HEHEHEHE11122")
                 print(data)
                 self.finish(data)
 
