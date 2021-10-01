@@ -256,8 +256,9 @@ export default function VerticalTabs(
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <div className={classes.text}>
-                            <TextField id="filled-basic" label="Packrat"
-                                    disabled helperText="This feature is temporarily unavailable." />
+                            <TextField id="filled-basic"
+                                       label="Packrat"
+                                       disabled helperText="This Feature Is Coming Soon!" />
                         </div>
                     </TabPanel>
                  </Paper>
