@@ -9,7 +9,7 @@ include install.json
 include ts*.json
 include yarn.lock
 
-graft qmaotest/labextension
+graft erase_and_program/labextension
 
 # Javascript files
 graft src
