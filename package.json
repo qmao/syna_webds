@@ -1,5 +1,5 @@
 {
-  "name": "@webds/erase_and_program",
+  "name": "@webds/erase-and-program",
   "version": "0.1.0",
   "description": "Erase and Program",
   "keywords": [
@@ -81,16 +81,6 @@
   ],
   "styleModule": "style/index.js",
   "jupyterlab": {
-    "discovery": {
-      "server": {
-        "managers": [
-          "pip"
-        ],
-        "base": {
-          "name": "erase_and_program"
-        }
-      }
-    },
     "extension": true,
     "outputDir": "erase_and_program/labextension",
     "schemaDir": "schema"
