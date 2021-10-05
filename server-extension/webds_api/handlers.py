@@ -1,8 +1,7 @@
 import json
 
-from notebook.base.handlers import APIHandler
-from notebook.utils import url_path_join
-from tornado.web import StaticFileHandler
+from jupyter_server.base.handlers import APIHandler
+from jupyter_server.utils import url_path_join
 
 from pathlib import Path
 
@@ -149,8 +148,7 @@ class UploadHandler(APIHandler):
                 print(packrat_id)
 
                 path = os.path.join(packrat_cache, packrat_id)
-                if not os.path.exists(path):
-                    os.makedirs(path)
+                Path(path).mkdir(parents=True, exist_ok=True)
 
                 packrat_filename="PR" + packrat_id + ".hex"
 
@@ -201,23 +199,16 @@ class GetListHandler(APIHandler):
             self.write(action, "unknown")   # 0 is the default case if x is not found
 
 
-def setup_handlers(web_app, url_path):
+def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]
-    program_pattern = url_path_join(base_url, url_path, "start-program")
-    upload_pattern = url_path_join(base_url, url_path, "upload")
-    get_list_pattern = url_path_join(base_url, url_path, "manage-file")
+    program_pattern = url_path_join(base_url, "webds-api", "start-program")
+    
+    upload_pattern = url_path_join(base_url, "webds-api", "upload")
+
+    get_list_pattern = url_path_join(base_url, "webds-api", "manage-file")
+    
     handlers = [(program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (get_list_pattern, GetListHandler)]
 
     web_app.add_handlers(host_pattern, handlers)
-
-    # Prepend the base_url so that it works in a JupyterHub setting
-    doc_url = url_path_join(base_url, url_path, "public")
-    doc_dir = os.getenv(
-        "JLAB_SERVER_EXAMPLE_STATIC_DIR",
-        os.path.join(os.path.dirname(__file__), "public"),
-    )
-    handlers = [("{}/(.*)".format(doc_url), StaticFileHandler, {"path": doc_dir})]
-    web_app.add_handlers(".*$", handlers)
-
