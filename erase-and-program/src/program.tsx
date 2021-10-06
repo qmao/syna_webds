@@ -28,7 +28,7 @@ interface ButtonProps {
 
 const useStyles = makeStyles((theme: typeof webdsTheme) =>
     createStyles({
-        root: {
+        programRoot: {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -144,7 +144,7 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     return (
-        <div className={classes.root} {...other}>
+        <div className={classes.programRoot} {...other}>
             <div className={classes.progress} {...other}>
                 {progress && <LinearProgress />}
             </div>

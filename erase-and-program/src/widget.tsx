@@ -284,6 +284,7 @@ export class TabPanelUiWidget extends ReactWidget {
     constructor() {
         super();
         this.addClass('content-widget');
+		console.log("TabPanelUiWidget is created!!!");
     }
 
     handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
