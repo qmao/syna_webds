@@ -9,7 +9,7 @@ include install.json
 include ts*.json
 include yarn.lock
 
-graft erase_and_program/labextension
+graft webds_erase_and_program/labextension
 
 # Javascript files
 graft src

@@ -36,7 +36,7 @@
     "build:lib": "tsc",
     "clean": "jlpm run clean:lib",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-    "clean:labextension": "rimraf erase_and_program/labextension",
+    "clean:labextension": "rimraf webds_erase_and_program/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
@@ -82,7 +82,7 @@
   "styleModule": "style/index.js",
   "jupyterlab": {
     "extension": true,
-    "outputDir": "erase_and_program/labextension",
+    "outputDir": "webds_erase_and_program/labextension",
     "schemaDir": "schema"
   },
   "jupyter-releaser": {

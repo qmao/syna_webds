@@ -1,5 +1,5 @@
 """
-erase_and_program setup
+webds_erase_and_program setup
 """
 import json
 import sys
@@ -10,7 +10,7 @@ import setuptools
 HERE = Path(__file__).parent.resolve()
 
 # The name of the project
-name = "erase_and_program"
+name = "webds_erase_and_program"
 
 lab_path = (HERE / name.replace("-", "_") / "labextension")
 
@@ -26,10 +26,10 @@ data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path.relative_to(HERE)), "**"),
     ("share/jupyter/labextensions/%s" % labext_name, str("."), "install.json"),
     ("etc/jupyter/jupyter_server_config.d",
-     "jupyter-config/server-config", "erase_and_program.json"),
+     "jupyter-config/server-config", "webds_erase_and_program.json"),
     # For backward compatibility with notebook server
     ("etc/jupyter/jupyter_notebook_config.d",
-     "jupyter-config/nb-config", "erase_and_program.json"),
+     "jupyter-config/nb-config", "webds_erase_and_program.json"),
 ]
 
 long_description = (HERE / "README.md").read_text()
