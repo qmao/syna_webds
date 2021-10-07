@@ -80,7 +80,7 @@ const useStyles = makeStyles((webdsTheme) => ({
         bgcolor: "background.paper",
     },
     tabpanel: {
-        minWidth: 380,
+        minWidth: 420,
     },
 }));
 

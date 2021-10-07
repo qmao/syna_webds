@@ -122,7 +122,7 @@ class UploadHandler(APIHandler):
     def get(self):
         print(self.request)
         self.finish(json.dumps({
-            "data": "file is created la!"
+            "data": "file is created!"
         }))  
 
 
@@ -198,17 +198,30 @@ class GetListHandler(APIHandler):
         else:
             self.write(action, "unknown")   # 0 is the default case if x is not found
 
+class GeneralHandler(APIHandler):
+    # The following decorator should be present on all verb methods (head, get, post,
+    # patch, put, delete, options) to ensure only authorized user can request the
+    # Jupyter server
+    @tornado.web.authenticated
+    def get(self):
+        print(self.request)
+        self.finish(json.dumps({
+            "data": "webds-api server is running"
+        }))
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = web_app.settings["base_url"]
+
+    general_pattern = url_path_join(base_url, "webds-api", "general")
+        
     program_pattern = url_path_join(base_url, "webds-api", "start-program")
-    
+
     upload_pattern = url_path_join(base_url, "webds-api", "upload")
 
     get_list_pattern = url_path_join(base_url, "webds-api", "manage-file")
     
-    handlers = [(program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (get_list_pattern, GetListHandler)]
+    handlers = [(general_pattern, GeneralHandler), (program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (get_list_pattern, GetListHandler)]
 
     web_app.add_handlers(host_pattern, handlers)

@@ -40,7 +40,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   optional: [ILauncher, IDocumentManager],
   requires: [ICommandPalette],
-  activate: async (app: JupyterFrontEnd,
+  activate: (app: JupyterFrontEnd,
     palette: ICommandPalette,
     launcher: ILauncher | null,
 	docManager: IDocumentManager,
@@ -52,20 +52,20 @@ const extension: JupyterFrontEndPlugin<void> = {
     const command = CommandIDs.get;
     const category = 'WebDS';
 
-
+    const extension_string = 'Erase and Program';
 	
     commands.addCommand(command, {
-      label: 'Erase and Program',
-      caption: 'Erase and Program',
+      label: extension_string,
+      caption: extension_string,
 	  icon: extensionProgramIcon,
-      execute: async () => {
+      execute: () => {
 
 		let tabpanel_all = new TabPanelUiWidget();
 
 		const main_widget = new StackedPanel();
 		main_widget.addWidget(tabpanel_all);
 		main_widget.id = 'erase_and_program';
-		main_widget.title.label = 'Program';
+		main_widget.title.label = extension_string;
 		main_widget.title.closable = true;
 		main_widget.addClass('main-widget');
 
