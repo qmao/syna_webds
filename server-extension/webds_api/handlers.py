@@ -25,16 +25,16 @@ import shutil
 
 packrat_cache = "/var/cache/syna/packrat"
 workspace = '/home/pi/jupyter/workspace'
-workspacke_cache = workspace + '/packrat' + '/hex'
+workspace_cache = workspace + '/packrat' + '/hex'
 
 def UpdateHexLink():
-    if os.path.exists(workspacke_cache):
+    if os.path.exists(workspace_cache):
         try:
-            shutil.rmtree(workspacke_cache)
+            shutil.rmtree(workspace_cache)
         except OSError as e:
             print("Error: %s - %s." % (e.filename, e.strerror))
 
-    os.makedirs(workspacke_cache)
+    os.makedirs(workspace_cache)
 
     for packrat in os.listdir(packrat_cache):
         print(packrat)
@@ -42,16 +42,14 @@ def UpdateHexLink():
         for fname in os.listdir(dirpath):
             if fname.endswith('.hex'):
                 print(dirpath)
-                os.symlink(dirpath, workspacke_cache + '/' + packrat)
+                os.symlink(dirpath, workspace_cache + '/' + packrat)
                 break
 
-def UpdateWorkspakce():
+def UpdateWorkspace():
+    Path(packrat_cache).mkdir(parents=True, exist_ok=True)
     UpdateHexLink()
 
 def GetFileList(extension, packrat=""):
-
-    UpdateWorkspakce()
-
     filelist = []
     os.chdir(packrat_cache)
     for file in glob.glob("**/*." + extension):
@@ -159,6 +157,7 @@ class UploadHandler(APIHandler):
                     f.write(body)
 
                 data = GetFileList('hex', packrat_filename)
+                UpdateWorkspace()
 
                 print(data)
                 self.finish(data)
@@ -205,6 +204,9 @@ class GeneralHandler(APIHandler):
     @tornado.web.authenticated
     def get(self):
         print(self.request)
+        
+        UpdateWorkspace()
+
         self.finish(json.dumps({
             "data": "webds-api server is running"
         }))
