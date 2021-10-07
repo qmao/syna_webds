@@ -1,55 +1,53 @@
 {
-  "name": "@webds/server-extension",
-  "version": "0.3.0",
-  "description": "A minimal JupyterLab extension with backend and frontend parts.",
+  "name": "@webds/webds-api",
+  "version": "0.1.0",
+  "description": "A JupyterLab extension.",
   "keywords": [
     "jupyter",
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/jupyterlab/extension-examples",
+  "homepage": "https://github.com/github_username/@webds/webds-api",
   "bugs": {
-    "url": "https://github.com/jupyterlab/extension-examples/issues"
+    "url": "https://github.com/github_username/@webds/webds-api/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
-    "name": "Project Jupyter Contributors",
+    "name": "",
     "email": ""
   },
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,js,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jupyterlab/extension-examples.git"
+    "url": "https://github.com/github_username/@webds/webds-api.git"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
-    "build:all": "jlpm run build:lib && jlpm run build:labextension",
+    "build:prod": "jlpm run clean && jlpm run build:lib && jlpm run build:labextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
-    "build:prod": "jlpm run clean && jlpm run build:lib && jlpm run build:labextension",
     "clean": "jlpm run clean:lib",
-    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
-    "clean:labextension": "rimraf webds_api/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:labextension": "rimraf webds_api/labextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
     "install:extension": "jlpm run build",
-    "prepare": "jlpm run clean && jlpm run build:prod",
     "watch": "run-p watch:src watch:labextension",
-    "watch:labextension": "jupyter labextension watch .",
-    "watch:src": "tsc -w"
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
     "@jupyterlab/application": "^3.1.0",
     "@jupyterlab/coreutils": "^5.1.0",
-    "@jupyterlab/launcher": "^3.1.0",
+    "@jupyterlab/launcher": "^3.1.16",
     "@jupyterlab/services": "^6.1.0"
   },
   "devDependencies": {
@@ -58,9 +56,7 @@
     "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-jsdoc": "^36.0.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.18.3",
     "mkdirp": "^1.0.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.1",
@@ -71,6 +67,10 @@
     "style/*.css",
     "style/index.js"
   ],
+  "styleModule": "style/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "jupyterlab": {
     "discovery": {
       "server": {
@@ -85,5 +85,12 @@
     "extension": true,
     "outputDir": "webds_api/labextension"
   },
-  "styleModule": "style/index.js"
+  "jupyter-releaser": {
+    "hooks": {
+      "before-build-npm": [
+        "python -m pip install jupyterlab~=3.1",
+        "jlpm"
+      ]
+    }
+  }
 }
