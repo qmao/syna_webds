@@ -64,14 +64,6 @@ const useStyles = makeStyles((webdsTheme) => ({
         backgroundColor: webdsTheme.palette.background.paper,
         display: 'flex',
     },
-    program: {
-        flexGrow: 1,
-        backgroundColor: webdsTheme.palette.background.paper,
-        display: 'flex',
-        margin: webdsTheme.spacing(1),
-        flexDirection: "row",
-        marginLeft: webdsTheme.spacing(40),
-    },
     upload: {
         display: 'flex',
         flexDirection: "row-reverse",
@@ -263,7 +255,12 @@ export default function VerticalTabs(
                         </div>
                     </TabPanel>
                  </Paper>
-                 <Box className={classes.program}>
+                 <Box sx={{
+                            flexGrow: 1, bgcolor: webdsTheme.palette.background.paper, display: 'flex',
+                            margin: webdsTheme.spacing(1), flexDirection: "row",
+						    marginLeft: webdsTheme.spacing(40),
+                         }}
+                >
                      <ButtonProgram title="PROGRAM" />
                  </Box>
             </Paper>
