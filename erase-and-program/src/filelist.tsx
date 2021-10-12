@@ -1,18 +1,19 @@
 import React, { useContext } from 'react';
-import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
+
 import IconButton from '@mui/material/IconButton';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { UserContext } from './context';
 import Paper from '@mui/material/Paper';
-import Tooltip from '@material-ui/core/Tooltip';
 import webdsTheme from './webdsTheme';
+
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ListItemButton from '@mui/material/ListItemButton';
 
 
 const useStyles = makeStyles((theme: typeof webdsTheme) =>
@@ -25,12 +26,6 @@ const useStyles = makeStyles((theme: typeof webdsTheme) =>
         },
     }),
 );
-
-const ListItemWithWiderSecondaryAction = withStyles({
-    secondaryAction: {
-        paddingRight: 45
-    }
-})(ListItem);
 
 export default function FileList(
     props: {
@@ -53,25 +48,27 @@ export default function FileList(
         console.log(index);
         props.onSelect(value);
     };
-
+ 
     return (
         <Paper className={classes.filelist} elevation={0}>
             <List>
      			<RadioGroup aria-label="Hex File" name="select-hex" value={context.packrat} onChange={handleChange} >
                 { props.list.map((value, index) => {
                     return (
-                        <ListItemWithWiderSecondaryAction key={value} role={undefined} dense button onClick={handleToggle(value, index)}>
-                            <ListItemIcon>
-                                <FormControlLabel value={value} control={<Radio color='primary'/>} label={value} />
-                            </ListItemIcon>
-                            <ListItemSecondaryAction>
-                                <Tooltip title="Remove the HEX file">
-                                    <IconButton edge="end" aria-label="comments" onClick={() => props.onDelete(value, index)}>
-                                        <DeleteForeverIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </ListItemSecondaryAction>
-                        </ListItemWithWiderSecondaryAction>
+                        <ListItem
+                            secondaryAction={
+                                <IconButton edge="end" aria-label="delete" onClick={() => props.onDelete(value, index)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            }
+                            disablePadding
+                        >
+                            <ListItemButton role={undefined} onClick={handleToggle(value, index)} dense>
+                                <ListItemIcon>
+                                    <FormControlLabel value={value} control={<Radio color='primary' />} label={value} />
+                                </ListItemIcon>
+                            </ListItemButton>
+                        </ListItem>
                     );
                 })}
 				</RadioGroup>
