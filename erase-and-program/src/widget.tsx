@@ -47,12 +47,6 @@ const useStyles = makeStyles((webdsTheme) => ({
     tabs: {
         borderRight: `1px solid ${webdsTheme.palette.divider}`,
     },
-    progress: {
-        display: 'flex',
-        '& > * + *': {
-             marginLeft: webdsTheme.spacing(2),
-        },
-    },
     text: {
         '& > *': {
             margin: webdsTheme.spacing(1),
@@ -197,7 +191,6 @@ export default function VerticalTabs(
         console.log("onFileChange:", event.currentTarget.files);
 
         if (event.currentTarget.files) {
-            props.onFileChange(event);      //???
             upload_hex(event.currentTarget.files[0]);
         }
     };
@@ -240,11 +233,16 @@ export default function VerticalTabs(
                     </Tabs>
                     <TabPanel value={value} index={0}>
                         <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
-                        <Box className={classes.upload}>
+                        <Box className={classes.upload} sx={{ m: 1, position: 'relative' }}>
                             <UploadButtons onChange={onFileChange} />
-                            <div className={classes.progress}>
-                               {loading && <CircularProgress id="progress" />}
-                            </div>
+                            {loading && <CircularProgress
+                                size={50}
+                                sx={{
+                                    position: 'absolute',
+                                    top: 3,
+                                    right: 11,
+                                }}
+                            />}
                         </Box>
                     </TabPanel>
                     <TabPanel value={value} index={1}>

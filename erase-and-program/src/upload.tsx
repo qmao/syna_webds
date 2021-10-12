@@ -9,19 +9,19 @@ import {
   ThemeProvider,
 } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme: typeof webdsTheme) =>
+const useStyles = makeStyles(webdsTheme =>
     createStyles({
         root: {
             '& > *': {
-                margin: theme.spacing(1),
+                margin: webdsTheme.spacing(1),
             },
         },
         input: {
             display: 'none',
         },
         upload: {
-            width: theme.spacing(5),
-            height: theme.spacing(5),
+            width: webdsTheme.spacing(5),
+            height: webdsTheme.spacing(5),
         },
     }),
 );

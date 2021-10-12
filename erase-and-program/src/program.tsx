@@ -42,12 +42,6 @@ const useStyles = makeStyles(webdsTheme =>
         extendedIcon: {
             marginRight: webdsTheme.spacing(1),
         },
-        program: {
-            margin: webdsTheme.spacing(2),
-            marginBottom: webdsTheme.spacing(2),
-            backgroundColor: webdsTheme.palette.background.default,
-            color: webdsTheme.palette.primary.main,
-        }
     }),
 );
 
