@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
+import { UserContext } from './context';
+import webdsTheme from './webdsTheme';
 
 import IconButton from '@mui/material/IconButton';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
-import { UserContext } from './context';
 import Paper from '@mui/material/Paper';
-import webdsTheme from './webdsTheme';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';

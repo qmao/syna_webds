@@ -1,14 +1,20 @@
 import React, { useState, useContext } from 'react';
-import LinearProgress from '@mui/material/LinearProgress';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { requestAPI } from './handler';
+import { UserContext } from './context';
+//import webdsTheme from './webdsTheme';
+
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import { requestAPI } from './handler';
-import { UserContext } from './context';
-import Fab from '@mui/material/Fab';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
-import webdsTheme from './webdsTheme';
+import Box from '@mui/material/Box';
+//import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Fab from '@mui/material/Fab';
+
+import { green } from '@mui/material/colors';
+
 
 
 export interface IProgramInfo {
@@ -26,27 +32,21 @@ interface ButtonProps {
     onFinish?: any;
 }
 
-const useStyles = makeStyles((theme: typeof webdsTheme) =>
+const useStyles = makeStyles(webdsTheme =>
     createStyles({
         programRoot: {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
         },
-        progress: {
-            width: '100%',
-            '& > * + *': {
-                margin: theme.spacing(2),
-            },
-        },
         extendedIcon: {
-            marginRight: theme.spacing(1),
+            marginRight: webdsTheme.spacing(1),
         },
         program: {
-            margin: theme.spacing(2),
-            marginBottom: theme.spacing(2),
-            backgroundColor: theme.palette.background.default,
-            color: theme.palette.primary.main,
+            margin: webdsTheme.spacing(2),
+            marginBottom: webdsTheme.spacing(2),
+            backgroundColor: webdsTheme.palette.background.default,
+            color: webdsTheme.palette.primary.main,
         }
     }),
 );
@@ -63,10 +63,12 @@ export default function ButtonProgram(props: ButtonProps) {
     const context = useContext(UserContext);
     const classes = useStyles();
 
+
+
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
         setDisable(start);
         setProgress(start);
-
+        console.log(progress);
         if (start) {
             setAlert(false);
         }
@@ -145,13 +147,28 @@ export default function ButtonProgram(props: ButtonProps) {
 
     return (
         <div className={classes.programRoot} {...other}>
-            <div className={classes.progress} {...other}>
-                {progress && <LinearProgress />}
-            </div>
-            <Fab variant="extended" size="medium" onClick={onClick} disabled={disable} className={classes.program} color="primary">
-                <FlashOnIcon className={classes.extendedIcon} />
-                {title}
-            </Fab>
+
+            <Box sx={{ m: 1, position: 'relative' }}>
+                <Fab variant="extended" color="primary" disabled={disable} onClick={onClick}>
+                    <FlashOnIcon className={classes.extendedIcon} />
+                    {title}
+                </Fab>
+
+                {disable && (
+                    <CircularProgress
+                        size={24}
+                        sx={{
+                            color: green[500],
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            marginTop: '-12px',
+                            marginLeft: '-12px',
+                        }}
+                    />
+                )}
+            </Box>
+
             <Snackbar open={isAlert} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} >
                 <Alert severity={severity} onClose={handleClose}>
                     <AlertTitle> {result} </AlertTitle>
