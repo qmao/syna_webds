@@ -8,24 +8,36 @@ from pathlib import Path
 import logging
 
 import os
-
 import tornado
-import uuid
-from werkzeug.utils import secure_filename
 import grp, pwd
 import glob
 import re
+import shutil
+import subprocess
+from werkzeug.utils import secure_filename
 
 import sys
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 from programmer import AsicProgrammer
 
-import shutil
 
 packrat_cache = "/var/cache/syna/packrat"
 workspace = '/home/pi/jupyter/workspace'
 workspace_cache = workspace + '/packrat' + '/hex'
+workspace_temp_hex = workspace_cache + '/temp.hex'
+
+
+def CallSysCommand(command):
+    if os.geteuid() == 0:
+        print("We're root")
+        subprocess.call(command)
+    else:
+        print("We're not root.")
+        sudo_command = ['sudo'] + command
+        print(command)
+        subprocess.call(sudo_command)
+
 
 def UpdateHexLink():
     if os.path.exists(workspace_cache):
@@ -145,16 +157,18 @@ class UploadHandler(APIHandler):
                 packrat_id = GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
                 print(packrat_id)
 
+                # save temp hex file in worksapce
+                with open(workspace_temp_hex, 'wb') as f:
+                    f.write(body)
+
+                # move temp hex to packrat cache
                 path = os.path.join(packrat_cache, packrat_id)
-                Path(path).mkdir(parents=True, exist_ok=True)
-
+                CallSysCommand(['mkdir','-p', path])
                 packrat_filename="PR" + packrat_id + ".hex"
-
                 file_path = os.path.join(path, packrat_filename)
                 print(file_path)
+                CallSysCommand(['mv', workspace_temp_hex, file_path])
 
-                with open(file_path, 'wb') as f:
-                    f.write(body)
 
                 data = GetFileList('hex', packrat_filename)
                 UpdateWorkspace()

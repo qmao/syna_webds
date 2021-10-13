@@ -10,10 +10,10 @@ import { ILauncher } from '@jupyterlab/launcher';
 import { requestAPI } from './handler';
 
 /**
- * Initialization data for the server-extension-example extension.
+ * Initialization data for the server-extension extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: 'server-extension-example',
+  id: 'server-extension',
   autoStart: true,
   optional: [ILauncher],
   requires: [ICommandPalette],
@@ -22,7 +22,7 @@ const extension: JupyterFrontEndPlugin<void> = {
     palette: ICommandPalette,
     launcher: ILauncher | null
   ) => {
-    console.log('JupyterLab extension server-extension-example is activated!');
+    console.log('JupyterLab extension server-extension is activated!');
 
     // GET request
     try {

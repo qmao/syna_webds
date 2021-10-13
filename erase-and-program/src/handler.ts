@@ -21,7 +21,7 @@ export async function requestAPI<T>(
     endPoint
   );
 
-  console.log("qmao", requestUrl);
+  console.log(requestUrl);
 
   let response: Response;
   try {
