@@ -58,7 +58,7 @@ def UpdateHexLink():
                 break
 
 def UpdateWorkspace():
-    Path(packrat_cache).mkdir(parents=True, exist_ok=True)
+    CallSysCommand(['mkdir','-p', packrat_cache])
     UpdateHexLink()
 
 def GetFileList(extension, packrat=""):
@@ -102,7 +102,6 @@ class ProgramHandler(APIHandler):
         print(input_data)
 
         print("start to erase and program!!!")
-        ####PR3319382.hex
         
         filename = os.path.join(packrat_cache, input_data["filename"])
         print(filename)
@@ -204,7 +203,7 @@ class GetListHandler(APIHandler):
         elif (action == 'delete'):
             filename = input_data["file"]
             print("delete file: ", filename)
-            os.remove(packrat_cache + "/" + filename)
+            CallSysCommand(['rm', packrat_cache + "/" + filename])
 
             filelist = GetFileList(extension)
             self.finish(filelist)
