@@ -9,61 +9,47 @@ import logging
 
 import os
 import tornado
+
 import grp, pwd
 import glob
 import re
 import shutil
-import subprocess
 from werkzeug.utils import secure_filename
 
 import sys
 sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
-from programmer import AsicProgrammer
 
-
-packrat_cache = "/var/cache/syna/packrat"
-workspace = '/home/pi/jupyter/workspace'
-workspace_cache = workspace + '/packrat' + '/hex'
-workspace_temp_hex = workspace_cache + '/temp.hex'
-
-
-def CallSysCommand(command):
-    if os.geteuid() == 0:
-        print("We're root")
-        subprocess.call(command)
-    else:
-        print("We're not root.")
-        sudo_command = ['sudo'] + command
-        print(command)
-        subprocess.call(sudo_command)
+from .start_program import ProgramHandler
+from . import webds
+from . import utils
 
 
 def UpdateHexLink():
-    if os.path.exists(workspace_cache):
+    if os.path.exists(webds.WORKSPACE_CACHE):
         try:
-            shutil.rmtree(workspace_cache)
+            shutil.rmtree(webds.WORKSPACE_CACHE)
         except OSError as e:
             print("Error: %s - %s." % (e.filename, e.strerror))
 
-    os.makedirs(workspace_cache)
+    os.makedirs(webds.WORKSPACE_CACHE)
 
-    for packrat in os.listdir(packrat_cache):
+    for packrat in os.listdir(webds.PACKRAT_CACHE):
         print(packrat)
-        dirpath = packrat_cache + '/' + packrat
+        dirpath = webds.PACKRAT_CACHE + '/' + packrat
         for fname in os.listdir(dirpath):
             if fname.endswith('.hex'):
                 print(dirpath)
-                os.symlink(dirpath, workspace_cache + '/' + packrat)
+                os.symlink(dirpath, webds.WORKSPACE_CACHE + '/' + packrat)
                 break
 
 def UpdateWorkspace():
-    CallSysCommand(['mkdir','-p', packrat_cache])
+    utils.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
     UpdateHexLink()
 
 def GetFileList(extension, packrat=""):
     filelist = []
-    os.chdir(packrat_cache)
+    os.chdir(webds.PACKRAT_CACHE)
     for file in glob.glob("**/*." + extension):
         print(file)
         filelist += [str(file)]
@@ -84,44 +70,6 @@ def GetSymbolValue(symbol, content):
     else:
         return None
     
-
-class ProgramHandler(APIHandler):
-    # The following decorator should be present on all verb methods (head, get, post,
-    # patch, put, delete, options) to ensure only authorized user can request the
-    # Jupyter server
-    @tornado.web.authenticated
-    def get(self):
-        self.finish(json.dumps({
-            "data": "This is /erase-and-program/get_example endpoint!"
-        }))
-        
-    @tornado.web.authenticated
-    def post(self):
-        # input_data is a dictionary with a key "filename"
-        input_data = self.get_json_body()
-        print(input_data)
-
-        print("start to erase and program!!!")
-        
-        filename = os.path.join(packrat_cache, input_data["filename"])
-        print(filename)
-
-        if not os.path.isfile(filename):
-            raise Exception(filename)
-
-        AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
-        print("Erase and program done!!!")
-        
-        tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
-        if(tc):
-            id = tc.identify()
-            print(id)
-            tc.close()
-            tc = None
-
-        data = id
-        self.finish(json.dumps(data))
-
 
 class UploadHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -157,16 +105,16 @@ class UploadHandler(APIHandler):
                 print(packrat_id)
 
                 # save temp hex file in worksapce
-                with open(workspace_temp_hex, 'wb') as f:
+                with open(webds.WORKSPACE_TEMP_HEX, 'wb') as f:
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(packrat_cache, packrat_id)
-                CallSysCommand(['mkdir','-p', path])
+                path = os.path.join(webds.PACKRAT_CACHE, packrat_id)
+                utils.CallSysCommand(['mkdir','-p', path])
                 packrat_filename="PR" + packrat_id + ".hex"
                 file_path = os.path.join(path, packrat_filename)
                 print(file_path)
-                CallSysCommand(['mv', workspace_temp_hex, file_path])
+                utils.CallSysCommand(['mv', webds.WORKSPACE_TEMP_HEX, file_path])
 
 
                 data = GetFileList('hex', packrat_filename)
@@ -203,7 +151,7 @@ class GetListHandler(APIHandler):
         elif (action == 'delete'):
             filename = input_data["file"]
             print("delete file: ", filename)
-            CallSysCommand(['rm', packrat_cache + "/" + filename])
+            utils.CallSysCommand(['rm', webds.PACKRAT_CACHE + "/" + filename])
 
             filelist = GetFileList(extension)
             self.finish(filelist)
@@ -223,6 +171,7 @@ class GeneralHandler(APIHandler):
         self.finish(json.dumps({
             "data": "webds-api server is running"
         }))
+
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
