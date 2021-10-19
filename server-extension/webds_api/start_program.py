@@ -1,4 +1,5 @@
 import tornado
+from jupyter_server.base.handlers import APIHandler
 import os
 import json
 import sys
@@ -7,7 +8,6 @@ sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 from programmer import AsicProgrammer
 
-from jupyter_server.base.handlers import APIHandler
 from . import webds
 
 

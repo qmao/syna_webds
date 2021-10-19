@@ -13,7 +13,6 @@ import tornado
 import grp, pwd
 import glob
 import re
-import shutil
 from werkzeug.utils import secure_filename
 
 import sys
@@ -21,31 +20,10 @@ sys.path.append("/usr/local/syna/lib/python")
 from touchcomm import TouchComm
 
 from .start_program import ProgramHandler
+from .general import GeneralHandler
 from . import webds
 from . import utils
 
-
-def UpdateHexLink():
-    if os.path.exists(webds.WORKSPACE_CACHE):
-        try:
-            shutil.rmtree(webds.WORKSPACE_CACHE)
-        except OSError as e:
-            print("Error: %s - %s." % (e.filename, e.strerror))
-
-    os.makedirs(webds.WORKSPACE_CACHE)
-
-    for packrat in os.listdir(webds.PACKRAT_CACHE):
-        print(packrat)
-        dirpath = webds.PACKRAT_CACHE + '/' + packrat
-        for fname in os.listdir(dirpath):
-            if fname.endswith('.hex'):
-                print(dirpath)
-                os.symlink(dirpath, webds.WORKSPACE_CACHE + '/' + packrat)
-                break
-
-def UpdateWorkspace():
-    utils.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
-    UpdateHexLink()
 
 def GetFileList(extension, packrat=""):
     filelist = []
@@ -118,7 +96,7 @@ class UploadHandler(APIHandler):
 
 
                 data = GetFileList('hex', packrat_filename)
-                UpdateWorkspace()
+                utils.UpdateWorkspace()
 
                 print(data)
                 self.finish(data)
@@ -158,19 +136,6 @@ class GetListHandler(APIHandler):
         else:
             self.write(action, "unknown")   # 0 is the default case if x is not found
 
-class GeneralHandler(APIHandler):
-    # The following decorator should be present on all verb methods (head, get, post,
-    # patch, put, delete, options) to ensure only authorized user can request the
-    # Jupyter server
-    @tornado.web.authenticated
-    def get(self):
-        print(self.request)
-        
-        UpdateWorkspace()
-
-        self.finish(json.dumps({
-            "data": "webds-api server is running"
-        }))
 
 
 def setup_handlers(web_app):
