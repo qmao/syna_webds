@@ -6,10 +6,10 @@ import sys
 sys.path.append("/usr/local/syna/lib/python")
 
 from touchcomm import TouchComm
-from programmer import AsicProgrammer
 
 from . import webds
-
+from .programmer_manager import ProgrammerManager
+from .touchcomm_manager import TouchcommManager
 
 class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -35,15 +35,9 @@ class ProgramHandler(APIHandler):
         if not os.path.isfile(filename):
             raise Exception(filename)
 
-        AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
+        ProgrammerManager.program(filename)
         print("Erase and program done!!!")
         
-        tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
-        if(tc):
-            id = tc.identify()
-            print(id)
-            tc.close()
-            tc = None
+        data = TouchcommManager().identify()
 
-        data = id
         self.finish(json.dumps(data))
