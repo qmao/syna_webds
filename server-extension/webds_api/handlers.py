@@ -15,12 +15,9 @@ import glob
 import re
 from werkzeug.utils import secure_filename
 
-import sys
-sys.path.append("/usr/local/syna/lib/python")
-from touchcomm import TouchComm
 
-from .start_program import ProgramHandler
-from .general import GeneralHandler
+from .route_start_program import ProgramHandler
+from .route_general import GeneralHandler
 from . import webds
 from . import utils
 

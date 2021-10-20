@@ -12,11 +12,12 @@ class TouchcommManager(object):
         return cls._instance 
          
     def __init__(self):
-
+        print("TouchcommManager init")
+ 
     def connect(self):
         if self._tc is None:
-            print("TouchcommManager connect")
             self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
+            print("TouchcommManager connect")
             
     def disconnect(self):
         if self._tc is not None:
