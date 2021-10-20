@@ -1,6 +1,9 @@
 import os
 import subprocess
 import shutil
+import glob
+import re
+import json
 from . import webds
 
 def CallSysCommand(command):
@@ -35,3 +38,26 @@ def UpdateHexLink():
 def UpdateWorkspace():
     CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
     UpdateHexLink()
+    
+def GetSymbolValue(symbol, content):
+    find=r'(?<='+ symbol + r'=").*(?=")'
+    x = re.findall(find, content)
+
+    if (len(x) > 0):
+        return x[0]
+    else:
+        return None
+        
+def GetFileList(extension, packrat=""):
+    filelist = []
+    os.chdir(webds.PACKRAT_CACHE)
+    for file in glob.glob("**/*." + extension):
+        print(file)
+        filelist += [str(file)]
+
+    data = json.loads("{}")
+    data["filelist"] = filelist
+    data["upload"] = packrat
+
+    jsonString = json.dumps(data)
+    return jsonString         
