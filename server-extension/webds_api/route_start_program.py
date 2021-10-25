@@ -17,6 +17,7 @@ g_program_thread = None
 
 class StdoutHandler(Queue):
     _progress = 0
+    _status = 'idle'
 
     def __init__(self):
         super().__init__()
@@ -37,7 +38,14 @@ class StdoutHandler(Queue):
         self._progress = num
 
     def reset(self):
+        self._status = 'idle'
         self._progress = 0
+
+    def set_status(self, status):
+        self._status = status
+
+    def get_status(self):
+        return self._status
 
 class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -57,6 +65,9 @@ class ProgramHandler(APIHandler):
         print(input_data)
         data = ""
 
+        global g_stdout_handler
+        global g_program_thread
+
         action = input_data["action"]
         if action == "start":
             print("start to erase and program!!!")
@@ -66,9 +77,6 @@ class ProgramHandler(APIHandler):
 
             if not os.path.isfile(filename):
                 raise Exception(filename)
-
-            global g_stdout_handler
-            global g_program_thread
 
             if g_program_thread is not None and g_program_thread.is_alive():
                 print("erase and program thread is still running...")
@@ -90,12 +98,20 @@ class ProgramHandler(APIHandler):
             print("cancel thread")
             data = "erase and program is canceled"
 
+        elif action == "request":
+            print("request progress")
+            data = {
+              "status": g_stdout_handler.get_status(),
+              "progress": g_stdout_handler.get_progress()
+            }
+
         self.finish(json.dumps(data))
 
     def program(self, filename, handler):
         temp = sys.stdout
         sys.stdout = handler
 
+        handler.set_status("running")
         try:
             ret = ProgrammerManager.program(filename)
         except Exception as error:
@@ -110,3 +126,5 @@ class ProgramHandler(APIHandler):
             handler.set_progress(-1)
         else:
             print("Erase and program done.")
+
+        handler.set_status("done")

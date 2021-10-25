@@ -114,6 +114,11 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log(pass);
     }
 
+    interface ProgressResponse {
+        status: string;
+        progress: number;
+    }
+
     const start_program = async (): Promise<string | undefined> => {
         let reply_str = "";
         const file_type = "hex";
@@ -135,6 +140,44 @@ export default function ButtonProgram(props: ButtonProps) {
             console.log(reply);
             reply_str = JSON.stringify(reply);
 
+            for (var i = 0; i < 100; i++) {
+                let res = await get_progress()
+                let obj: ProgressResponse = JSON.parse(res!);
+                console.log(obj.progress);
+                await new Promise(f => setTimeout(f, 500));
+                if (obj.status != "running") {
+                    console.log(obj.status);
+                    break;
+                }
+            }
+        } catch (e) {
+            console.error(
+                `Error on POST ${dataToSend}.\n${e}`
+            );
+            return Promise.reject((e as Error).message);
+        }
+        return Promise.resolve(reply_str);
+    }
+
+    const get_progress = async (): Promise<string | undefined> => {
+        let reply_str = "";
+        const action = "request";
+        const data = "progress"
+
+        const dataToSend = {
+            action: action,
+            data: data
+        };
+
+        console.log("request progress");
+
+        try {
+            const reply = await requestAPI<any>('start-program', {
+                body: JSON.stringify(dataToSend),
+                method: 'POST',
+            });
+            console.log(reply);
+            reply_str = JSON.stringify(reply);
         } catch (e) {
             console.error(
                 `Error on POST ${dataToSend}.\n${e}`
