@@ -118,7 +118,12 @@ export default function ButtonProgram(props: ButtonProps) {
         let reply_str = "";
         const file_type = "hex";
         const file_name = context.packrat;
-        const dataToSend = { filename: file_name, type: file_type };
+        const action = "start";
+        const dataToSend = {
+            filename: file_name,
+            type: file_type,
+            action: action
+        };
 
         console.log("test filename:", file_name);
 
