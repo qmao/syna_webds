@@ -140,6 +140,6 @@ class ProgramHandler(APIHandler):
         except Exception as error:
             print(error)
             handler.set_progress(-1)
-            handler.set_message(json.dumps(error))
+            handler.set_message(str(error))
 
         handler.set_status("done")
