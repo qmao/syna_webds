@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 //import webdsTheme from './webdsTheme';
@@ -45,6 +45,11 @@ export default function ButtonProgram(props: ButtonProps) {
     const [buffer, setBuffer] = React.useState(0);
 
     const context = useContext(UserContext);
+
+    useEffect(() => {
+        console.log("buffer:", buffer);
+        console.log("progress:", progress);
+    }, [progress, buffer]);
 
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
 
@@ -107,6 +112,7 @@ export default function ButtonProgram(props: ButtonProps) {
     interface ProgressResponse {
         status: string;
         progress: number;
+        message: string;
     }
 
     const start_program = async (): Promise<string | undefined> => {
@@ -128,18 +134,22 @@ export default function ButtonProgram(props: ButtonProps) {
                 method: 'POST',
             });
             console.log(reply);
-            reply_str = JSON.stringify(reply);
 
+            let post_progress = 0;
             for (var i = 0; i < 100; i++) {
+                setBuffer(post_progress + 3);
                 let res = await get_progress()
-                setBuffer(progress + 10);
                 let obj: ProgressResponse = JSON.parse(res!);
                 setProgress(obj.progress);
+                post_progress = obj.progress;
 
                 await new Promise(f => setTimeout(f, 500));
+                let message = obj.message;
                 if (obj.status != "running") {
-                    console.log(obj.status);
-                    break;
+                    if (obj.progress != 100)
+                        return Promise.reject(message);
+                    else
+                        return Promise.resolve(message);
                 }
             }
         } catch (e) {
@@ -181,7 +191,7 @@ export default function ButtonProgram(props: ButtonProps) {
 
     return (
         <div {...other}>
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', maxWidth: 480 }}>
                 {disable && (
                     <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
                 )}

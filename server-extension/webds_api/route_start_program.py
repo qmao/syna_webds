@@ -18,6 +18,7 @@ g_program_thread = None
 class StdoutHandler(Queue):
     _progress = 0
     _status = 'idle'
+    _message = ''
 
     def __init__(self):
         super().__init__()
@@ -40,12 +41,20 @@ class StdoutHandler(Queue):
     def reset(self):
         self._status = 'idle'
         self._progress = 0
+        self._message = ''
 
     def set_status(self, status):
         self._status = status
 
     def get_status(self):
         return self._status
+
+    def get_message(self):
+        return self._message
+        
+    def set_message(self, message):
+        self._message = message
+        
 
 class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
@@ -100,9 +109,11 @@ class ProgramHandler(APIHandler):
 
         elif action == "request":
             print("request progress")
+            handler = g_stdout_handler
             data = {
-              "status": g_stdout_handler.get_status(),
-              "progress": g_stdout_handler.get_progress()
+              "status": handler.get_status(),
+              "progress": handler.get_progress(),
+              "message": handler.get_message()
             }
 
         self.finish(json.dumps(data))
@@ -114,17 +125,21 @@ class ProgramHandler(APIHandler):
         handler.set_status("running")
         try:
             ret = ProgrammerManager.program(filename)
+            sys.stdout = temp
+
+            if handler.get_progress() != 100:
+                print(handler.get_progress())
+                handler.set_message("Unkwon error")
+                handler.set_progress(-1)
+            else:
+                print("Erase and program done.")
+
+                tc = TouchcommManager()
+                handler.set_message(json.dumps(tc.identify()))
+
         except Exception as error:
             print(error)
             handler.set_progress(-1)
-
-        sys.stdout = temp
-
-        if handler.get_progress() != 100:
-            print(handler.get_progress())
-            print("Unkwon error")
-            handler.set_progress(-1)
-        else:
-            print("Erase and program done.")
+            handler.set_message(json.dumps(error))
 
         handler.set_status("done")

@@ -253,11 +253,11 @@ export default function VerticalTabs(
                         </div>
                     </TabPanel>
                  </Paper>
-                 <Box sx={{
+                 <Box /*sx={{
                             flexGrow: 1, bgcolor: webdsTheme.palette.background.paper, display: 'flex',
                             margin: webdsTheme.spacing(1), flexDirection: "row",
 						    marginLeft: webdsTheme.spacing(40),
-                         }}
+                         }}*/
                  >
                      <ButtonProgram title="PROGRAM" />
                  </Box>
