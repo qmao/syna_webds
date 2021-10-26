@@ -258,7 +258,7 @@ export default function VerticalTabs(
                             margin: webdsTheme.spacing(1), flexDirection: "row",
 						    marginLeft: webdsTheme.spacing(40),
                          }}
-                >
+                 >
                      <ButtonProgram title="PROGRAM" />
                  </Box>
             </Paper>

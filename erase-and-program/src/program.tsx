@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 //import webdsTheme from './webdsTheme';
@@ -11,6 +10,8 @@ import FlashOnIcon from '@material-ui/icons/FlashOn';
 import Box from '@mui/material/Box';
 //import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
+
 import Fab from '@mui/material/Fab';
 
 import { green } from '@mui/material/colors';
@@ -32,37 +33,21 @@ interface ButtonProps {
     onFinish?: any;
 }
 
-const useStyles = makeStyles(webdsTheme =>
-    createStyles({
-        programRoot: {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-        },
-        extendedIcon: {
-            marginRight: webdsTheme.spacing(1),
-        },
-    }),
-);
 
 export default function ButtonProgram(props: ButtonProps) {
     const { children, value, index, title, alert, ...other } = props;
-    const [progress, setProgress] = useState(false);
     const [message, setMessage] = useState("");
     const [isAlert, setAlert] = useState(false);
     const [disable, setDisable] = useState(false);
     const [severity, setSeverity] = useState<'error' | 'info' | 'success' | 'warning'>('info');
     const [result, setResult] = useState("");
+    const [progress, setProgress] = React.useState(0);
+    const [buffer, setBuffer] = React.useState(0);
 
     const context = useContext(UserContext);
-    const classes = useStyles();
-
-
 
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
-        setDisable(start);
-        setProgress(start);
-        console.log(progress);
+
         if (start) {
             setAlert(false);
         }
@@ -70,6 +55,11 @@ export default function ButtonProgram(props: ButtonProps) {
             console.log(result);
             show_result(status!, result || '');
         }
+
+        setBuffer(0);
+        setProgress(0);
+
+        setDisable(start);
     }
 
     const onClick = (event?: React.SyntheticEvent, reason?: string) => {
@@ -142,8 +132,10 @@ export default function ButtonProgram(props: ButtonProps) {
 
             for (var i = 0; i < 100; i++) {
                 let res = await get_progress()
+                setBuffer(progress + 10);
                 let obj: ProgressResponse = JSON.parse(res!);
-                console.log(obj.progress);
+                setProgress(obj.progress);
+
                 await new Promise(f => setTimeout(f, 500));
                 if (obj.status != "running") {
                     console.log(obj.status);
@@ -188,11 +180,17 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     return (
-        <div className={classes.programRoot} {...other}>
+        <div {...other}>
+            <Box sx={{ width: '100%' }}>
+                {disable && (
+                    <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
+                )}
+            </Box>
 
-            <Box sx={{ m: 1, position: 'relative' }}>
+            <Box sx={{
+                m: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Fab variant="extended" color="primary" disabled={disable} onClick={onClick}>
-                    <FlashOnIcon className={classes.extendedIcon} />
+                    <FlashOnIcon />
                     {title}
                 </Fab>
 
@@ -216,7 +214,7 @@ export default function ButtonProgram(props: ButtonProps) {
                     <AlertTitle> {result} </AlertTitle>
                     {message}
                 </Alert>
-                </Snackbar>
+            </Snackbar>
         </div>
     );
 }
