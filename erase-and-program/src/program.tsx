@@ -1,21 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
-//import webdsTheme from './webdsTheme';
+import webdsTheme from './webdsTheme';
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import FlashOnIcon from '@material-ui/icons/FlashOn';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
 import Box from '@mui/material/Box';
-//import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
-
-import { green } from '@mui/material/colors';
-
 
 
 export interface IProgramInfo {
@@ -196,11 +192,13 @@ export default function ButtonProgram(props: ButtonProps) {
                     <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
                 )}
             </Box>
-
             <Box sx={{
-                m: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        m: 1, position: 'relative', display: 'flex', flexDirection: 'column',
+                        margin: webdsTheme.spacing(1), marginLeft: webdsTheme.spacing(40), maxWidth: 145
+                    }}
+            >
                 <Fab variant="extended" color="primary" disabled={disable} onClick={onClick}>
-                    <FlashOnIcon />
+                    <FlashOnIcon sx={{ mr: 1 }} />
                     {title}
                 </Fab>
 
@@ -208,7 +206,7 @@ export default function ButtonProgram(props: ButtonProps) {
                     <CircularProgress
                         size={24}
                         sx={{
-                            color: green[500],
+                            color: "primary",
                             position: 'absolute',
                             top: '50%',
                             left: '50%',
