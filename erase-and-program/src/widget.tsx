@@ -11,8 +11,6 @@ import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
 import { ThemeProvider } from "@mui/material/styles";
 
-import { makeStyles } from '@material-ui/core/styles';
-
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 import FileList from './filelist'
@@ -36,47 +34,10 @@ function a11yProps(index: any) {
   };
 }
 
-const useStyles = makeStyles((webdsTheme) => ({
-    root: {
-        flexDirection: 'column',
-        backgroundColor: webdsTheme.palette.background.paper,
-        display: 'flex',
-        minWidth: 600,
-        maxHeight: 500,
-    },
-    tabs: {
-        borderRight: `1px solid ${webdsTheme.palette.divider}`,
-    },
-    text: {
-        '& > *': {
-            margin: webdsTheme.spacing(1),
-            width: '25ch',
-        },
-    },
-    paper_tab: {
-        flexGrow: 1,
-        backgroundColor: webdsTheme.palette.background.paper,
-        display: 'flex',
-    },
-    upload: {
-        display: 'flex',
-        flexDirection: "row-reverse",
-        padding: webdsTheme.spacing(0),
-        margin: webdsTheme.spacing(0),
-        bgcolor: "background.paper",
-    },
-    tabpanel: {
-        minHeight: 140,
-        minWidth: 390,
-    },
-}));
-
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
-    const classes = useStyles();
     return (
         <div
-            className={classes.tabpanel}
             role="tabpanel"
             hidden={value !== index}
             id={`vertical-tabpanel-${index}`}
@@ -84,7 +45,10 @@ function TabPanel(props: TabPanelProps) {
             {...other}
         >
             {value === index && (
-                <Box p={2} >
+                <Box p={2} sx={{
+                    minHeight: 140,
+                    minWidth: 390,
+                }}>
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -97,7 +61,6 @@ export default function VerticalTabs(
         onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 ) {
-    const classes = useStyles();
     const [value, setValue] = React.useState(0);
     const [filelist, setFileList] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
@@ -206,24 +169,34 @@ export default function VerticalTabs(
     };
 
     return (
-        <div className={classes.root}>
+        <Box sx={{
+            flexDirection: 'column',
+            backgroundColor: webdsTheme.palette.background.paper,
+            display: 'flex',
+            width: 600,
+            maxHeight: 500,
+        }}>
 		<ThemeProvider theme={webdsTheme}>
         <UserContext.Provider
             value={{ packrat: packrat }}
         >
             <Paper elevation={0}>
-                <Paper className={classes.paper_tab} elevation={0}>
+                        <Paper elevation={0} sx={{
+                            flexGrow: 1,
+                            backgroundColor: webdsTheme.palette.background.paper,
+                            display: 'flex',
+                        }}>
                     <Tabs
                         orientation="vertical"
                         variant="scrollable"
                         value={value}
                         onChange={handleChange}
                         aria-label="Vertical tabs example"
-                        className={classes.tabs}
                         textColor="primary"
                         indicatorColor="primary"
                         id="tabs"
-                        >
+                        sx={{ borderRight: `1px solid ${webdsTheme.palette.divider}`}}
+                    >
                             <Tooltip placement="left-start" title="Choose a HEX file on RPi4 packrat cache">
                                 <Tab label="Files" {...a11yProps(0)} />
                             </Tooltip>
@@ -233,7 +206,12 @@ export default function VerticalTabs(
                     </Tabs>
                     <TabPanel value={value} index={0}>
                         <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
-                        <Box className={classes.upload} sx={{ m: 1, position: 'relative' }}>
+                                <Box sx={{
+                                    m: 1, position: 'relative', display: 'flex',
+                                    flexDirection: "row-reverse",
+                                    padding: webdsTheme.spacing(0),
+                                    margin: webdsTheme.spacing(0),
+                                    bgcolor: "background.paper", }}>
                             <UploadButtons onChange={onFileChange} />
                             {loading && <CircularProgress
                                 size={50}
@@ -246,11 +224,13 @@ export default function VerticalTabs(
                         </Box>
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <div className={classes.text}>
-                            <TextField id="filled-basic"
-                                       label="Packrat"
-                                       disabled helperText="This Feature Is Coming Soon!" />
-                        </div>
+                        <TextField id="filled-basic"
+                                   label="Packrat"
+                                   sx={{
+                                      margin: webdsTheme.spacing(1),
+                                      width: '25ch',
+                                    }}
+                        />
                     </TabPanel>
                  </Paper>
                  <Box>
@@ -259,7 +239,7 @@ export default function VerticalTabs(
             </Paper>
             </UserContext.Provider>
 			</ThemeProvider>
-            </div>
+            </Box>
     );
 }
 

@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
-import webdsTheme from './webdsTheme';
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -187,31 +186,29 @@ export default function ButtonProgram(props: ButtonProps) {
 
     return (
         <div {...other}>
-            <Box sx={{ width: '100%', maxWidth: 480 }}>
+            <Box sx={{ width: '100%', maxWidth: 490 }}>
                 {disable && (
                     <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
                 )}
             </Box>
             <Box sx={{
-                        m: 1, position: 'relative', display: 'flex', flexDirection: 'column',
-                        margin: webdsTheme.spacing(1), marginLeft: webdsTheme.spacing(40), maxWidth: 145
+                m: 1, display: 'flex',
+                flexDirection: 'row-reverse'
                     }}
             >
-                <Fab variant="extended" color="primary" disabled={disable} onClick={onClick}>
+                <Fab variant="extended" color="primary" disabled={disable} onClick={onClick} sx={{ maxWidth: 145, mr: 12 }}>
                     <FlashOnIcon sx={{ mr: 1 }} />
                     {title}
                 </Fab>
 
                 {disable && (
                     <CircularProgress
-                        size={24}
+                        size={36}
                         sx={{
                             color: "primary",
                             position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            marginTop: '-12px',
-                            marginLeft: '-12px',
+                            mr: '190px',
+                            marginTop: '6px',
                         }}
                     />
                 )}
