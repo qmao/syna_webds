@@ -122,10 +122,10 @@ export default function ButtonProgram(props: ButtonProps) {
             action: action
         };
 
-        console.log("test filename:", file_name);
+        console.log("filename:", file_name);
 
         try {
-            const reply = await requestAPI<any>('start-program', {
+            const reply = await requestAPI<any>('program', {
                 body: JSON.stringify(dataToSend),
                 method: 'POST',
             });
@@ -170,7 +170,7 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log("request progress");
 
         try {
-            const reply = await requestAPI<any>('start-program', {
+            const reply = await requestAPI<any>('program', {
                 body: JSON.stringify(dataToSend),
                 method: 'POST',
             });

@@ -155,7 +155,7 @@ export default function VerticalTabs(
         console.log("get_hex_list:", event);
         const dataToSend = { action:"get-list", extension: "hex" };
         try {
-            const reply = await requestAPI<any>('manage-file', {
+            const reply = await requestAPI<any>('file', {
                 body: JSON.stringify(dataToSend),
                 method: 'POST',
             });
@@ -173,7 +173,7 @@ export default function VerticalTabs(
         console.log("delete_hex:", event);
         const dataToSend = { action: "delete", extension: "hex", file: filename };
         try {
-            const reply = await requestAPI<any>('manage-file', {
+            const reply = await requestAPI<any>('file', {
                 body: JSON.stringify(dataToSend),
                 method: 'POST',
             });
@@ -253,12 +253,7 @@ export default function VerticalTabs(
                         </div>
                     </TabPanel>
                  </Paper>
-                 <Box /*sx={{
-                            flexGrow: 1, bgcolor: webdsTheme.palette.background.paper, display: 'flex',
-                            margin: webdsTheme.spacing(1), flexDirection: "row",
-						    marginLeft: webdsTheme.spacing(40),
-                         }}*/
-                 >
+                 <Box>
                      <ButtonProgram title="PROGRAM" />
                  </Box>
             </Paper>

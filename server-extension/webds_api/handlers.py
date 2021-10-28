@@ -3,7 +3,7 @@ from jupyter_server.utils import url_path_join
 
 import tornado
 
-from .route_start_program import ProgramHandler
+from .route_program import ProgramHandler
 from .route_general import GeneralHandler
 from .route_upload import UploadHandler
 from .route_file import FileHandler
@@ -16,11 +16,11 @@ def setup_handlers(web_app):
 
     general_pattern = url_path_join(base_url, "webds-api", "general")
         
-    program_pattern = url_path_join(base_url, "webds-api", "start-program")
+    program_pattern = url_path_join(base_url, "webds-api", "program")
 
     upload_pattern = url_path_join(base_url, "webds-api", "upload")
 
-    file_pattern = url_path_join(base_url, "webds-api", "manage-file")
+    file_pattern = url_path_join(base_url, "webds-api", "file")
     
     handlers = [(general_pattern, GeneralHandler), (program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (file_pattern, FileHandler)]
 
