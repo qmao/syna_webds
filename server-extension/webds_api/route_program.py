@@ -100,8 +100,16 @@ class ProgramHandler(APIHandler):
 
             g_program_thread = threading.Thread(target=self.program, args=(filename, g_stdout_handler))
             g_program_thread.start()
+            print("program thread start")
+            g_program_thread.join()
 
-            data = "start erase and program"
+            print("program thread done")
+
+            data = {
+              "status": g_stdout_handler.get_status(),
+              "message": g_stdout_handler.get_message()
+            }
+            print(data)
 
         elif action == "cancel":
             print("cancel thread")
@@ -122,7 +130,7 @@ class ProgramHandler(APIHandler):
         temp = sys.stdout
         sys.stdout = handler
 
-        handler.set_status("running")
+        handler.set_status("unknown")
         try:
             ret = ProgrammerManager.program(filename)
             sys.stdout = temp
@@ -131,15 +139,16 @@ class ProgramHandler(APIHandler):
                 print(handler.get_progress())
                 handler.set_message("Unkwon error")
                 handler.set_progress(-1)
+                handler.set_status("error")
             else:
                 print("Erase and program done.")
 
                 tc = TouchcommManager()
                 handler.set_message(json.dumps(tc.identify()))
+                handler.set_status("success")
 
         except Exception as error:
             print(error)
             handler.set_progress(-1)
             handler.set_message(str(error))
-
-        handler.set_status("done")
+            handler.set_status("error")

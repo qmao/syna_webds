@@ -38,8 +38,45 @@ export default function ButtonProgram(props: ButtonProps) {
     const [result, setResult] = useState("");
     const [progress, setProgress] = React.useState(0);
     const [buffer, setBuffer] = React.useState(0);
+    const [isStart, setStart] = React.useState(false);
 
     const context = useContext(UserContext);
+
+    interface ProgramResponse {
+        status: string;
+        message: string;
+    }
+
+    useEffect(() => {
+        console.log("start is set");
+
+        if (isStart) {
+            setProgramStatus(true);
+
+            if (context.packrat.includes("PR")) {
+                console.log("packrat is exising");
+            }
+            else {
+                console.log("need to download packrat from server");
+                start_fetch();
+            }
+
+            if (context.packrat == "") {
+                setProgramStatus(false, false, "Please choose a HEX file");
+            }
+            else {
+                start_program()
+                    .then(res => {
+                        console.log(res);
+                        setProgramStatus(false, res!.status == 'success', res!.message);
+                    })
+                    .catch((error) => {
+                        console.log(error, 'Promise error');
+                        setProgramStatus(false, false, error);
+                    })
+            }
+        }
+    }, [isStart]);
 
     useEffect(() => {
         console.log("buffer:", buffer);
@@ -54,6 +91,7 @@ export default function ButtonProgram(props: ButtonProps) {
         else {
             console.log(result);
             show_result(status!, result || '');
+            setStart(false);
         }
 
         setBuffer(0);
@@ -61,26 +99,6 @@ export default function ButtonProgram(props: ButtonProps) {
 
         setDisable(start);
     }
-
-    const onClick = (event?: React.SyntheticEvent, reason?: string) => {
-        console.log("context packrat", context.packrat);
-
-        setProgramStatus(true);
-
-        if (context.packrat == "") {
-            setProgramStatus(false, false, "Please choose a HEX file");
-        } else {
-            start_program()
-                .then(res => {
-                    console.log(res);
-                    setProgramStatus(false, true, res);
-                })
-                .catch((error) => {
-                    console.log(error, 'Promise error');
-                    setProgramStatus(false, false, error);
-                })
-        }
-    };
 
     const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
         if (reason === 'clickaway') {
@@ -103,15 +121,25 @@ export default function ButtonProgram(props: ButtonProps) {
 
         console.log(pass);
     }
-
+    /*
     interface ProgressResponse {
         status: string;
         progress: number;
         message: string;
     }
 
-    const start_program = async (): Promise<string | undefined> => {
-        let reply_str = "";
+
+    const update_progress = async () => {
+        let post_progress = 0;
+        setBuffer(post_progress + 3);
+        let res = await get_progress();
+        let obj: ProgressResponse = JSON.parse(res!);
+        setProgress(obj.progress);
+        post_progress = obj.progress;
+    }
+    */
+
+    const start_program = async (): Promise<ProgramResponse | undefined> => {
         const file_type = "hex";
         const file_name = context.packrat;
         const action = "start";
@@ -129,33 +157,56 @@ export default function ButtonProgram(props: ButtonProps) {
                 method: 'POST',
             });
             console.log(reply);
-
-            let post_progress = 0;
-            for (var i = 0; i < 100; i++) {
-                setBuffer(post_progress + 3);
-                let res = await get_progress()
-                let obj: ProgressResponse = JSON.parse(res!);
-                setProgress(obj.progress);
-                post_progress = obj.progress;
-
-                await new Promise(f => setTimeout(f, 500));
-                let message = obj.message;
-                if (obj.status != "running") {
-                    if (obj.progress != 100)
-                        return Promise.reject(message);
-                    else
-                        return Promise.resolve(message);
-                }
-            }
+            return Promise.resolve(reply);
         } catch (e) {
             console.error(
                 `Error on POST ${dataToSend}.\n${e}`
             );
             return Promise.reject((e as Error).message);
         }
-        return Promise.resolve(reply_str);
     }
 
+    const start_fetch = async (): Promise<string | undefined> => {
+        try {
+            console.log("start to fetch");
+
+            var myRequest = new Request('https://get.geojs.io/v1/ip/geo.json');
+
+            fetch(myRequest)
+                .then(response => response.blob())
+                .then(function (myBlob) {
+                    const formData = new FormData();
+                    formData.append("blob", myBlob, 'test');
+
+                    requestAPI<any>('upload', {
+                        body: formData,
+                        method: 'POST',
+                    });
+                });
+
+
+            /*
+            fetch('https://get.geojs.io/v1/ip/geo.json')
+                .then(response => {
+                    console.log(response);
+                    if (!response.ok) {
+                        throw new Error("HTTP error " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(json => {
+                    console.log(json);
+                })
+                .catch(function () {
+                    console.log("error!!!");
+                })
+                */
+            return Promise.reject(message);
+        } catch (e) {
+            return Promise.reject((e as Error).message);
+        }
+    }
+    /*
     const get_progress = async (): Promise<string | undefined> => {
         let reply_str = "";
         const action = "request";
@@ -183,7 +234,7 @@ export default function ButtonProgram(props: ButtonProps) {
         }
         return Promise.resolve(reply_str);
     }
-
+    */
     return (
         <div {...other}>
             <Box sx={{ width: '100%', maxWidth: 490 }}>
@@ -196,7 +247,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 flexDirection: 'row-reverse'
                     }}
             >
-                <Fab variant="extended" color="primary" disabled={disable} onClick={onClick} sx={{ maxWidth: 145, mr: 12 }}>
+                <Fab variant="extended" color="primary" disabled={disable} onClick={() => setStart(true)} sx={{ maxWidth: 145, mr: 12 }}>
                     <FlashOnIcon sx={{ mr: 1 }} />
                     {title}
                 </Fab>

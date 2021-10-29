@@ -66,7 +66,6 @@ export default function VerticalTabs(
     const [loading, setLoading] = React.useState(false);
     const [packrat, setPackrat] = React.useState("");
     const [packratError, setPackratError] = React.useState(false);
-    const [packratNumber, setPackratNumber] = React.useState("");
 
     useEffect(() => {
         if (value == 0)
@@ -74,14 +73,18 @@ export default function VerticalTabs(
     }, [value]);
 
     React.useEffect(() => {
-        if (packratNumber === '') {
-            setPackratError(false);
+        if (value == 1) {
+            if (packrat === '') {
+                setPackratError(false);
+            }
+            else if (isNaN(+Number(packrat))) {
+                console.log("invalid!!");
+                setPackratError(true);
+            }
+            else
+                setPackratError(false);
         }
-        else if (isNaN(+Number(packratNumber))) {
-            console.log("invalid!!");
-            setPackratError(true);
-        }
-    }, [packratNumber]);
+    }, [packrat]);
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setValue(newValue);
@@ -238,7 +241,7 @@ export default function VerticalTabs(
                     <TabPanel value={value} index={1}>
                         <TextField id="filled-basic"
                                     label="Packrat"
-                                    onChange={(e) => setPackratNumber(e.target.value)}
+                                    onChange={(e) => setPackrat(e.target.value)}
                                     error={packratError}
                                     sx={{
                                       margin: webdsTheme.spacing(1),

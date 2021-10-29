@@ -31,9 +31,20 @@ class UploadHandler(APIHandler):
                 #    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
                 #)
                 print(filename)
+                packrat_id = None
 
-                packrat_id = utils.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
-                print(packrat_id)
+                try:
+                    packrat_id = utils.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
+                    print(packrat_id)
+                except:
+                    print("Invalid Hex File")
+                    ##return
+
+                if packrat_id is None:
+                    print("Invalid Hex File (PACKRAT_ID not found)")
+                    ##return
+                if filename is 'test':
+                    packrat_id=1234567
 
                 # save temp hex file in worksapce
                 with open(webds.WORKSPACE_TEMP_HEX, 'wb') as f:
