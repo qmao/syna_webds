@@ -101,25 +101,24 @@ export default function VerticalTabs(
 
             console.log(formData);
             try {
-                const reply = await requestAPI<any>('upload', {
+                const reply = await requestAPI<any>('packrat', {
                     body: formData,
                     method: 'POST',
                 });
-                
+
                 console.log(reply);
                 setLoading(false);
 
-                let filelist = reply['filelist'];
-                setFileList(filelist);
-
-                // set select packrat
-                filelist.forEach((element: any) => {
-                    if (element.includes(reply['upload'])) {
-                        setPackrat(element);
-                    }
-                });
-
-                return reply;
+                let filename = reply['filename'];
+                get_hex_list().then(filelist => {
+                    // set select packrat
+                    filelist!.forEach((element: any) => {
+                        if (element.includes(filename)) {
+                            setPackrat(element);
+                        }
+                    });
+                })
+                return filename;
             } catch (error) {
                 if (error) {
                     return error.message
@@ -129,17 +128,15 @@ export default function VerticalTabs(
         }
     }
 
-    const get_hex_list = async (): Promise<string | undefined> => {
+    const get_hex_list = async (): Promise<string[] | undefined> => {
         console.log("get_hex_list:", event);
-        const dataToSend = { action:"get-list", extension: "hex" };
         try {
-            const reply = await requestAPI<any>('file', {
-                body: JSON.stringify(dataToSend),
-                method: 'POST',
+            const reply = await requestAPI<any>('packrat?extension=hex', {
+                method: 'GET',
             });
             console.log(reply);
             setFileList(reply['filelist']);
-            return reply;
+            return reply['filelist'];
         } catch (error) {
 			console.log(error);
 			setFileList([]);

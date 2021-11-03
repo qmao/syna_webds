@@ -48,7 +48,21 @@ def GetSymbolValue(symbol, content):
     else:
         return None
         
-def GetFileList(extension, packrat=""):
+def GetFileList(extension):
+    filelist = []
+    os.chdir(webds.PACKRAT_CACHE)
+    for file in glob.glob("**/*." + extension):
+        print(file)
+        filelist += [str(file)]
+
+    data = json.loads("{}")
+    data["filelist"] = filelist
+
+    jsonString = json.dumps(data)
+    return jsonString   
+    
+    
+def GetFileList2(extension, packrat=""):
     filelist = []
     os.chdir(webds.PACKRAT_CACHE)
     for file in glob.glob("**/*." + extension):
@@ -60,4 +74,4 @@ def GetFileList(extension, packrat=""):
     data["upload"] = packrat
 
     jsonString = json.dumps(data)
-    return jsonString         
+    return jsonString             
