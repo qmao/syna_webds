@@ -20,7 +20,7 @@ def setup_handlers(web_app):
 
     upload_pattern = url_path_join(base_url, "webds-api", "upload")
 
-    packrat_pattern = url_path_join(base_url, "webds-api", "packrat")
+    packrat_pattern = url_path_join(base_url, "webds-api", "packrat" + '(.*)')
     
     handlers = [(general_pattern, GeneralHandler), (program_pattern, ProgramHandler), (upload_pattern, UploadHandler), (packrat_pattern, PackratHandler)]
 
