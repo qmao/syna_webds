@@ -47,6 +47,13 @@ export default function ButtonProgram(props: ButtonProps) {
         message: string;
     }
 
+    /*
+    interface ProgressResponse {
+        status: string;
+        progress: number;
+    }
+    */
+
     useEffect(() => {
         console.log("start is set");
 
@@ -83,10 +90,36 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log("progress:", progress);
     }, [progress, buffer]);
 
+    /*
+    async function poll(ms: number) {
+        while (true) {
+            console.log("start poll:");
+            let post_progress = 0;
+            setBuffer(post_progress + 3);
+
+            const res: ProgressResponse = await requestAPI<any>('program');
+            console.log(res);
+
+            console.log("progress::::", res);
+            setProgress(res!.progress);
+            post_progress = res!.progress;
+            console.log("progress 1:", res!.progress);
+
+            if (res!.progress == 100)
+                break;
+
+            console.log("progress: 2");
+            await new Promise(f => setTimeout(f, ms));
+            console.log("progress: 3");
+        }
+    }
+    */
+
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
 
         if (start) {
             setAlert(false);
+            //poll(500);
         }
         else {
             console.log(result);
@@ -121,23 +154,6 @@ export default function ButtonProgram(props: ButtonProps) {
 
         console.log(pass);
     }
-    /*
-    interface ProgressResponse {
-        status: string;
-        progress: number;
-        message: string;
-    }
-
-
-    const update_progress = async () => {
-        let post_progress = 0;
-        setBuffer(post_progress + 3);
-        let res = await get_progress();
-        let obj: ProgressResponse = JSON.parse(res!);
-        setProgress(obj.progress);
-        post_progress = obj.progress;
-    }
-    */
 
     const start_program = async (): Promise<ProgramResponse | undefined> => {
         const file_type = "hex";
@@ -206,35 +222,7 @@ export default function ButtonProgram(props: ButtonProps) {
             return Promise.reject((e as Error).message);
         }
     }
-    /*
-    const get_progress = async (): Promise<string | undefined> => {
-        let reply_str = "";
-        const action = "request";
-        const data = "progress"
 
-        const dataToSend = {
-            action: action,
-            data: data
-        };
-
-        console.log("request progress");
-
-        try {
-            const reply = await requestAPI<any>('program', {
-                body: JSON.stringify(dataToSend),
-                method: 'POST',
-            });
-            console.log(reply);
-            reply_str = JSON.stringify(reply);
-        } catch (e) {
-            console.error(
-                `Error on POST ${dataToSend}.\n${e}`
-            );
-            return Promise.reject((e as Error).message);
-        }
-        return Promise.resolve(reply_str);
-    }
-    */
     return (
         <div {...other}>
             <Box sx={{ width: '100%', maxWidth: 490 }}>

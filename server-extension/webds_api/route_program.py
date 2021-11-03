@@ -63,9 +63,21 @@ class ProgramHandler(APIHandler):
 
     @tornado.web.authenticated
     def get(self):
-        self.finish(json.dumps({
-            "data": "This is /erase-and-program/start-program endpoint!"
-        }))
+        print("request progress")
+
+        if g_stdout_handler is None:
+            data = {
+                  'status': 'unknown',
+                  'progress': 0,
+                }
+        else:
+            data = {
+                  "status": g_stdout_handler.get_status(),
+                  "progress": g_stdout_handler.get_progress(),
+                }
+
+        print(data)
+        self.finish(json.dumps(data))
 
     @tornado.web.authenticated
     def post(self):
@@ -95,8 +107,6 @@ class ProgramHandler(APIHandler):
             if g_stdout_handler is None:
                 print("create StdoutHandler")
                 g_stdout_handler = StdoutHandler()
-            else:
-                g_stdout_handler.reset()
 
             g_program_thread = threading.Thread(target=self.program, args=(filename, g_stdout_handler))
             g_program_thread.start()
@@ -110,6 +120,7 @@ class ProgramHandler(APIHandler):
               "message": g_stdout_handler.get_message()
             }
             print(data)
+            g_stdout_handler.reset()
 
         elif action == "cancel":
             print("cancel thread")
@@ -117,13 +128,19 @@ class ProgramHandler(APIHandler):
 
         elif action == "request":
             print("request progress")
-            handler = g_stdout_handler
-            data = {
-              "status": handler.get_status(),
-              "progress": handler.get_progress(),
-              "message": handler.get_message()
-            }
 
+            if g_stdout_handler is None:
+                data = {
+                  'status': 'unknown',
+                  'progress': 0,
+                }
+            else:
+                data = {
+                  "status": g_stdout_handler.get_status(),
+                  "progress": g_stdout_handler.get_progress(),
+                }
+
+        print(data)
         self.finish(json.dumps(data))
 
     def program(self, filename, handler):
