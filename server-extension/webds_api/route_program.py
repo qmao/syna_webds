@@ -12,13 +12,16 @@ from queue import Queue
 import time
 import sys
 
+from tornado import gen
+from tornado.iostream import StreamClosedError
+
 g_stdout_handler = None
 g_program_thread = None
 
 class StdoutHandler(Queue):
     _progress = 0
     _status = 'idle'
-    _message = ''
+    _message = None
 
     def __init__(self):
         super().__init__()
@@ -60,24 +63,59 @@ class ProgramHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
+    def initialize(self):
+        self._last = 0
+        self.set_header('cache-control', 'no-cache')
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
+    def publish(self, data):
+        """Pushes data to a listener."""
+        try:
+            self.set_header('content-type', 'text/event-stream')
+            self.write('event: program\n')
+            self.write('data: {}\n'.format(data))
+            self.write('\n')
+            yield self.flush()
+
+        except StreamClosedError:
+            print("stream close error!!")
+            pass
+
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self):
         print("request progress")
 
-        if g_stdout_handler is None:
-            data = {
-                  'status': 'unknown',
-                  'progress': 0,
-                }
-        else:
-            data = {
-                  "status": g_stdout_handler.get_status(),
-                  "progress": g_stdout_handler.get_progress(),
-                }
+        while True:
+            if g_stdout_handler is not None:
+                status = g_stdout_handler.get_status()
+                if status == 'start':
+                    if self._last != g_stdout_handler.get_progress():
+                        send = {
+                            "progress": g_stdout_handler.get_progress(),
+                        }
+                        yield self.publish(json.dumps(send))
+                        self._last = g_stdout_handler.get_progress()
+                elif status != 'start' and status != 'idle':
+                    print(g_stdout_handler.get_message())
+                    send = {
+                        "progress": g_stdout_handler.get_progress(),
+                        "status": status,
+                        "message": g_stdout_handler.get_message()
+                    }
+                    print(json.dumps(send))
+                    yield self.publish(json.dumps(send))
+                    g_stdout_handler.reset()
 
-        print(data)
-        self.finish(json.dumps(data))
+                    self.finish(json.dumps({
+                        "data": "done"
+                    }))
+                    return
+            else:
+                yield gen.sleep(1)
+
+        print("request progress finished")
 
     @tornado.web.authenticated
     def post(self):
@@ -102,7 +140,7 @@ class ProgramHandler(APIHandler):
             if g_program_thread is not None and g_program_thread.is_alive():
                 print("erase and program thread is still running...")
                 g_program_thread.join()
-                print("erase and program thread finished.")
+                print("previous erase and program thread finished.")
 
             if g_stdout_handler is None:
                 print("create StdoutHandler")
@@ -111,34 +149,21 @@ class ProgramHandler(APIHandler):
             g_program_thread = threading.Thread(target=self.program, args=(filename, g_stdout_handler))
             g_program_thread.start()
             print("program thread start")
-            g_program_thread.join()
-
-            print("program thread done")
+            ### g_program_thread.join()
 
             data = {
               "status": g_stdout_handler.get_status(),
-              "message": g_stdout_handler.get_message()
             }
             print(data)
-            g_stdout_handler.reset()
 
         elif action == "cancel":
             print("cancel thread")
-            data = "erase and program is canceled"
+            data = {
+              "status": "TBC",
+            }
 
-        elif action == "request":
-            print("request progress")
-
-            if g_stdout_handler is None:
-                data = {
-                  'status': 'unknown',
-                  'progress': 0,
-                }
-            else:
-                data = {
-                  "status": g_stdout_handler.get_status(),
-                  "progress": g_stdout_handler.get_progress(),
-                }
+        else:
+            print("unknown action" + action)
 
         print(data)
         self.finish(json.dumps(data))
@@ -147,7 +172,7 @@ class ProgramHandler(APIHandler):
         temp = sys.stdout
         sys.stdout = handler
 
-        handler.set_status("unknown")
+        handler.set_status("start")
         try:
             ret = ProgrammerManager.program(filename)
             sys.stdout = temp
@@ -161,7 +186,7 @@ class ProgramHandler(APIHandler):
                 print("Erase and program done.")
 
                 tc = TouchcommManager()
-                handler.set_message(json.dumps(tc.identify()))
+                handler.set_message(tc.identify())
                 handler.set_status("success")
 
         except Exception as error:

@@ -28,6 +28,9 @@ interface ButtonProps {
     onFinish?: any;
 }
 
+declare global {
+    var source: EventSource;
+}
 
 export default function ButtonProgram(props: ButtonProps) {
     const { children, value, index, title, alert, ...other } = props;
@@ -47,12 +50,17 @@ export default function ButtonProgram(props: ButtonProps) {
         message: string;
     }
 
-    /*
-    interface ProgressResponse {
-        status: string;
-        progress: number;
+    const eventHandler = (event: any) => {
+        let obj = JSON.parse(event.data);
+        //console.log(obj)
+
+        if (obj.progress) {
+            setProgress(obj.progress);
+        }
+        if (obj.status && obj.message) {
+            setProgramStatus(false, obj.status == 'success', JSON.stringify(obj.message));
+        }
     }
-    */
 
     useEffect(() => {
         console.log("start is set");
@@ -61,7 +69,7 @@ export default function ButtonProgram(props: ButtonProps) {
             setProgramStatus(true);
 
             if (context.packrat.includes("PR")) {
-                console.log("packrat is exising");
+                console.log("packrat exists");
             }
             else {
                 console.log("need to download packrat from server");
@@ -72,10 +80,18 @@ export default function ButtonProgram(props: ButtonProps) {
                 setProgramStatus(false, false, "Please choose a HEX file");
             }
             else {
+                globalThis.source = new window.EventSource('/webds/program');
+                console.log(globalThis.source);
+                if (globalThis.source != null) {
+                    globalThis.source.addEventListener('program', eventHandler, false);
+                }
+                else {
+                    console.log("event source is null");
+                }
                 start_program()
                     .then(res => {
                         console.log(res);
-                        setProgramStatus(false, res!.status == 'success', res!.message);
+                        setProgramStatus(true);
                     })
                     .catch((error) => {
                         console.log(error, 'Promise error');
@@ -90,46 +106,21 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log("progress:", progress);
     }, [progress, buffer]);
 
-    /*
-    async function poll(ms: number) {
-        while (true) {
-            console.log("start poll:");
-            let post_progress = 0;
-            setBuffer(post_progress + 3);
-
-            const res: ProgressResponse = await requestAPI<any>('program');
-            console.log(res);
-
-            console.log("progress::::", res);
-            setProgress(res!.progress);
-            post_progress = res!.progress;
-            console.log("progress 1:", res!.progress);
-
-            if (res!.progress == 100)
-                break;
-
-            console.log("progress: 2");
-            await new Promise(f => setTimeout(f, ms));
-            console.log("progress: 3");
-        }
-    }
-    */
-
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
-
         if (start) {
             setAlert(false);
-            //poll(500);
         }
         else {
             console.log(result);
             show_result(status!, result || '');
             setStart(false);
+            globalThis.source.removeEventListener('program', eventHandler, false);
+            globalThis.source.close();
+            console.log("close event source");
         }
 
         setBuffer(0);
         setProgress(0);
-
         setDisable(start);
     }
 
@@ -139,6 +130,7 @@ export default function ButtonProgram(props: ButtonProps) {
         }
         setAlert(false);
     };
+
     const show_result = (pass: boolean, message: string) => {
         console.log("pass:", pass);
         if (pass) {
@@ -156,12 +148,10 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     const start_program = async (): Promise<ProgramResponse | undefined> => {
-        const file_type = "hex";
         const file_name = context.packrat;
         const action = "start";
         const dataToSend = {
             filename: file_name,
-            type: file_type,
             action: action
         };
 
