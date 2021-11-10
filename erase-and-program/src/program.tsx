@@ -63,23 +63,23 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     useEffect(() => {
-        console.log("start is set");
 
         if (isStart) {
-            setProgramStatus(true);
-
             if (context.packrat.includes("PR")) {
-                console.log("packrat exists");
+                //console.log("packrat exists");
             }
             else {
-                console.log("need to download packrat from server");
-                start_fetch();
+                console.log("download hex from packrat server");
+                //start_fetch();
             }
+
+            console.log(context.packrat);
 
             if (context.packrat == "") {
                 setProgramStatus(false, false, "Please choose a HEX file");
             }
             else {
+                setProgramStatus(true);
                 globalThis.source = new window.EventSource('/webds/program');
                 console.log(globalThis.source);
                 if (globalThis.source != null) {
@@ -90,7 +90,6 @@ export default function ButtonProgram(props: ButtonProps) {
                 }
                 start_program()
                     .then(res => {
-                        console.log(res);
                         setProgramStatus(true);
                     })
                     .catch((error) => {
@@ -101,11 +100,6 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }, [isStart]);
 
-    useEffect(() => {
-        console.log("buffer:", buffer);
-        console.log("progress:", progress);
-    }, [progress, buffer]);
-
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
         if (start) {
             setAlert(false);
@@ -114,9 +108,12 @@ export default function ButtonProgram(props: ButtonProps) {
             console.log(result);
             show_result(status!, result || '');
             setStart(false);
-            globalThis.source.removeEventListener('program', eventHandler, false);
-            globalThis.source.close();
-            console.log("close event source");
+            console.log(globalThis.source)
+            if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
+                globalThis.source.removeEventListener('program', eventHandler, false);
+                globalThis.source.close();
+                console.log("close event source");
+            }
         }
 
         setBuffer(0);
@@ -172,6 +169,7 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
+    /*
     const start_fetch = async (): Promise<string | undefined> => {
         try {
             console.log("start to fetch");
@@ -189,29 +187,12 @@ export default function ButtonProgram(props: ButtonProps) {
                         method: 'POST',
                     });
                 });
-
-
-            /*
-            fetch('https://get.geojs.io/v1/ip/geo.json')
-                .then(response => {
-                    console.log(response);
-                    if (!response.ok) {
-                        throw new Error("HTTP error " + response.status);
-                    }
-                    return response.json();
-                })
-                .then(json => {
-                    console.log(json);
-                })
-                .catch(function () {
-                    console.log("error!!!");
-                })
-                */
             return Promise.reject(message);
         } catch (e) {
             return Promise.reject((e as Error).message);
         }
     }
+    */
 
     return (
         <div {...other}>

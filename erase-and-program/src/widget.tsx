@@ -91,7 +91,7 @@ export default function VerticalTabs(
     };
 
     const upload_hex = async (file: File): Promise<string | undefined> => {
-        console.log("upload_hex:", event);
+        console.log("upload_hex:", file);
 
         if (file) {
             setLoading(true);
@@ -242,7 +242,9 @@ export default function VerticalTabs(
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <TextField id="filled-basic"
-                                    label="Packrat"
+                                    label="This Feature Is Coming Soon!"
+                                    value="Packrat"
+                                    disabled
                                     onChange={(e) => setPackrat(e.target.value)}
                                     error={packratError}
                                     sx={{
