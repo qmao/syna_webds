@@ -2,7 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from . import utils
+from .utils import FileHandler
 
 
 class GeneralHandler(APIHandler):
@@ -13,7 +13,7 @@ class GeneralHandler(APIHandler):
     def get(self):
         print(self.request)
 
-        utils.UpdateWorkspace()
+        SystemHandler.UpdateWorkspace()
 
         self.finish(json.dumps({
             "data": "webds-api server is running"
