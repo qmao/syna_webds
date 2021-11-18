@@ -2,7 +2,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
-from .utils import FileHandler
+from .utils import SystemHandler
 
 
 class GeneralHandler(APIHandler):
