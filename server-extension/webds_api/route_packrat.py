@@ -51,7 +51,7 @@ class PackratHandler(APIHandler):
         input_data = self.get_json_body()
         print(input_data)
 
-        filename = packrat_id + "/" +input_data["file"]
+        filename = packrat_id + "/" + input_data["file"]
         print("delete file: ", filename)
         SystemHandler.CallSysCommand(['rm', webds.PACKRAT_CACHE + "/" + filename])
 
