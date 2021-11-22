@@ -1,6 +1,6 @@
-# wifi
+# unit_test
 
-[![Github Actions Status](https://github.com/qmao/erase_and_program/wifi/workflows/Build/badge.svg)](https://github.com/qmao/erase_and_program/wifi/actions/workflows/build.yml)
+[![Github Actions Status](https://github.com/github_username/unit-test/workflows/Build/badge.svg)](https://github.com/github_username/unit-test/actions/workflows/build.yml)
 
 A JupyterLab extension.
 
@@ -15,7 +15,7 @@ A JupyterLab extension.
 To install the extension, execute:
 
 ```bash
-pip install wifi
+pip install unit_test
 ```
 
 ## Uninstall
@@ -23,7 +23,7 @@ pip install wifi
 To remove the extension, execute:
 
 ```bash
-pip uninstall wifi
+pip uninstall unit_test
 ```
 
 
@@ -39,7 +39,7 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the wifi directory
+# Change directory to the unit_test directory
 # Install package in development mode
 pip install -e .
 # Link your development version of the extension with JupyterLab
@@ -68,12 +68,12 @@ jupyter lab build --minimize=False
 ### Development uninstall
 
 ```bash
-pip uninstall wifi
+pip uninstall unit_test
 ```
 
 In development mode, you will also need to remove the symlink created by `jupyter labextension develop`
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
-folder is located. Then you can remove the symlink named `@webds/webds-wifi` within that folder.
+folder is located. Then you can remove the symlink named `unit-test` within that folder.
 
 ### Packaging the extension
 

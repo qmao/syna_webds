@@ -19,11 +19,11 @@
     "strictNullChecks": true,
     "target": "es2017",
     "types": [ "node" ],
-    "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ]
+      "skipLibCheck": true,
+      "typeRoots": [
+         "./node_modules/@types",
+         "./types"
+      ]
   },
-  "include": [ "src/*" ]
+  "include": ["src/*"]
 }

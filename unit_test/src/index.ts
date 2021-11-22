@@ -13,15 +13,17 @@ import { TestList } from './testlist'
 
 import { StackedPanel } from '@lumino/widgets';
 
+import { extensionTestIcon } from './icons';
+
 namespace CommandIDs {
   export const get = 'webds:unit-test';
 }
 
 /**
- * Initialization data for the @webds/webds-wifi extension.
+ * Initialization data for the @webds/webds-unit-test extension.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
-  id: '@webds/webds-wifi:plugin',
+  id: '@webds/unit-test:plugin',
   autoStart: true,
   optional: [ILauncher, ISettingRegistry],
   requires: [ICommandPalette],
@@ -31,17 +33,20 @@ const plugin: JupyterFrontEndPlugin<void> = {
 	palette: ICommandPalette,
 	launcher: ILauncher | null,
   ) => {
-    console.log('JupyterLab extension @webds/webds-wifi is activated!');
+    console.log('JupyterLab extension @webds/webds-unit-test is activated!');
 
     if (settingRegistry) {
+		/*
       settingRegistry
         .load(plugin.id)
         .then(settings => {
-          console.log('@webds/webds-wifi settings loaded:', settings.composite);
+          console.log('@webds/webds-unit-test settings loaded:', settings.composite);
         })
         .catch(reason => {
-          console.error('Failed to load settings for @webds/webds-wifi.', reason);
+          console.error('Failed to load settings for @webds/webds-unit-test.', reason);
         });
+		*/
+		console.log(settingRegistry);
     }
 	
 	const { commands, shell } = app;
@@ -53,7 +58,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     commands.addCommand(command, {
       label: extension_string,
       caption: extension_string,
-	  //icon: extensionProgramIcon,
+	  icon: extensionTestIcon,
       execute: () => {
 
 		let list = new TestList();

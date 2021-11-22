@@ -1,7 +1,7 @@
 {
   "jupyter.lab.shortcuts": [],
-  "title": "@webds/webds-wifi",
-  "description": "@webds/webds-wifi settings.",
+  "title": "unit-test",
+  "description": "unit-test settings.",
   "type": "object",
   "properties": {},
   "additionalProperties": false
