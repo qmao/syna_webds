@@ -7,8 +7,6 @@ import { ICommandPalette } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
-
 import { TestList } from './testlist'
 
 import { StackedPanel } from '@lumino/widgets';
@@ -25,30 +23,15 @@ namespace CommandIDs {
 const plugin: JupyterFrontEndPlugin<void> = {
   id: '@webds/unit-test:plugin',
   autoStart: true,
-  optional: [ILauncher, ISettingRegistry],
+  optional: [ILauncher],
   requires: [ICommandPalette],
   activate: (
 	app: JupyterFrontEnd,
-	settingRegistry: ISettingRegistry | null,
 	palette: ICommandPalette,
 	launcher: ILauncher | null,
   ) => {
     console.log('JupyterLab extension @webds/webds-unit-test is activated!');
 
-    if (settingRegistry) {
-		/*
-      settingRegistry
-        .load(plugin.id)
-        .then(settings => {
-          console.log('@webds/webds-unit-test settings loaded:', settings.composite);
-        })
-        .catch(reason => {
-          console.error('Failed to load settings for @webds/webds-unit-test.', reason);
-        });
-		*/
-		console.log(settingRegistry);
-    }
-	
 	const { commands, shell } = app;
     const command = CommandIDs.get;
     const category = 'WebDS';
