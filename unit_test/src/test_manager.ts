@@ -23,7 +23,7 @@ export class TestManager {
 		this._list = [];
 		this._class_list = [];
 	}
-	
+
 	build() {
 		// TBC: auto detection
 		this._class_list.push(TestGetList);

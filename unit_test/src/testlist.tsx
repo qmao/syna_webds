@@ -17,13 +17,9 @@ import DangerousOutlinedIcon from '@mui/icons-material/DangerousOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import Box from '@mui/material/Box';
 import { red, green, yellow } from '@mui/material/colors';
-
-
-
 import Snackbar from '@mui/material/Snackbar';
 
 import { TestUnit } from './test/test_interface';
-
 import { TestManager } from './test_manager';
 
 export default function UnitTest() {
@@ -41,7 +37,6 @@ export default function UnitTest() {
         });
     }
 
-    const testManager = new TestManager();
     const [start, setStart] = React.useState(false);
     const [reset, setReset] = React.useState(false);
     const [open, setOpen] = React.useState(false);
@@ -66,12 +61,12 @@ export default function UnitTest() {
     }, [tests]);
 
     React.useEffect(() => {
+        let testManager = new TestManager();
         testManager.build();
         setTests(testManager.list);
 
-        console.log("Set Test Manager at beginning");
+        console.log("Create Test Manager at beginning");
     }, []);
-
 
     const test = async () => {
         setReset(true);
