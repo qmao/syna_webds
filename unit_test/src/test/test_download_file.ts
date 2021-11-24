@@ -8,7 +8,8 @@ export class TestDownloadFile extends TestBase {
 
 	constructor(packrat: string, file: string) {
 		super();
-		
+		this._id = 'DownloadFile' + '_' + packrat + '_' + file;
+		this._title = 'Download File'
 		this._file = file;
 		this._packrat = packrat;
 	}

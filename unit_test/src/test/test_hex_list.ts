@@ -3,14 +3,21 @@ import { TestResult } from './test_interface'
 import { TestBase } from './test_base'
 
 export class TestGetHexList extends TestBase {
-		
-	constructor() {
+	
+	_extension: string;
+	
+	constructor(extension: string) {
 		super();
+		this._id = 'GetList' + '_' + extension;
+		this._title = 'Test Get Hex List';
+		this._extension = extension
 	}
 	
 	async run() : Promise<TestResult> {
 		try {
-			const reply = await requestAPI<any>('packrat?extension=hex', {
+			let url = 'packrat?extension=' + this._extension;
+			
+			const reply = await requestAPI<any>(url, {
 				method: 'GET',
 			});
 

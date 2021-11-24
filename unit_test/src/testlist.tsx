@@ -22,11 +22,9 @@ import { red, green, yellow } from '@mui/material/colors';
 
 import Snackbar from '@mui/material/Snackbar';
 
-import { TestGetHexList } from './test/test_hex_list'
-import { TestDownloadFile } from './test/test_download_file';
 import { TestUnit } from './test/test_interface';
 
-
+import { TestManager } from './test_manager';
 
 export default function UnitTest() {
 
@@ -86,13 +84,13 @@ export default function UnitTest() {
     const [reset, setReset] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [openMessage, setOpenMessage] = React.useState('');
-    const [items, setItems] = React.useState<TestUnit[]>([]);
+    const [testManager, setTestManager] = React.useState<TestManager>(new TestManager());
 
 
     React.useEffect(() => {
         console.log("reset:", reset)
         if (reset) {
-            items.map((currElement, index) => {
+            testManager.list.map((currElement, index) => {
                 currElement.state = 'pending';
             });
         }
@@ -103,19 +101,15 @@ export default function UnitTest() {
     }, [start]);
 
     React.useEffect(() => {
-        setItems(
-            [
-                new TestGetHexList(),
-                new TestDownloadFile("3080091", "PR3080091.hex")
-            ]
-        );
+        setTestManager(testManager);
+        console.log(test);
     }, []);
 
 
     const test = async () => {
         setReset(true);
 
-        for (let value of items) {
+        for (let value of testManager.list) {
             await test_main(value);
         }
         setReset(false)
@@ -138,7 +132,7 @@ export default function UnitTest() {
                     </ListSubheader>
                 }
             >
-                {items.map((test) => (
+                {testManager.list.map((test) => (
                     <ListItemButton>
                         <ListItemText primary={`Test ${test.title}`} />
                         <IconButton onClick={() => test_main(test)}>
