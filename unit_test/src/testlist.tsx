@@ -86,11 +86,7 @@ export default function UnitTest() {
     const [reset, setReset] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [openMessage, setOpenMessage] = React.useState('');
-    const [items, setItems] = React.useState<TestUnit[]>(
-        [
-            new TestGetHexList(),
-            new TestDownloadFile("file name")
-        ]);
+    const [items, setItems] = React.useState<TestUnit[]>([]);
 
 
     React.useEffect(() => {
@@ -110,7 +106,7 @@ export default function UnitTest() {
         setItems(
             [
                 new TestGetHexList(),
-                new TestDownloadFile("file name")
+                new TestDownloadFile("3080091", "PR3080091.hex")
             ]
         );
     }, []);

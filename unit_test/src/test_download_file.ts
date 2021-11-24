@@ -3,19 +3,28 @@ import { TestResult, TestUnit } from './test_interface'
 export class TestDownloadFile implements TestUnit {
 	_title: string;
 	_result: TestResult;
-	_file: string;
 	_state: string;
 
-	constructor(file: string) {
+	_file: string;
+	_packrat: string;
+
+	constructor(packrat: string, file: string) {
 		this._title = 'Test Download File';
 		this._result = { status: 'pending', info: "" };
 		this._state = 'pending';
+		
 		this._file = file;
+		this._packrat = packrat;
 	}
 	
 	async run() : Promise<TestResult> {
 		try {
-            var myRequest = new Request('/webds/packrat?packrat-id=3080091&filename=PR3080091.hex');
+			
+			let url = '/webds/packrat?packrat-id=' + this._packrat + '&filename=' + this._file
+			
+			console.log(url);
+
+            var myRequest = new Request(url);
 
             const response = await fetch(myRequest);
 			console.log(response);
@@ -30,12 +39,10 @@ export class TestDownloadFile implements TestUnit {
 			if ( blob.size < read_max )
 				read_max = blob.size;
 
-			if ( blob.size > 2 ) { 
-				this._result = { status: 'pass', info: text.substring(0, read_max) };
-			}
-			else
-			{
+			if ( blob.type == "application/json" ) {
 				this._result = { status: 'fail', info: text.substring(0, read_max) };	
+			} else {
+				this._result = { status: 'pass', info: text.substring(0, read_max) };	
 			}
 
 			this._state = 'done';
