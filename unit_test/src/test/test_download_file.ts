@@ -1,17 +1,13 @@
-import { TestResult, TestUnit } from './test_interface'
+import { TestResult } from './test_interface'
+import { TestBase } from './test_base'
 
-export class TestDownloadFile implements TestUnit {
-	_title: string;
-	_result: TestResult;
-	_state: string;
-
+export class TestDownloadFile extends TestBase {
+		
 	_file: string;
 	_packrat: string;
 
 	constructor(packrat: string, file: string) {
-		this._title = 'Test Download File';
-		this._result = { status: 'pending', info: "" };
-		this._state = 'pending';
+		super();
 		
 		this._file = file;
 		this._packrat = packrat;
@@ -52,21 +48,5 @@ export class TestDownloadFile implements TestUnit {
 			this._state = 'done';
             return Promise.reject(this._result);
         }
-	}
-
-	get title() {
-		return this._title;
-	}
-	
-	get result() {
-		return this._result;
-	}
-	
-	get state() {
-		return this._state;
-	}
-	
-	set state(s: string ) {
-		this._state = s;
 	}
 }

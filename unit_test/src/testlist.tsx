@@ -22,9 +22,9 @@ import { red, green, yellow } from '@mui/material/colors';
 
 import Snackbar from '@mui/material/Snackbar';
 
-import { TestGetHexList } from './test_hex_list'
-import { TestDownloadFile } from './test_download_file';
-import { TestUnit } from './test_interface';
+import { TestGetHexList } from './test/test_hex_list'
+import { TestDownloadFile } from './test/test_download_file';
+import { TestUnit } from './test/test_interface';
 
 
 
