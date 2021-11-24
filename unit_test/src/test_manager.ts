@@ -19,11 +19,13 @@ export class TestManager {
 	
 	constructor() {
 		console.log("CONSTRUCTOR IS CALLED?");
-		
+
 		this._list = [];
-		
-		// TBC: auto detection
 		this._class_list = [];
+	}
+	
+	build() {
+		// TBC: auto detection
 		this._class_list.push(TestGetList);
 		this._class_list.push(TestDownloadFile);
 		this._class_list.push(TestProgram);
@@ -53,6 +55,7 @@ export class TestManager {
 			});
 		
 		});
+		
 	}
 	
 	get list() {

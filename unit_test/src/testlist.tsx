@@ -66,7 +66,9 @@ export default function UnitTest() {
     }, [tests]);
 
     React.useEffect(() => {
+        testManager.build();
         setTests(testManager.list);
+
         console.log("Set Test Manager at beginning");
     }, []);
 
