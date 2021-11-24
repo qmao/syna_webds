@@ -12,6 +12,7 @@ export interface TestResult {
 
 export interface TestUnit {
 	run: () => Promise<TestResult>;
-	Name: string;
-	Result: TestResult;
+	title: string;
+	result: TestResult;
+	state: string;
 }

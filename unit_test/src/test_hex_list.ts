@@ -3,38 +3,46 @@ import { TestResult, TestUnit } from './test_interface'
 
 export class TestGetHexList implements TestUnit {
 
-	name: string;
-	result: TestResult;
-
+	_title: string;
+	_result: TestResult;
+	_state: string;
+		
 	constructor() {
-		this.name = 'Test Get Hex List';
-		this.result = { status: 'pending', info: "" };
+		this._title = 'Test Get Hex List';
+		this._result = { status: 'pending', info: "" };
+		this._state = 'pending';
 	}
 	
 	async run() : Promise<TestResult> {
-	
-		console.log("get_hex_list:", event);
 		try {
 			const reply = await requestAPI<any>('packrat?extension=hex', {
 				method: 'GET',
 			});
 
-			this.result = { status: 'pass', info: reply['filelist'].toString() };
-			return Promise.resolve(this.result);
+			this._state = 'done';
+			this._result = { status: 'pass', info: reply['filelist'].toString() };
+			return Promise.resolve(this._result);
 
 		} catch (error) {
-			this.result = { status: 'fail', info: error.message };
-			return Promise.resolve(this.result);
+			this._state = 'done';
+			this._result = { status: 'fail', info: error.message };
+			return Promise.resolve(this._result);
 		}
 	}
 
-	get Name() {
-		return this.name;
+	get title() {
+		return this._title;
 	}
 	
-	get Result() {
-		return this.result;
+	get result() {
+		return this._result;
 	}
 	
-
+	get state() {
+		return this._state;
+	}
+	
+	set state(s: string ) {
+		this._state = s;
+	}
 }
