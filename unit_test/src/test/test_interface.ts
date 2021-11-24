@@ -15,5 +15,4 @@ export interface TestUnit {
 	title: string;
 	result: TestResult;
 	state: string;
-	id: string;
 }

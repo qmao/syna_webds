@@ -1,23 +1,26 @@
 import { TestResult } from './test_interface'
 import { TestBase } from './test_base'
 
-export class TestDownloadFile extends TestBase {
-		
-	_file: string;
-	_packrat: string;
+export interface TestDownloadFileParam {
+	file: string;
+	packrat: string;
+}
 
-	constructor(packrat: string, file: string) {
+export class TestDownloadFile extends TestBase {
+	static id: string = 'DownloadFile';
+
+	_param: TestDownloadFileParam;
+
+	constructor() {
 		super();
-		this._id = 'DownloadFile' + '_' + packrat + '_' + file;
-		this._title = 'Download File'
-		this._file = file;
-		this._packrat = packrat;
+		this._title = 'Download File ';
+		this._param = {file: '', packrat: ''}
 	}
 	
 	async run() : Promise<TestResult> {
 		try {
 			
-			let url = '/webds/packrat?packrat-id=' + this._packrat + '&filename=' + this._file
+			let url = '/webds/packrat?packrat-id=' + this._param.packrat + '&filename=' + this._param.file
 			
 			console.log(url);
 
@@ -49,5 +52,15 @@ export class TestDownloadFile extends TestBase {
 			this._state = 'done';
             return Promise.reject(this._result);
         }
+	}
+	
+	set param(param: TestDownloadFileParam) {
+		this._param = param;
+		this._title += JSON.stringify(this._param);
+	}
+	
+	static create(): TestBase
+	{
+		return new TestDownloadFile();
 	}
 }

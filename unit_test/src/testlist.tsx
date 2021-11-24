@@ -40,57 +40,18 @@ export default function UnitTest() {
                 setStart(false);
         });
     }
-     
-    /*
-    const test_reprogram = async (): Promise<TestResult | undefined> => {
-        const file_name = "3365253/PR3365253.hex";
-        const action = "start";
-        const dataToSend = {
-            filename: file_name,
-            action: action
-        };
 
-        console.log("filename:", file_name);
-
-        try {
-
-       
-            const reply = await requestAPI<any>('program', {
-                body: JSON.stringify(dataToSend),
-                method: 'POST',
-            });
-            console.log(reply);
-
-            await new Promise(f => setTimeout(f, 5000));
-
-            return Promise.resolve({
-                status: 'pass',
-                info: reply
-            });
-
-        } catch (e) {
-            console.error(
-                `Error on POST ${dataToSend}.\n${e}`
-            );
-
-            return Promise.reject({
-                status: 'fail',
-                info: (e as Error).message
-            });
-        }
-    }
-*/
+    const testManager = new TestManager();
     const [start, setStart] = React.useState(false);
     const [reset, setReset] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [openMessage, setOpenMessage] = React.useState('');
-    const [testManager, setTestManager] = React.useState<TestManager>(new TestManager());
-
+    const [tests, setTests] = React.useState<TestUnit[]>([]);
 
     React.useEffect(() => {
         console.log("reset:", reset)
         if (reset) {
-            testManager.list.map((currElement, index) => {
+            tests.map((currElement, index) => {
                 currElement.state = 'pending';
             });
         }
@@ -101,15 +62,19 @@ export default function UnitTest() {
     }, [start]);
 
     React.useEffect(() => {
-        setTestManager(testManager);
-        console.log(test);
+        console.log("tests:", tests)
+    }, [tests]);
+
+    React.useEffect(() => {
+        setTests(testManager.list);
+        console.log("Set Test Manager at beginning");
     }, []);
 
 
     const test = async () => {
         setReset(true);
 
-        for (let value of testManager.list) {
+        for (let value of tests) {
             await test_main(value);
         }
         setReset(false)
@@ -119,7 +84,7 @@ export default function UnitTest() {
         <Box sx={{
             flexDirection: 'column',
             display: 'flex',
-            width: 400,
+            width: 500,
             maxHeight: 500,
         }}>
             <IconButton onClick={() => test()}>
@@ -132,7 +97,7 @@ export default function UnitTest() {
                     </ListSubheader>
                 }
             >
-                {testManager.list.map((test) => (
+                {tests.map((test) => (
                     <ListItemButton>
                         <ListItemText primary={`Test ${test.title}`} />
                         <IconButton onClick={() => test_main(test)}>
