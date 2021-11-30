@@ -14,7 +14,7 @@ export class TestGetList extends TestBase {
 	
 	constructor() {
 		super();
-		this._title = 'Get List ';
+		this._title = 'Get List';
 		this._param = { extension: '' }
 	}
 	
@@ -38,8 +38,8 @@ export class TestGetList extends TestBase {
 	}
 	
 	set param(param: TestGetListParam) {
+		this.setParameter(param);
 		this._param = param;
-		this._title += JSON.stringify(this._param);
 	}
 	
 	static create(): TestBase

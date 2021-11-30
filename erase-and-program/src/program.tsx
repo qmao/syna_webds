@@ -12,6 +12,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
+import { PackratSession } from './packrat/Packrat_Client.js';
+
 
 export interface IProgramInfo {
     filename: string;
@@ -70,7 +72,7 @@ export default function ButtonProgram(props: ButtonProps) {
             }
             else {
                 console.log("download hex from packrat server");
-                //start_fetch();
+                start_fetch();
             }
 
             console.log(context.packrat);
@@ -169,9 +171,15 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
-    /*
     const start_fetch = async (): Promise<string | undefined> => {
         try {
+
+            var packratSession = new PackratSession({
+                serverUrl: "http://sjc1uvt-packrat01.synaptics.com:8088/service"
+            });
+
+            console.log(packratSession);
+
             console.log("start to fetch");
 
             var myRequest = new Request('https://get.geojs.io/v1/ip/geo.json');
@@ -192,7 +200,6 @@ export default function ButtonProgram(props: ButtonProps) {
             return Promise.reject((e as Error).message);
         }
     }
-    */
 
     return (
         <div {...other}>

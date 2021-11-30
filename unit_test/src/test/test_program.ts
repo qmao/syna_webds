@@ -103,8 +103,8 @@ export class TestProgram extends TestBase {
 	}
 
 	set param(param: TestProgramParam) {
+		this.setParameter(param);
 		this._param = param;
-		this._title += JSON.stringify(this._param);
 	}
 	
 	static create(): TestBase

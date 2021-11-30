@@ -13,7 +13,7 @@ export class TestDownloadFile extends TestBase {
 
 	constructor() {
 		super();
-		this._title = 'Download File ';
+		this._title = 'Download File';
 		this._param = {file: '', packrat: ''}
 	}
 	
@@ -55,8 +55,8 @@ export class TestDownloadFile extends TestBase {
 	}
 	
 	set param(param: TestDownloadFileParam) {
+		this.setParameter(param);
 		this._param = param;
-		this._title += JSON.stringify(this._param);
 	}
 	
 	static create(): TestBase

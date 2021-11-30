@@ -42,4 +42,9 @@ export class TestBase implements TestUnit {
 	set param(param: any) {
 
 	}
+	
+	setParameter(param: any) {
+		this._title += '\n';
+		this._title += JSON.stringify(param);
+	}
 }
