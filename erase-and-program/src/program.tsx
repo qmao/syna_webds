@@ -12,7 +12,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
-import { PackratSession } from './packrat/Packrat_Client.js';
+import DownloadBlob, { BlobFile } from './packrat/packrat'
 
 
 export interface IProgramInfo {
@@ -174,28 +174,22 @@ export default function ButtonProgram(props: ButtonProps) {
     const start_fetch = async (): Promise<string | undefined> => {
         try {
 
-            var packratSession = new PackratSession({
-                serverUrl: "http://sjc1uvt-packrat01.synaptics.com:8088/service"
+            console.log("start to fetch");
+            console.log(context.packrat);
+
+            let blob: BlobFile | undefined = DownloadBlob(context.packrat, "hex");
+
+            const formData = new FormData();
+            formData.append("blob", blob!.content, blob!.name);
+
+            const reply = requestAPI<any>('upload', {
+                body: formData,
+                method: 'POST',
             });
 
-            console.log(packratSession);
+            console.log(reply);
 
-            console.log("start to fetch");
-
-            var myRequest = new Request('https://get.geojs.io/v1/ip/geo.json');
-
-            fetch(myRequest)
-                .then(response => response.blob())
-                .then(function (myBlob) {
-                    const formData = new FormData();
-                    formData.append("blob", myBlob, 'test');
-
-                    requestAPI<any>('upload', {
-                        body: formData,
-                        method: 'POST',
-                    });
-                });
-            return Promise.reject(message);
+            return Promise.resolve(reply);
         } catch (e) {
             return Promise.reject((e as Error).message);
         }
