@@ -12,12 +12,26 @@ class SystemHandler():
     def CallSysCommand(command):
         if os.geteuid() == 0:
             print("We're root")
-            subprocess.call(command)
         else:
             print("We're not root.")
-            sudo_command = ['sudo'] + command
-            print(command)
-            subprocess.call(sudo_command)
+            command = ['sudo'] + command
+        print(command)
+        subprocess.call(sudo_command)
+
+    def RunSysCommand(command):
+        if os.geteuid() == 0:
+            print("We're root")
+        else:
+            print("We're not root.")
+            command = ['sudo'] + command + ['']
+
+        print(command)
+        result = subprocess.run(command, capture_output=True, text=True)
+        print("stdout:", result.stdout)
+
+        ### should throw exception
+        print("stderr:", result.stderr)
+        return result.stdout
 
     def UpdateHexLink():
         if os.path.exists(webds.WORKSPACE_CACHE):

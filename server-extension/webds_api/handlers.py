@@ -6,7 +6,7 @@ import tornado
 from .route_program import ProgramHandler
 from .route_general import GeneralHandler
 from .route_packrat import PackratHandler
-
+from .route_about   import AboutHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -19,6 +19,13 @@ def setup_handlers(web_app):
 
     packrat_pattern = url_path_join(base_url, "webds", "packrat" + '(.*)')
 
-    handlers = [(general_pattern, GeneralHandler), (program_pattern, ProgramHandler), (packrat_pattern, PackratHandler)]
+    about_pattern = url_path_join(base_url, "webds", "about")
+
+    handlers = [
+                (general_pattern, GeneralHandler),
+                (program_pattern, ProgramHandler),
+                (packrat_pattern, PackratHandler),
+                (about_pattern, AboutHandler)
+               ]
 
     web_app.add_handlers(host_pattern, handlers)
