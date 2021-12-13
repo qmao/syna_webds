@@ -50,22 +50,22 @@ class AboutHandler(APIHandler):
 
         print(self.request.arguments)
 
+        query = self.get_argument('query', None)
         os_info = self.get_argument('os-info', None)
         system_info = self.get_argument('system-info', None)
         phone_info = self.get_argument('phone-connection', None)
 
-        if phone_info is not None:
+        if query == 'phone-connection':
             connected = ReadPhoneInfo()
-            self.set_header('content-type', 'application/json')
             self.finish(json.dumps({
                 "connection": connected
             }))
 
-        elif system_info is not None:
+        elif query == 'system-info':
             info = ReadSystemInfo()
             self.finish(json.dumps(info))
 
-        elif os_info is not None:
+        elif query == 'os-info':
             info = ReadOsInfo()
             self.finish(json.dumps(info))
 

@@ -9,18 +9,18 @@ from . import webds
 from tornado import iostream, gen
 
 class SystemHandler():
-    def CallSysCommand(command):
-        if os.geteuid() == 0:
-            print("We're root")
+    def CallSysCommand(command, user = False):
+        if os.geteuid() == 0 or user:
+            print("No need to call with sudo")
         else:
             print("We're not root.")
             command = ['sudo'] + command
         print(command)
-        subprocess.call(sudo_command)
+        subprocess.call(command)
 
-    def RunSysCommand(command):
-        if os.geteuid() == 0:
-            print("We're root")
+    def RunSysCommand(command, user = False):
+        if os.geteuid() == 0 or user:
+            print("No need to call with sudo")
         else:
             print("We're not root.")
             command = ['sudo'] + command + ['']
