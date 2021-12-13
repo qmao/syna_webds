@@ -34,13 +34,13 @@ class SystemHandler():
         return result.stdout
 
     def UpdateHexLink():
-        if os.path.exists(webds.WORKSPACE_CACHE):
+        if os.path.exists(webds.WORKSPACE_PACKRAT_DIR):
             try:
-                shutil.rmtree(webds.WORKSPACE_CACHE)
+                shutil.rmtree(webds.WORKSPACE_PACKRAT_DIR)
             except OSError as e:
                 print("Error: %s - %s." % (e.filename, e.strerror))
 
-        os.makedirs(webds.WORKSPACE_CACHE, exist_ok=True)
+        os.makedirs(webds.WORKSPACE_PACKRAT_DIR, exist_ok=True)
 
         for packrat in os.listdir(webds.PACKRAT_CACHE):
             print(packrat)
@@ -48,7 +48,7 @@ class SystemHandler():
             for fname in os.listdir(dirpath):
                 if fname.endswith('.hex'):
                     print(dirpath)
-                    os.symlink(dirpath, webds.WORKSPACE_CACHE + '/' + packrat)
+                    os.symlink(dirpath, webds.WORKSPACE_PACKRAT_DIR + '/' + packrat)
                     break
 
     def UpdateWorkspace():

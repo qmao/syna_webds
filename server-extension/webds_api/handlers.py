@@ -21,7 +21,7 @@ def setup_handlers(web_app):
     packrat_pattern = url_path_join(base_url, "webds", "packrat" + '(.*)')
 
     about_pattern = url_path_join(base_url, "webds", "about")
-    
+
     filesystem_pattern = url_path_join(base_url, "webds", "filesystem")
 
     handlers = [

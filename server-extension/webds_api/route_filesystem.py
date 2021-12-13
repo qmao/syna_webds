@@ -41,7 +41,7 @@ class FilesystemHandler(APIHandler):
 
                 body = f["body"]
                 
-                SystemHandler.CallSysCommand(['mkdir','-p', webds.WORKSPACE_CACHE_FOLDER], True)
+                SystemHandler.CallSysCommand(['mkdir','-p', webds.WORKSPACE_CACHE_DIR], True)
                 
                 # save temp hex file in worksapce
                 with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
@@ -53,7 +53,7 @@ class FilesystemHandler(APIHandler):
                 SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
                 
                 # delete cache folder
-                SystemHandler.CallSysCommand(['rm', '-rf', webds.WORKSPACE_CACHE_FOLDER])
+                SystemHandler.CallSysCommand(['rm', '-rf', webds.WORKSPACE_CACHE_DIR])
 
         data = {'data': 'done'}
         self.set_header('content-type', 'application/json')

@@ -28,7 +28,7 @@ class PackratHandler(APIHandler):
             print(packrat_id)
             print(filename)
 
-            filename = webds.WORKSPACE_CACHE + '/' + packrat_id + '/' + filename
+            filename = webds.WORKSPACE_PACKRAT_DIR + '/' + packrat_id + '/' + filename
             print(filename)
             await FileHandler.download(self, filename)
 
@@ -53,7 +53,7 @@ class PackratHandler(APIHandler):
 
         filename = packrat_id + "/" + input_data["file"]
         print("delete file: ", filename)
-        SystemHandler.CallSysCommand(['rm', webds.PACKRAT_CACHE + "/" + filename])
+        SystemHandler.CallSysCommand(['rm', webds.PACKRAT_PACKRAT_DIR + "/" + filename])
 
         self.finish(json.dumps("{delete: yes}"))
 
@@ -81,17 +81,17 @@ class PackratHandler(APIHandler):
                     ##return
 
                 # save temp hex file in worksapce
-                with open(webds.WORKSPACE_TEMP_HEX, 'wb') as f:
+                with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.PACKRAT_CACHE, packrat_id)
+                path = os.path.join(webds.PACKRAT_PACKRAT_DIR, packrat_id)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
                 packrat_filename="PR" + packrat_id + ".hex"
                 file_path = os.path.join(path, packrat_filename)
                 print(file_path)
 
-                SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_HEX, file_path])
+                SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
                 SystemHandler.UpdateWorkspace()
 
                 data = json.loads("{}")
@@ -113,17 +113,17 @@ class PackratHandler(APIHandler):
                 print(filename)
 
                 # save temp hex file in worksapce
-                with open(webds.WORKSPACE_TEMP_HEX, 'wb') as f:
+                with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.PACKRAT_CACHE, packrat)
+                path = os.path.join(webds.PACKRAT_PACKRAT_DIR, packrat)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
 
                 file_path = os.path.join(path, filename)
                 print(file_path)
 
-                SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_HEX, file_path])
+                SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
                 SystemHandler.UpdateWorkspace()
 
                 data = json.loads("{}")
