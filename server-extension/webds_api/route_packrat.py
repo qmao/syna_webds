@@ -53,6 +53,7 @@ class PackratHandler(APIHandler):
         filename = os.path.join(webds.PACKRAT_CACHE, packrat_id[1:], input_data["file"])
         print("delete file: ", filename)
         SystemHandler.CallSysCommand(['rm', filename])
+        SystemHandler.UpdateWorkspace()
 
         self.finish(json.dumps("{delete: yes}"))
 
