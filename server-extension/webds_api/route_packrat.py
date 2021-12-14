@@ -53,7 +53,7 @@ class PackratHandler(APIHandler):
 
         filename = packrat_id + "/" + input_data["file"]
         print("delete file: ", filename)
-        SystemHandler.CallSysCommand(['rm', webds.PACKRAT_PACKRAT_DIR + "/" + filename])
+        SystemHandler.CallSysCommand(['rm', webds.WORKSPACE_PACKRAT_DIR + "/" + filename])
 
         self.finish(json.dumps("{delete: yes}"))
 
@@ -85,7 +85,7 @@ class PackratHandler(APIHandler):
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.PACKRAT_PACKRAT_DIR, packrat_id)
+                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
                 packrat_filename="PR" + packrat_id + ".hex"
                 file_path = os.path.join(path, packrat_filename)
@@ -117,7 +117,7 @@ class PackratHandler(APIHandler):
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.PACKRAT_PACKRAT_DIR, packrat)
+                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
 
                 file_path = os.path.join(path, filename)
