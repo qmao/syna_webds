@@ -73,7 +73,7 @@ class ProgramHandler(APIHandler):
         """Pushes data to a listener."""
         try:
             self.set_header('content-type', 'text/event-stream')
-            self.write('event: program\n')
+            self.write('event: reprogram\n')
             self.write('data: {}\n'.format(data))
             self.write('\n')
             yield self.flush()

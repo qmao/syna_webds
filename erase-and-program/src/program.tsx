@@ -82,10 +82,10 @@ export default function ButtonProgram(props: ButtonProps) {
             }
             else {
                 setProgramStatus(true);
-                globalThis.source = new window.EventSource('/webds/program');
+                globalThis.source = new window.EventSource('/webds/reprogram');
                 console.log(globalThis.source);
                 if (globalThis.source != null) {
-                    globalThis.source.addEventListener('program', eventHandler, false);
+                    globalThis.source.addEventListener('reprogram', eventHandler, false);
                 }
                 else {
                     console.log("event source is null");
@@ -112,7 +112,7 @@ export default function ButtonProgram(props: ButtonProps) {
             setStart(false);
             console.log(globalThis.source)
             if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
-                globalThis.source.removeEventListener('program', eventHandler, false);
+                globalThis.source.removeEventListener('reprogram', eventHandler, false);
                 globalThis.source.close();
                 console.log("close event source");
             }
@@ -157,7 +157,7 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log("filename:", file_name);
 
         try {
-            const reply = await requestAPI<any>('program', {
+            const reply = await requestAPI<any>('reprogram', {
                 body: JSON.stringify(dataToSend),
                 method: 'POST',
             });

@@ -3,7 +3,7 @@ from jupyter_server.utils import url_path_join
 
 import tornado
 
-from .route_program      import ProgramHandler
+from .route_reprogram    import ProgramHandler
 from .route_general      import GeneralHandler
 from .route_packrat      import PackratHandler
 from .route_about        import AboutHandler
@@ -16,7 +16,7 @@ def setup_handlers(web_app):
 
     general_pattern = url_path_join(base_url, "webds", "general")
 
-    program_pattern = url_path_join(base_url, "webds", "program")
+    reprogram_pattern = url_path_join(base_url, "webds", "reprogram")
 
     packrat_pattern = url_path_join(base_url, "webds", "packrat" + '(.*)')
 
@@ -26,7 +26,7 @@ def setup_handlers(web_app):
 
     handlers = [
                 (general_pattern, GeneralHandler),
-                (program_pattern, ProgramHandler),
+                (reprogram_pattern, ProgramHandler),
                 (packrat_pattern, PackratHandler),
                 (about_pattern, AboutHandler),
                 (filesystem_pattern, FilesystemHandler),
