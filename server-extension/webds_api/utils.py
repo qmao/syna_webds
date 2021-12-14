@@ -33,6 +33,9 @@ class SystemHandler():
         print("stderr:", result.stderr)
         return result.stdout
 
+    def UpdateWorkSpaceCache():
+        os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)
+
     def UpdateHexLink():
         if os.path.exists(webds.WORKSPACE_PACKRAT_DIR):
             try:
@@ -49,16 +52,18 @@ class SystemHandler():
 
         for packrat in os.listdir(webds.PACKRAT_CACHE):
             print(packrat)
-            dirpath = webds.PACKRAT_CACHE + '/' + packrat
-            for fname in os.listdir(dirpath):
+            cache_path = os.path.join(webds.PACKRAT_CACHE, packrat)
+            for fname in os.listdir(cache_path):
                 if fname.endswith('.hex'):
-                    print(dirpath)
-                    os.symlink(dirpath, webds.WORKSPACE_PACKRAT_DIR + '/' + packrat)
+                    ws_path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat)
+                    print(ws_path + " -> " + cache_path)
+                    os.symlink(cache_path, ws_path)
                     break
 
     def UpdateWorkspace():
         SystemHandler.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
         SystemHandler.UpdateHexLink()
+        SystemHandler.UpdateWorkSpaceCache()
 
 class HexFile():
     def GetSymbolValue(symbol, content):

@@ -28,7 +28,7 @@ class PackratHandler(APIHandler):
             print(packrat_id)
             print(filename)
 
-            filename = webds.WORKSPACE_PACKRAT_DIR + '/' + packrat_id + '/' + filename
+            filename = os.path.join(webds.PACKRAT_CACHE, packrat_id, filename)
             print(filename)
             await FileHandler.download(self, filename)
 
@@ -49,11 +49,10 @@ class PackratHandler(APIHandler):
     def delete(self, packrat_id: str = ""):
         print(self.request)
         input_data = self.get_json_body()
-        print(input_data)
 
-        filename = packrat_id + "/" + input_data["file"]
+        filename = os.path.join(webds.PACKRAT_CACHE, packrat_id[1:], input_data["file"])
         print("delete file: ", filename)
-        SystemHandler.CallSysCommand(['rm', webds.WORKSPACE_PACKRAT_DIR + "/" + filename])
+        SystemHandler.CallSysCommand(['rm', filename])
 
         self.finish(json.dumps("{delete: yes}"))
 
@@ -72,6 +71,14 @@ class PackratHandler(APIHandler):
                 try:
                     packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
                     print(packrat_id)
+
+                    ##check if folder already been used
+                    path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
+                    if os.path.exists(path):
+                        message = path + " exists in workspace."
+                        print(message)
+                        raise tornado.web.HTTPError(status_code=400, log_message=message)
+                        return
                 except:
                     print("Invalid Hex File")
                     ##return
@@ -85,20 +92,23 @@ class PackratHandler(APIHandler):
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
+                path = os.path.join(webds.PACKRAT_CACHE, packrat_id)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
                 packrat_filename="PR" + packrat_id + ".hex"
                 file_path = os.path.join(path, packrat_filename)
                 print(file_path)
 
                 SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
-                SystemHandler.UpdateWorkspace()
-
                 data = json.loads("{}")
-                data["filename"] = packrat_filename
-                print(data)
-
-                self.finish(json.dumps(data))
+                try:
+                    SystemHandler.UpdateWorkspace()
+                    data["filename"] = packrat_filename
+                    print(data)
+                    self.finish(json.dumps(data))
+                except FileExistsError:
+                    message = file_path + " exists. Create softlink failed."
+                    print(message)
+                    raise tornado.web.HTTPError(status_code=400, log_message=message)
 
 
     def save_to(self, packrat):
@@ -117,7 +127,7 @@ class PackratHandler(APIHandler):
                     f.write(body)
 
                 # move temp hex to packrat cache
-                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat)
+                path = os.path.join(webds.PACKRAT_CACHE, packrat)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
 
                 file_path = os.path.join(path, filename)
