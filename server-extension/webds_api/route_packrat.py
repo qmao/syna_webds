@@ -43,7 +43,7 @@ class PackratHandler(APIHandler):
             print(packrat)
             self.save_to(packrat)
         else:
-            self.save_file()
+            return self.save_file()
 
     @tornado.web.authenticated
     def delete(self, packrat_id: str = ""):
@@ -71,17 +71,18 @@ class PackratHandler(APIHandler):
                 try:
                     packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
                     print(packrat_id)
-
-                    ##check if folder already been used
-                    path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
-                    if os.path.exists(path):
-                        message = path + " exists in workspace."
-                        print(message)
-                        raise tornado.web.HTTPError(status_code=400, log_message=message)
-                        return
                 except:
-                    print("Invalid Hex File")
-                    ##return
+                    message = "PACKRAT_ID not found"
+                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    return
+
+                ##check if folder already been used
+                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
+                if os.path.exists(path):
+                    message = path + " exists in workspace."
+                    print(message)
+                    raise tornado.web.HTTPError(status_code=400, log_message=message)
+                    return
 
                 if packrat_id is None:
                     print("Invalid Hex File (PACKRAT_ID not found)")

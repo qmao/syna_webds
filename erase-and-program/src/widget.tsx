@@ -93,6 +93,7 @@ export default function VerticalTabs(
     const upload_hex = async (file: File): Promise<string | undefined> => {
         console.log("upload_hex:", file);
 
+
         if (file) {
             setLoading(true);
 
@@ -107,7 +108,6 @@ export default function VerticalTabs(
                 });
 
                 console.log(reply);
-                setLoading(false);
 
                 let filename = reply['filename'];
                 get_hex_list().then(filelist => {
@@ -118,12 +118,11 @@ export default function VerticalTabs(
                         }
                     });
                 })
-                return filename;
+                return Promise.resolve(filename);
             } catch (error) {
-                if (error) {
-                    return error.message
-                }
-                setLoading(false);
+                console.log(error);
+                console.log(error.message);
+                return Promise.reject(error.message);
             }
         }
     }
@@ -171,7 +170,15 @@ export default function VerticalTabs(
         console.log("onFileChange:", event.currentTarget.files);
 
         if (event.currentTarget.files) {
-            upload_hex(event.currentTarget.files[0]);
+            upload_hex(event.currentTarget.files[0])
+                .then((file) => {
+                    console.log(file);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    setLoading(false);
+                    alert(err)
+                });
         }
     };
 
