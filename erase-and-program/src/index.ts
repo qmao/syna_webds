@@ -4,7 +4,7 @@ import {
   ILayoutRestorer
 } from '@jupyterlab/application';
 
-import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
+import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
@@ -26,12 +26,10 @@ namespace CommandIDs {
 const extension: JupyterFrontEndPlugin<void> = {
   id: '@webds/erase_and_program:plugin',
   autoStart: true,
-  optional: [ILauncher],
-  requires: [ICommandPalette, ILayoutRestorer],
+  requires: [ILauncher, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
-    palette: ICommandPalette,
-    launcher: ILauncher | null,
+    launcher: ILauncher,
 	restorer: ILayoutRestorer
   ) => {
     console.log('JupyterLab extension @webds/erase_and_program is activated!');
@@ -68,15 +66,11 @@ const extension: JupyterFrontEndPlugin<void> = {
       }
     });
 
-	palette.addItem({ command, category: category });
-
-    if (launcher) {
-      // Add launcher
-      launcher.add({
-        command: command,
-        category: category
-      });
-    }
+    // Add launcher
+    launcher.add({
+      command: command,
+      category: category
+    });
 
     let tracker = new WidgetTracker<MainAreaWidget>({ namespace: 'webds' });
     restorer.restore(tracker, { command, name: () => 'webds' });
