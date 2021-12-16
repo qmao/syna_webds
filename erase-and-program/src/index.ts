@@ -3,18 +3,11 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import { ICommandPalette } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-import {
-  IDocumentManager,
-} from '@jupyterlab/docmanager';
-
-
 import { TabPanelUiWidget } from './widget'
-
-import { StackedPanel } from '@lumino/widgets';
 
 import { extensionProgramIcon } from './icons';
 
@@ -25,12 +18,6 @@ import { extensionProgramIcon } from './icons';
 namespace CommandIDs {
   export const get = 'webds:erase-and-program';
 }
-
-declare const window: Window &
-   typeof globalThis & {
-     FB: any
-   }
-
 	
 /**
  * Initialization data for the @webds/erase_and_program extension.
@@ -38,15 +25,14 @@ declare const window: Window &
 const extension: JupyterFrontEndPlugin<void> = {
   id: '@webds/erase_and_program:plugin',
   autoStart: true,
-  optional: [ILauncher, IDocumentManager],
+  optional: [ILauncher],
   requires: [ICommandPalette],
-  activate: (app: JupyterFrontEnd,
+  activate: (
+    app: JupyterFrontEnd,
     palette: ICommandPalette,
     launcher: ILauncher | null,
-	docManager: IDocumentManager,
-	) => {
+  ) => {
     console.log('JupyterLab extension @webds/erase_and_program is activated!');
-
 
 	const { commands, shell } = app;
     const command = CommandIDs.get;
@@ -60,16 +46,17 @@ const extension: JupyterFrontEndPlugin<void> = {
 	  icon: extensionProgramIcon,
       execute: () => {
 
-		let tabpanel_all = new TabPanelUiWidget();
+        let content = new TabPanelUiWidget();
 
-		const main_widget = new StackedPanel();
-		main_widget.addWidget(tabpanel_all);
-		main_widget.id = 'erase_and_program';
-		main_widget.title.label = extension_string;
-		main_widget.title.closable = true;
-		main_widget.addClass('main-widget');
+        const widget = new MainAreaWidget<TabPanelUiWidget>({ content });
+        widget.id = 'erase_and_program';
+        widget.title.label = extension_string;
+        widget.title.closable = true;
+        widget.title.icon = extensionProgramIcon;
 
-		shell.add(main_widget, 'main');
+        shell.add(widget, 'main');
+
+        shell.activateById(widget.id);
       }
     });
 
@@ -82,6 +69,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         category: category
       });
     }
+
   }
 };
 
