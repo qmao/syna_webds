@@ -1,9 +1,10 @@
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
+  ILayoutRestorer
 } from '@jupyterlab/application';
 
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
@@ -26,14 +27,16 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: '@webds/erase_and_program:plugin',
   autoStart: true,
   optional: [ILauncher],
-  requires: [ICommandPalette],
+  requires: [ICommandPalette, ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     launcher: ILauncher | null,
+	restorer: ILayoutRestorer
   ) => {
     console.log('JupyterLab extension @webds/erase_and_program is activated!');
 
+    let widget: MainAreaWidget;
 	const { commands, shell } = app;
     const command = CommandIDs.get;
     const category = 'WebDS';
@@ -45,16 +48,21 @@ const extension: JupyterFrontEndPlugin<void> = {
       caption: extension_string,
 	  icon: extensionProgramIcon,
       execute: () => {
+        if (!widget || widget.isDisposed) {
+          let content = new TabPanelUiWidget();
 
-        let content = new TabPanelUiWidget();
+          widget = new MainAreaWidget<TabPanelUiWidget>({ content });
+          widget.id = 'erase_and_program';
+          widget.title.label = extension_string;
+          widget.title.closable = true;
+          widget.title.icon = extensionProgramIcon;
+        }
 
-        const widget = new MainAreaWidget<TabPanelUiWidget>({ content });
-        widget.id = 'erase_and_program';
-        widget.title.label = extension_string;
-        widget.title.closable = true;
-        widget.title.icon = extensionProgramIcon;
+        if (!tracker.has(widget))
+          tracker.add(widget);
 
-        shell.add(widget, 'main');
+        if (!widget.isAttached)
+          shell.add(widget, 'main');
 
         shell.activateById(widget.id);
       }
@@ -69,6 +77,9 @@ const extension: JupyterFrontEndPlugin<void> = {
         category: category
       });
     }
+
+    let tracker = new WidgetTracker<MainAreaWidget>({ namespace: 'webds' });
+    restorer.restore(tracker, { command, name: () => 'webds' });
 
   }
 };
