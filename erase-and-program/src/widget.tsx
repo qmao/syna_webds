@@ -144,20 +144,25 @@ export default function VerticalTabs(
     }
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
-        console.log("delete_hex:", event);
-        let packrat = filename.split("/")
-        const dataToSend = { file: packrat[1] };
+        console.log("delete_hex");
+        let packrat_name = filename.split("/")
+        const dataToSend = { file: packrat_name[1] };
 
-        console.log(packrat);
+        console.log(packrat_name);
         console.log(dataToSend);
 
         try {
-            const reply = await requestAPI<any>('packrat/' + packrat[0], {
+            const reply = await requestAPI<any>('packrat/' + packrat_name[0], {
                 body: JSON.stringify(dataToSend),
                 method: 'DELETE',
             });
             console.log(reply);
-            await get_hex_list();
+            await get_hex_list().then(list => {
+                if (list!.indexOf(packrat) == -1) {
+                    setPackrat("");
+                }
+            });
+
             return reply;
         } catch (error) {
             if (error) {
