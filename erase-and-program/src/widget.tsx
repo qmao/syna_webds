@@ -199,6 +199,7 @@ export default function VerticalTabs(
             display: 'flex',
             width: 600,
             maxHeight: 500,
+            m: 4
         }}>
 		<ThemeProvider theme={webdsTheme}>
         <UserContext.Provider
