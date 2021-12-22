@@ -8,6 +8,8 @@ from .route_general      import GeneralHandler
 from .route_packrat      import PackratHandler
 from .route_about        import AboutHandler
 from .route_filesystem   import FilesystemHandler
+from .route_command      import CommandHandler
+from .route_report       import ReportHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -24,12 +26,18 @@ def setup_handlers(web_app):
 
     filesystem_pattern = url_path_join(base_url, "webds", "filesystem")
 
+    command_pattern = url_path_join(base_url, "webds", "command")
+
+    report_pattern = url_path_join(base_url, "webds", "report")
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
                 (packrat_pattern, PackratHandler),
                 (about_pattern, AboutHandler),
                 (filesystem_pattern, FilesystemHandler),
+                (command_pattern, CommandHandler),
+                (report_pattern, ReportHandler),
                ]
 
     web_app.add_handlers(host_pattern, handlers)

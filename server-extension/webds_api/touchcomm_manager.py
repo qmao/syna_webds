@@ -15,20 +15,46 @@ class TouchcommManager(object):
         print("TouchcommManager init")
  
     def connect(self):
+        print('Touchcomm instance:{}'.format(self))
+
         if self._tc is None:
             self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
             print("TouchcommManager connect")
+            self._tc.reset()
+            print("TouchcommManager reset")
+        else:
+            print("already connected")
             
     def disconnect(self):
         if self._tc is not None:
             self._tc.close()
             self._tc = None
             print("TouchcommManager disconnect")
-            
-    def identify(self, auto_close = True):
-        self.connect()
-        msg = self._tc.identify()
-        
-        if auto_close:
+        else:
+            print("already disconnected")
+
+    def identify(self, auto = True):
+        if auto:
+            self.connect()
+
+        data = self._tc.identify()
+
+        if auto:
             self.disconnect()
-        return msg
+        return data
+
+    def disableReport(self, id):
+        self.connect()
+        data = self._tc.disableReport(id)
+        return data
+
+    def enableReport(self, id):
+        self.connect()
+        data = self._tc.enableReport(id)
+        return data
+
+    def getReport(self):
+        self.connect()
+        data = self._tc.getReport()
+        print(data)
+        return data

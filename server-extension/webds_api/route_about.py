@@ -51,9 +51,6 @@ class AboutHandler(APIHandler):
         print(self.request.arguments)
 
         query = self.get_argument('query', None)
-        os_info = self.get_argument('os-info', None)
-        system_info = self.get_argument('system-info', None)
-        phone_info = self.get_argument('phone-connection', None)
 
         if query == 'android-connection':
             connected = ReadPhoneInfo()
