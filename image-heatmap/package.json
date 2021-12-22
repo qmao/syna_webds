@@ -53,7 +53,8 @@
     "@jupyterlab/settingregistry": "^3.1.0",
     "@lumino/datagrid": "^0.34.1",
     "@mui/material": "^5.2.5",
-    "@mui/x-data-grid": "^5.2.1"
+    "@mui/x-data-grid": "^5.2.1",
+    "heatmap-ts": "0.0.5"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.1.0",

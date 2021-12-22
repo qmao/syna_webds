@@ -8,9 +8,11 @@ import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-import { MainWidget } from './widget'
+import { Widget } from '@lumino/widgets';
 
 import { launcherIcon } from './icons';
+
+import HeatMap from 'heatmap-ts'
 
 /**
  * The command IDs used by the server extension plugin.
@@ -18,7 +20,38 @@ import { launcherIcon } from './icons';
 namespace CommandIDs {
   export const get = 'webds:image-heatmap';
 }
-	
+
+function update() {
+	const heatMap = new HeatMap({
+	  container: document.getElementById('image_heatmap')!,
+	  maxOpacity: .6,
+	  radius: 50,
+	  blur: 0.90,
+	})
+
+	console.log(heatMap);
+
+
+	heatMap.setData({
+	  max: 100,
+	  min: 1,
+	  data: [
+		{
+		  x: 100,
+		  y: 100,
+		  value: 100,
+		  radius: 20
+		},
+		{
+		  x: 200,
+		  y: 250,
+		  value: 50,
+		  radius: 30
+		}
+	  ]
+	})
+}
+
 /**
  * Initialization data for the @webds/image_heatmap extension.
  */
@@ -46,13 +79,15 @@ const extension: JupyterFrontEndPlugin<void> = {
 	  icon: launcherIcon,
       execute: () => {
         if (!widget || widget.isDisposed) {
-          let content = new MainWidget();
+          let content = new Widget();
 
-          widget = new MainAreaWidget<MainWidget>({ content });
+          widget = new MainAreaWidget<Widget>({ content });
           widget.id = 'image_heatmap';
           widget.title.label = extension_string;
           widget.title.closable = true;
           widget.title.icon = launcherIcon;
+		  
+		  update();
         }
 
         if (!tracker.has(widget))
