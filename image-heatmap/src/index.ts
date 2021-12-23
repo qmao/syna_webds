@@ -8,7 +8,7 @@ import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
-import { Widget } from '@lumino/widgets';
+import { MainWidget } from './widget';
 
 import { requestAPI } from './handler';
 
@@ -98,12 +98,25 @@ function prepare() {
 	set_report([17], [18]);
 	
 	globalThis.heatMap = new HeatMap({
-	  container: document.getElementById('image_heatmap')!,
-	  maxOpacity: .6,
+	  container: document.getElementById('mybox')!,
+	  maxOpacity: .3,
 	  radius: 15,
-	  blur: 0.75,
+	  blur: 0.8,
 	})
 	
+	//let canvas: HTMLElement = document.getElementById('mybox')!.children[0];
+	let e = document.getElementById('mybox');
+
+	console.log(e!.firstChild!.nodeName);
+	let test = e!.firstElementChild! as HTMLElement; 
+	console.log(test!.offsetTop);
+	
+	test!.style.left = "10px";
+	test!.style.top = "10px";
+	test!.style.position = "absolute";
+	test!.style.margin = 'auto';
+	
+
 	console.log(globalThis.heatMap);
 
 	// set event handler
@@ -185,10 +198,10 @@ const extension: JupyterFrontEndPlugin<void> = {
 	  icon: launcherIcon,
       execute: () => {
         if (!widget || widget.isDisposed) {
-          let content = new Widget();
-		  content.addClass('heatmapWidget');
+          let content = new MainWidget();
+		  content.id = 'heatmap_content';
 
-          widget = new MainAreaWidget<Widget>({ content });
+          widget = new MainAreaWidget<MainWidget>({ content });
           widget.id = 'image_heatmap';
           widget.title.label = extension_string;
           widget.title.closable = true;
@@ -218,5 +231,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 
   }
 };
+
 
 export default extension;
