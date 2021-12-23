@@ -47,6 +47,10 @@ const set_report = async (disable: number[], enable: number[]): Promise<string |
 
 function matrixIndexed(details: number[][]) {
 	let dataPoints = [];
+
+	globalThis.max = -1000;
+	globalThis.min = 1000;
+
 	for(let i = 0; i < details.length; i++){
 		// get the length of the inner array elements
 		let innerArrayLength = details[i].length;
@@ -55,28 +59,39 @@ function matrixIndexed(details: number[][]) {
 		for(let j = 0; j < innerArrayLength; j++) {
 			//console.log(details[i][j]);
 			let dataPoint = {
-			  x: i,
-			  y: j,
+			  x: j*10,
+			  y: i*10,
 			  value: details[i][j],
 			};
 			dataPoints.push(dataPoint);
-			//console.log(dataPoints);
+			if (dataPoint.value > globalThis.max)
+				globalThis.max = dataPoint.value;
+			if (dataPoint.value < globalThis.min)
+				globalThis.min = dataPoint.value;
 		}
 	}
+	//console.log(dataPoints);
+
 	return dataPoints;
 }
 
 declare global {
     var source: EventSource;
 	var heatMap: HeatMap;
+
+	var p1FrameCount: number;
+    var p1T0: number;
+    var p1T1: number;
+	var event_data: number[][];
+
+	var max: number;
+	var min: number;
 }
 
 const eventHandler = (event: any) => {
 	let report = JSON.parse(event.data);
-	console.log(report)
-	console.log(report.image);
-	
-	update(report.image);
+
+	globalThis.event_data = report.image;
 }
 
 function prepare() {
@@ -85,7 +100,7 @@ function prepare() {
 	globalThis.heatMap = new HeatMap({
 	  container: document.getElementById('image_heatmap')!,
 	  maxOpacity: .6,
-	  radius: 10,
+	  radius: 15,
 	  blur: 0.75,
 	})
 	
@@ -100,21 +115,47 @@ function prepare() {
 	else {
 		console.log("event source is null");
 	}
+
+	globalThis.p1T0 = Date.now();
+	globalThis.event_data = [[]];
+
+	requestAnimationFrame(update);
+	/* debug
+	let data = [[100, 20, 40, 80,  0,  0,  0,  0, 0,   100],
+				[ 11, 22, 33, 44, 55, 66,  0,  1, 10,  100],
+				[ 1 ,  2,  3,  4,  5,  6, 20,  0,  0,  100],
+				[ 11, 22, 33, 44, 55, 66,  0,100,  0,  100],
+				[  1,  2, 30,  0,  0,  0,  1,  4,  5,  50],
+				[  0,  1, 20, 10, 11, 22, 33, 44, 55, 99]];
+	update(data);
+	*/
 }
 
-function update(data: number[][]) {
+function update() {
+	if (globalThis.event_data == [[]])
+		requestAnimationFrame(update);
 
-	//let data = [[1,2,3,4,5,6,0,0,0,0],[11,22,33,44,55,66,0,1,10,3],[1,2,3,4,5,6,20,0,0,1],[11,22,33,44,55,66,0,100,0,0],
-	//[1,2,30,0,0,0,1,4,5,6],[0,1,20,10,11,22,33,44,55,66]];
-
+	let data = globalThis.event_data;
 	let points = matrixIndexed(data);
-	console.log(points);
+	//console.log(points);
 
 	globalThis.heatMap.setData({
-	  max: 100,
-	  min: 1,
+	  max: globalThis.max,
+	  min: globalThis.min,
 	  data: points
 	})
+
+	globalThis.p1FrameCount++;
+    globalThis.p1T1 = Date.now();
+    if (globalThis.p1T1 - globalThis.p1T0 >= 1000) {
+        globalThis.p1T0 = globalThis.p1T1;
+        console.log(`Lorenz attractor FPS = ${globalThis.p1FrameCount}`);
+        globalThis.p1FrameCount = 0;
+
+		console.log(data);
+		console.log(`max=${globalThis.max}, min=${globalThis.min}`);
+    }
+	requestAnimationFrame(update);
 }
 
 /**
@@ -145,6 +186,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       execute: () => {
         if (!widget || widget.isDisposed) {
           let content = new Widget();
+		  content.addClass('heatmapWidget');
 
           widget = new MainAreaWidget<Widget>({ content });
           widget.id = 'image_heatmap';
