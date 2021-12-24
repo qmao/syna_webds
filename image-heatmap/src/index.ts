@@ -14,6 +14,8 @@ import { requestAPI } from './handler';
 
 import { launcherIcon } from './icons';
 
+import { Message } from '@lumino/messaging';
+
 import HeatMap from 'heatmap-ts'
 
 /**
@@ -146,30 +148,37 @@ function prepare() {
 }
 
 function update() {
-	if (globalThis.event_data == [[]])
-		requestAnimationFrame(update);
+  if (globalThis.source.readyState == 2)
+  {
+    console.log("stop updating");
+    return;
+  }
 
-	let data = globalThis.event_data;
-	let points = matrixIndexed(data);
-	//console.log(points);
+  if (globalThis.event_data == [[]])
+    requestAnimationFrame(update);
 
-	globalThis.heatMap.setData({
-	  max: globalThis.max,
-	  min: globalThis.min,
-	  data: points
-	})
+  let data = globalThis.event_data;
+  let points = matrixIndexed(data);
+  //console.log(points);
 
-	globalThis.p1FrameCount++;
-    globalThis.p1T1 = Date.now();
-    if (globalThis.p1T1 - globalThis.p1T0 >= 1000) {
-        globalThis.p1T0 = globalThis.p1T1;
-        console.log(`Lorenz attractor FPS = ${globalThis.p1FrameCount}`);
-        globalThis.p1FrameCount = 0;
+  globalThis.heatMap.setData({
+    max: globalThis.max,
+    min: globalThis.min,
+    data: points
+  })
 
-		console.log(data);
-		console.log(`max=${globalThis.max}, min=${globalThis.min}`);
-    }
-	requestAnimationFrame(update);
+  globalThis.p1FrameCount++;
+  globalThis.p1T1 = Date.now();
+  if (globalThis.p1T1 - globalThis.p1T0 >= 1000) {
+    globalThis.p1T0 = globalThis.p1T1;
+    console.log(`Lorenz attractor FPS = ${globalThis.p1FrameCount}`);
+    globalThis.p1FrameCount = 0;
+
+    console.log(data);
+    console.log(`max=${globalThis.max}, min=${globalThis.min}`);
+	console.log(globalThis.source.readyState);
+  }
+  requestAnimationFrame(update);
 }
 
 /**
@@ -202,7 +211,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           let content = new MainWidget();
 		  content.id = 'heatmap_content';
 
-          widget = new MainAreaWidget<MainWidget>({ content });
+          widget = new ImageWidget({ content });
           widget.id = 'image_heatmap';
           widget.title.label = extension_string;
           widget.title.closable = true;
@@ -233,5 +242,23 @@ const extension: JupyterFrontEndPlugin<void> = {
   }
 };
 
+class ImageWidget extends MainAreaWidget<MainWidget> {
+  protected onCloseRequest(msg: Message): void {
+    //close event handler
+    if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
+      globalThis.source.removeEventListener('report', eventHandler, false);
+      globalThis.source.close();
+      console.log("close event source");
+    }
+
+    console.log("Ready to close!!!")
+    super.onCloseRequest(msg);
+  }
+
+  protected onAfterShow(msg: Message): void {
+    console.log("Ready to show!!!")
+    super.onAfterShow(msg);
+  }
+}
 
 export default extension;
