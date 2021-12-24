@@ -47,6 +47,21 @@ const set_report = async (disable: number[], enable: number[]): Promise<string |
 	}
 }
 
+
+const get_dimension = async (): Promise<number[]> => {
+  try {
+    const reply = await requestAPI<any>('command?query=app-info', {
+      method: 'GET',
+    });
+    console.log(reply['numRows']);
+	console.log(reply['numCols']);
+    return Promise.resolve([reply['numRows'], reply['numCols']]);
+  } catch (error) {
+    console.log(error);
+    return Promise.reject([0,0]);
+  }
+}
+
 function matrixIndexed(details: number[][]) {
 	let dataPoints = [];
 
@@ -61,8 +76,8 @@ function matrixIndexed(details: number[][]) {
 		for(let j = 0; j < innerArrayLength; j++) {
 			//console.log(details[i][j]);
 			let dataPoint = {
-			  x: j*10,
-			  y: i*10,
+			  x: j*globalThis.distance,
+			  y: i*globalThis.distance,
 			  value: details[i][j],
 			};
 			dataPoints.push(dataPoint);
@@ -88,6 +103,11 @@ declare global {
 
 	var max: number;
 	var min: number;
+
+	var col: number;
+	var row: number;
+
+	var distance: number;
 }
 
 const eventHandler = (event: any) => {
@@ -97,12 +117,15 @@ const eventHandler = (event: any) => {
 }
 
 function prepare() {
-	set_report([17], [18]);
 	
+	set_report([17], [18]);
+
+	globalThis.distance = 10;
+
 	globalThis.heatMap = new HeatMap({
 	  container: document.getElementById('mybox')!,
 	  maxOpacity: .3,
-	  radius: 15,
+	  radius: globalThis.distance * 1.5,
 	  blur: 0.8,
 	})
 	
@@ -117,10 +140,9 @@ function prepare() {
 	test!.style.top = "10px";
 	test!.style.position = "absolute";
 	test!.style.margin = 'auto';
-	
 
-	globalThis.heatMap.renderer.setDimensions(300, 200);
 	console.log(globalThis.heatMap);
+	globalThis.heatMap.renderer.setDimensions((globalThis.row - 1)*globalThis.distance, (globalThis.col - 1)*globalThis.distance);
 
 	// set event handler
 	globalThis.source = new window.EventSource('/webds/report');
@@ -226,7 +248,11 @@ const extension: JupyterFrontEndPlugin<void> = {
 
         shell.activateById(widget.id);
 		
-		prepare();
+		get_dimension().then((data) => {
+			globalThis.col = data[0];
+			globalThis.row = data[1];
+			prepare();
+		})
       }
     });
 
