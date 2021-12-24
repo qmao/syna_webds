@@ -6,13 +6,13 @@ import numpy as np
 from . import webds
 from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
-                
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-        return json.JSONEncoder.default(self, obj)     
-           
+        return json.JSONEncoder.default(self, obj)
+
 class ReportHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
@@ -27,11 +27,11 @@ class ReportHandler(APIHandler):
 
         try:
             tc = TouchcommManager()
-    
+
             for x in disable:
                 print('disable:{}'.format(x))
                 ret = tc.disableReport(x)
-                
+
             for x in enable:
                 print('enable:{}'.format(x))
                 ret = tc.enableReport(x)

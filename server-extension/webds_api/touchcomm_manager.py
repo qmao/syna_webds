@@ -5,15 +5,16 @@ from touchcomm import TouchComm
 class TouchcommManager(object):
     _instance = None
     _tc = None
- 
-    def __new__(cls, *args, **kwargs): 
-        if cls._instance is None: 
-            cls._instance = super().__new__(cls) 
-        return cls._instance 
-         
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
+        self.connect()
         print("TouchcommManager init")
- 
+
     def connect(self):
         print('Touchcomm instance:{}'.format(self))
 
@@ -24,7 +25,7 @@ class TouchcommManager(object):
             print("TouchcommManager reset")
         else:
             print("already connected")
-            
+
     def disconnect(self):
         if self._tc is not None:
             self._tc.close()
@@ -44,17 +45,15 @@ class TouchcommManager(object):
         return data
 
     def disableReport(self, id):
-        self.connect()
-        data = self._tc.disableReport(id)
-        return data
+        return self._tc.disableReport(id)
 
     def enableReport(self, id):
-        self.connect()
-        data = self._tc.enableReport(id)
-        return data
+        return self._tc.enableReport(id)
 
     def getReport(self):
-        self.connect()
         data = self._tc.getReport()
-        print(data)
+        ### print(data)
         return data
+
+    def getAppInfo(self):
+        return self._tc.getAppInfo()

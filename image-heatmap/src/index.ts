@@ -117,6 +117,7 @@ function prepare() {
 	test!.style.margin = 'auto';
 	
 
+	globalThis.heatMap.renderer.setDimensions(300, 200);
 	console.log(globalThis.heatMap);
 
 	// set event handler
