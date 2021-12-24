@@ -1,6 +1,7 @@
 import sys
 sys.path.append("/usr/local/syna/lib/python")
 from programmer import AsicProgrammer
+from .touchcomm_manager import TouchcommManager
 
 class ProgrammerManager(object):
     _instance = None
@@ -14,4 +15,8 @@ class ProgrammerManager(object):
         printf("ProgrammerManager singleton object is created")
 
     def program(filename):
+        ### disconnect tcm if exist
+        tc = TouchcommManager()
+        tc.disconnect()
+
         return AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
