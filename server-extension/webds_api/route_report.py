@@ -72,6 +72,12 @@ class ReportHandler(APIHandler):
 
         except StreamClosedError:
             print("stream close error!!")
-            return
+
+        data = {"info": 'ready to close'}
+        self.set_header('content-type', 'text/event-stream')
+        self.write('event: close\n')
+        self.write('data: {}\n'.format(data))
+        self.write('\n')
+        yield self.flush()
 
         print("sse finished")        

@@ -64,6 +64,7 @@ declare global {
     var row: number;
 
     var distance: number;
+    var esRunning: number;
 }
 
 const eventHandler = (event: any) => {
@@ -72,9 +73,6 @@ const eventHandler = (event: any) => {
 }
 
 function prepare() {
-
-    set_report([17], [18]);
-
     globalThis.distance = 10;
 
     globalThis.heatMap = new HeatMap({
@@ -111,11 +109,14 @@ function prepare() {
     console.log(paper);
 
     // set event handler
+    globalThis.esRunning = 0;
     globalThis.source = new window.EventSource('/webds/report');
     console.log(globalThis.source);
 
     globalThis.p1T0 = Date.now();
     globalThis.event_data = [[]];
+
+    set_report([REPORT_TOUCH, REPORT_RAW], [REPORT_DELTA]);
 
     requestAnimationFrame(update);
     /* debug
@@ -136,23 +137,53 @@ function addEvent() {
 
         globalThis.source.addEventListener("open", function (e) {
             alert("Connecting...");
+            globalThis.esRunning = 1;
         });
 
         globalThis.source.addEventListener("error", function (e) {
             console.log(e);
             alert("Error");
+            globalThis.esRunning = 0;
         });
 
+        globalThis.source.addEventListener("close", function (e) {
+            console.log(e);
+            alert("Close!");
+            globalThis.esRunning = 0;
+        });
     }
     else {
         console.log("event source is null");
     }
 }
 
+function waitForClosed() {
+    setTimeout(function () {
+        console.log(globalThis.esRunning);
+        if (globalThis.esRunning != 0) { 
+            waitForClosed();
+        }
+    }, 5000)
+}
+
+function waitForOpened() {
+    setTimeout(function () {
+        console.log(globalThis.esRunning);
+        if (globalThis.esRunning != 1) {
+            waitForOpened();
+        }
+    }, 5000)
+}
+
 function removeEvent() {
+    if (globalThis.esRunning == 0) {
+        console.log("event not stared. skip");
+        return;
+    }
     if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
         globalThis.source.removeEventListener('report', eventHandler, false);
-        globalThis.source.close();
+
+        waitForClosed();
     }
 }
 
@@ -165,10 +196,7 @@ function closeEvent() {
 }
 
 function update() {
-    //if (globalThis.source.readyState == 2) {
-    //    console.log("stop updating");
-    //    return;
-    //}
+    waitForOpened();
 
     if (globalThis.event_data == [[]])
         requestAnimationFrame(update);
@@ -201,7 +229,6 @@ function update() {
             console.log("ready to close event handler");
             //close event handler
             closeEvent();
-            return;
         }
     }
     requestAnimationFrame(update);
@@ -251,7 +278,6 @@ const set_report = async (disable: number[], enable: number[]): Promise<string |
 
         console.log("[QMAO] add event");
         addEvent();
-        update();
 
         console.log(reply);
         return Promise.resolve("ok");
@@ -280,10 +306,8 @@ export default function MyButton () {
         else if (option == 'RAW')
             set_report([REPORT_TOUCH, REPORT_DELTA], [REPORT_RAW]);
 
-
         setAnchorEl(null);
     };
-
 
     return (
         <Box
