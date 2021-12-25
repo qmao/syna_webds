@@ -1,4 +1,5 @@
 import tornado
+from tornado.iostream import StreamClosedError
 from jupyter_server.base.handlers import APIHandler
 import os
 import json
@@ -49,16 +50,11 @@ class ReportHandler(APIHandler):
     @tornado.gen.coroutine
     def publish(self, data):
         """Pushes data to a listener."""
-        try:
-            self.set_header('content-type', 'text/event-stream')
-            self.write('event: report\n')
-            self.write('data: {}\n'.format(data))
-            self.write('\n')
-            yield self.flush()
-
-        except StreamClosedError:
-            print("stream close error!!")
-            pass
+        self.set_header('content-type', 'text/event-stream')
+        self.write('event: report\n')
+        self.write('data: {}\n'.format(data))
+        self.write('\n')
+        yield self.flush()
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
@@ -67,10 +63,15 @@ class ReportHandler(APIHandler):
 
         tc = TouchcommManager()
 
-        while True:
-            report = tc.getReport()
-            image = report[1]['image']
-            send = {"image": image}
-            yield self.publish(json.dumps(send, cls=NumpyEncoder))
+        try:
+          while True:
+              report = tc.getReport()
+              image = report[1]['image']
+              send = {"image": image}
+              yield self.publish(json.dumps(send, cls=NumpyEncoder))
+
+        except StreamClosedError:
+            print("stream close error!!")
+            return
 
         print("sse finished")        
