@@ -9,22 +9,44 @@ import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 
 //import { ThemeProvider } from "@mui/material/styles";
-//import CssBaseline from '@mui/material/CssBaseline';
-//import Container from '@mui/material/Container';
 
-
-//import { requestAPI } from './handler';
+import { requestAPI } from './handler';
 //import { UserContext } from './context';
 
 
 //import webdsTheme from './webdsTheme';
 
 const options = [
-    'Delta',
-    'Raw',
+    'DELTA',
+    'RAW',
 ];
 
 const ITEM_HEIGHT = 20;
+
+const REPORT_TOUCH = 17;
+const REPORT_DELTA = 18;
+const REPORT_RAW = 19;
+
+const set_report = async (disable: number[], enable: number[]): Promise<string | undefined> => {
+    const dataToSend = {
+        enable: enable,
+        disable: disable
+    };
+    console.log(dataToSend);
+    try {
+        const reply = await requestAPI<any>('report', {
+            body: JSON.stringify(dataToSend),
+            method: 'POST',
+        });
+
+        console.log(reply);
+        return Promise.resolve("ok");
+    } catch (error) {
+        console.log(error);
+        console.log(error.message);
+        return Promise.reject(error.message);
+    }
+}
 
 export default function MyButton () {
 
@@ -33,7 +55,19 @@ export default function MyButton () {
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
-    const handleClose = () => {
+
+    const handleClose = (
+        event: React.MouseEvent<HTMLElement>,
+        option: string,
+    ) => {
+
+        console.log(option);
+        if (option == 'DELTA')
+            set_report([REPORT_TOUCH, REPORT_RAW], [REPORT_DELTA]);
+        else if (option == 'RAW')
+            set_report([REPORT_TOUCH, REPORT_DELTA], [REPORT_RAW]);
+
+
         setAnchorEl(null);
     };
 
@@ -45,7 +79,9 @@ export default function MyButton () {
                 height: 400,
                 flexDirection: "column",
                 display: "flex",
-                alignItems: "flex-start"
+                alignItems: "flex-start",
+                ml: 5,
+                mt: 5
             }}
         >
             <IconButton
@@ -75,12 +111,12 @@ export default function MyButton () {
                 }}
             >
                 {options.map((option) => (
-                    <MenuItem key={option} selected={option === 'Pyxis'} onClick={handleClose}>
+                    <MenuItem key={option} selected={option === 'DELTA'} onClick={(event) => handleClose(event, option)}>
                         {option}
                     </MenuItem>
                 ))}
             </Menu>
-            <Paper className="mybox" id='mybox' sx={{ width: 300, height: 200 }}></Paper>
+            <Paper className="mybox" id='mybox'></Paper>
         </Box>
     );
 }

@@ -129,6 +129,7 @@ function prepare() {
 	  blur: 0.8,
 	})
 	
+	/************
 	//let canvas: HTMLElement = document.getElementById('mybox')!.children[0];
 	let e = document.getElementById('mybox');
 
@@ -140,9 +141,19 @@ function prepare() {
 	test!.style.top = "10px";
 	test!.style.position = "absolute";
 	test!.style.margin = 'auto';
+	*************/
 
 	console.log(globalThis.heatMap);
-	globalThis.heatMap.renderer.setDimensions((globalThis.row - 1)*globalThis.distance, (globalThis.col - 1)*globalThis.distance);
+	let x = (globalThis.row - 1)*globalThis.distance;
+	let y = (globalThis.col - 1)*globalThis.distance;
+	globalThis.heatMap.renderer.setDimensions(x, y);
+
+	let e = document.getElementById('mybox');
+	let paper = e! as HTMLElement;
+	console.log(paper);
+	paper!.style.width = x.toString();
+	paper!.style.height = y.toString();
+	console.log(paper);
 
 	// set event handler
 	globalThis.source = new window.EventSource('/webds/report');
