@@ -17,6 +17,10 @@ import { requestAPI } from './handler';
 
 //import webdsTheme from './webdsTheme';
 
+//const SSE_CONNECTING = 0
+//const SSE_OPEN = 1
+const SSE_CLOSED = 2
+
 
 function matrixIndexed(details: number[][]) {
     let dataPoints = [];
@@ -64,7 +68,6 @@ declare global {
     var row: number;
 
     var distance: number;
-    var esRunning: number;
 }
 
 const eventHandler = (event: any) => {
@@ -109,16 +112,10 @@ function prepare() {
     console.log(paper);
 
     // set event handler
-    globalThis.esRunning = 0;
-    globalThis.source = new window.EventSource('/webds/report');
-    console.log(globalThis.source);
-
     globalThis.p1T0 = Date.now();
     globalThis.event_data = [[]];
 
     set_report([REPORT_TOUCH, REPORT_RAW], [REPORT_DELTA]);
-
-    requestAnimationFrame(update);
     /* debug
     let data = [[100, 20, 40, 80,  0,  0,  0,  0, 0,   100],
                 [ 11, 22, 33, 44, 55, 66,  0,  1, 10,  100],
@@ -131,25 +128,26 @@ function prepare() {
 }
 
 function addEvent() {
+    globalThis.source = new window.EventSource('/webds/report');
+    console.log(globalThis.source);
+
     // set event handler
     if (globalThis.source != null) {
         globalThis.source.addEventListener('report', eventHandler, false);
 
         globalThis.source.addEventListener("open", function (e) {
-            alert("Connecting...");
-            globalThis.esRunning = 1;
+            console.log("Connecting...");
+            update();
         });
 
         globalThis.source.addEventListener("error", function (e) {
             console.log(e);
             alert("Error");
-            globalThis.esRunning = 0;
         });
 
         globalThis.source.addEventListener("close", function (e) {
             console.log(e);
             alert("Close!");
-            globalThis.esRunning = 0;
         });
     }
     else {
@@ -159,57 +157,36 @@ function addEvent() {
 
 function waitForClosed() {
     setTimeout(function () {
-        console.log(globalThis.esRunning);
-        if (globalThis.esRunning != 0) { 
+        console.log(globalThis.source.readyState);
+        if (globalThis.source.readyState != SSE_CLOSED) { 
             waitForClosed();
         }
     }, 5000)
 }
 
-function waitForOpened() {
-    setTimeout(function () {
-        console.log(globalThis.esRunning);
-        if (globalThis.esRunning != 1) {
-            waitForOpened();
-        }
-    }, 5000)
-}
-
 function removeEvent() {
-    if (globalThis.esRunning == 0) {
-        console.log("event not stared. skip");
-        return;
-    }
-    if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
-        globalThis.source.removeEventListener('report', eventHandler, false);
-
-        waitForClosed();
-    }
-}
-
-function closeEvent() {
-    if (globalThis.source != undefined && globalThis.source.addEventListener != null) {
+    console.log(globalThis.source);
+    if (globalThis.source != undefined && globalThis.source.addEventListener != null && globalThis.source.readyState != SSE_CLOSED) {
         globalThis.source.removeEventListener('report', eventHandler, false);
         globalThis.source.close();
+        waitForClosed();
         console.log("close event source");
     }
 }
 
 function update() {
-    waitForOpened();
-
-    if (globalThis.event_data == [[]])
-        requestAnimationFrame(update);
-
     let data = globalThis.event_data;
-    let points = matrixIndexed(data);
-    //console.log(points);
 
-    globalThis.heatMap.setData({
-        max: globalThis.max,
-        min: globalThis.min,
-        data: points
-    })
+    if (globalThis.event_data != [[]]) {
+        let points = matrixIndexed(data);
+        //console.log(points);
+
+        globalThis.heatMap.setData({
+            max: globalThis.max,
+            min: globalThis.min,
+            data: points
+        })
+    }
 
     globalThis.p1FrameCount++;
     globalThis.p1T1 = Date.now();
@@ -222,18 +199,23 @@ function update() {
         console.log(`max=${globalThis.max}, min=${globalThis.min}`);
 
         console.log(globalThis.source.readyState);
-
-        //check if component exsit every 1 sec
-        let e = document.getElementById('mybox');
-        if (e == null) {
-            console.log("ready to close event handler");
-            //close event handler
-            closeEvent();
-        }
     }
+
+    //check if component exsit every 1 sec
+    let e = document.getElementById('mybox');
+    if (e == null) {
+        console.log("ready to close event handler");
+        //close event handler
+        removeEvent();
+        return;
+    }
+
+    //if event source is closed because user change report
+    if (globalThis.source.readyState == SSE_CLOSED)
+        return;
+
     requestAnimationFrame(update);
 }
-
 
 const options = [
     'DELTA',
