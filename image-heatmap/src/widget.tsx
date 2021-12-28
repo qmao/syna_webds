@@ -139,16 +139,6 @@ function addEvent() {
             console.log("Connecting...");
             update();
         });
-
-        globalThis.source.addEventListener("error", function (e) {
-            console.log(e);
-            alert("Error");
-        });
-
-        globalThis.source.addEventListener("close", function (e) {
-            console.log(e);
-            alert("Close!");
-        });
     }
     else {
         console.log("event source is null");
