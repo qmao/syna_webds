@@ -12,8 +12,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
-//import DownloadBlob, { BlobFile } from './packrat/packrat'
-
+import DownloadBlob, { BlobFile } from './packrat/packrat'
 
 export interface IProgramInfo {
     filename: string;
@@ -72,7 +71,7 @@ export default function ButtonProgram(props: ButtonProps) {
             }
             else {
                 console.log("download hex from packrat server");
-                //start_fetch();
+                start_fetch();
             }
 
             console.log(context.packrat);
@@ -170,7 +169,7 @@ export default function ButtonProgram(props: ButtonProps) {
             return Promise.reject((e as Error).message);
         }
     }
-    /*
+
     const start_fetch = async (): Promise<string | undefined> => {
         try {
 
@@ -194,7 +193,7 @@ export default function ButtonProgram(props: ButtonProps) {
             return Promise.reject((e as Error).message);
         }
     }
-    */
+
     return (
         <div {...other}>
             <Box sx={{ width: '100%', maxWidth: 490 }}>

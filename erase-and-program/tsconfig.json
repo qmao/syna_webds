@@ -19,7 +19,7 @@
     "strictNullChecks": true,
     "target": "es2017",
     "types": [ "node" ],
-    "allowJs": false,
+    "allowJs": true,
 	"skipLibCheck": true,
 	"typeRoots": [
       "./node_modules/@types",
@@ -28,6 +28,6 @@
   },
   "include": [
     "src/*",
-    //"src/packrat/*"
+    "src/packrat/*"
   ]
 }
