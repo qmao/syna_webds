@@ -60,6 +60,7 @@ declare global {
     var p1T0: number;
     var p1T1: number;
     var event_data: number[][];
+    var frame: number;
 
     var max: number;
     var min: number;
@@ -73,6 +74,7 @@ declare global {
 const eventHandler = (event: any) => {
     let report = JSON.parse(event.data);
     globalThis.event_data = report.image;
+    globalThis.frame = report.frame;
 }
 
 function prepare() {
@@ -185,10 +187,9 @@ function update() {
         console.log(`Lorenz attractor FPS = ${globalThis.p1FrameCount}`);
         globalThis.p1FrameCount = 0;
 
-        console.log(data);
+        //console.log(data);
         console.log(`max=${globalThis.max}, min=${globalThis.min}`);
-
-        console.log(globalThis.source.readyState);
+        console.log(globalThis.frame);
     }
 
     //check if component exsit every 1 sec

@@ -7,6 +7,7 @@ import numpy as np
 from . import webds
 from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
+import time
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -62,13 +63,35 @@ class ReportHandler(APIHandler):
         print("get report")
 
         tc = TouchcommManager()
+        fcount = 0
+        fprev = 0
+        start_time = time.time()
 
         try:
           while True:
+
+              time_before_report = time.time()
+
               report = tc.getReport()
+
+              time_after_report = time.time()
+
               image = report[1]['image']
-              send = {"image": image}
+              fcount = fcount + 1
+              send = { "image": image, "frame": fcount }
               yield self.publish(json.dumps(send, cls=NumpyEncoder))
+
+              time_after_send = time.time()
+
+              if (fcount % 50) == 0:
+                  print(fcount)
+                  end_time = time.time()
+                  fps = ((fcount - fprev) / (end_time - start_time))
+                  start_time = end_time
+                  fprev = fcount
+                  print("FPS: ", fps)
+                  print("get report takes: ", time_after_report - time_before_report)
+                  print("send sse   takes: ", time_after_send - time_after_report)
 
         except StreamClosedError:
             print("stream close error!!")
