@@ -64,7 +64,7 @@ export default function VerticalTabs(
     const [value, setValue] = React.useState(0);
     const [filelist, setFileList] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    const [packrat, setPackrat] = React.useState("");
+    const [packrat, setPackrat] = React.useState("3365253");
     const [packratError, setPackratError] = React.useState(false);
 
     useEffect(() => {
@@ -74,6 +74,7 @@ export default function VerticalTabs(
 
     React.useEffect(() => {
         if (value == 1) {
+            console.log(packrat);
             if (packrat === '') {
                 setPackratError(false);
             }
@@ -255,8 +256,8 @@ export default function VerticalTabs(
                     </TabPanel>
                     <TabPanel value={value} index={1}>
                         <TextField id="filled-basic"
-                                    label="This Feature Is Coming Soon!"
-                                    value="3365253"
+                                    label="Packrat"
+                                    value={packrat}
                                     onChange={(e) => setPackrat(e.target.value)}
                                     error={packratError}
                                     sx={{
