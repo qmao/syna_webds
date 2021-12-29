@@ -135,7 +135,8 @@ class ProgramHandler(APIHandler):
             print(filename)
 
             if not os.path.isfile(filename):
-                raise Exception(filename)
+                message = "HEX file not found: " + filename
+                raise tornado.web.HTTPError(status_code=400, log_message=message)
 
             if g_program_thread is not None and g_program_thread.is_alive():
                 print("erase and program thread is still running...")

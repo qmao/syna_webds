@@ -41,7 +41,7 @@ class PackratHandler(APIHandler):
         if packrat_id:
             packrat = packrat_id[1:]
             print(packrat)
-            self.save_to(packrat)
+            self.save_file(packrat)
         else:
             return self.save_file()
 
@@ -57,7 +57,7 @@ class PackratHandler(APIHandler):
 
         self.finish(json.dumps("{delete: yes}"))
 
-    def save_file(self):
+    def save_file(self, packrat_id=None):
         for field_name, files in self.request.files.items():
             print(field_name)
             for f in files:
@@ -67,15 +67,19 @@ class PackratHandler(APIHandler):
                 #    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
                 #)
                 print(filename)
-                packrat_id = None
 
-                try:
-                    packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
-                    print(packrat_id)
-                except:
-                    message = "PACKRAT_ID not found"
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
-                    return
+                if packrat_id is None:
+                    try:
+                        packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
+                        print(packrat_id)
+                    except:
+                        message = "PACKRAT_ID not found"
+                        raise tornado.web.HTTPError(status_code=400, log_message=message)
+                        return
+                    if packrat_id is None:
+                        message = "PACKRAT_ID not found"
+                        raise tornado.web.HTTPError(status_code=400, log_message=message)
+                        return
 
                 ##check if folder already been used
                 path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
@@ -111,35 +115,3 @@ class PackratHandler(APIHandler):
                     message = file_path + " exists. Create softlink failed."
                     print(message)
                     raise tornado.web.HTTPError(status_code=400, log_message=message)
-
-
-    def save_to(self, packrat):
-        for field_name, files in self.request.files.items():
-            print(field_name)
-            for f in files:
-                filename, content_type = f["filename"], f["content_type"]
-                body = f["body"]
-                #logging.info(
-                #    'POST "%s" "%s" %d bytes', filename, content_type, len(body)
-                #)
-                print(filename)
-
-                # save temp hex file in worksapce
-                with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
-                    f.write(body)
-
-                # move temp hex to packrat cache
-                path = os.path.join(webds.PACKRAT_CACHE, packrat)
-                SystemHandler.CallSysCommand(['mkdir','-p', path])
-
-                file_path = os.path.join(path, filename)
-                print(file_path)
-
-                SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
-                SystemHandler.UpdateWorkspace()
-
-                data = json.loads("{}")
-                data["filename"] = file_path
-                print(data)
-
-                self.finish(json.dumps(data))

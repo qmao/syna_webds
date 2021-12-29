@@ -64,7 +64,8 @@ export default function VerticalTabs(
     const [value, setValue] = React.useState(0);
     const [filelist, setFileList] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    const [packrat, setPackrat] = React.useState("3365253");
+    const [packrat, setPackrat] = React.useState("");
+    const [packratnumber, setPackratNumber] = React.useState("745");
     const [packratError, setPackratError] = React.useState(false);
 
     useEffect(() => {
@@ -75,17 +76,20 @@ export default function VerticalTabs(
     React.useEffect(() => {
         if (value == 1) {
             console.log(packrat);
-            if (packrat === '') {
+            if (packratnumber === '') {
                 setPackratError(false);
             }
-            else if (isNaN(+Number(packrat))) {
+            else if (isNaN(+Number(packratnumber))) {
                 console.log("invalid!!");
                 setPackratError(true);
             }
             else
                 setPackratError(false);
         }
-    }, [packrat]);
+        else {
+            setPackratError(false);
+        }
+    }, [packratnumber]);
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setValue(newValue);
@@ -209,7 +213,7 @@ export default function VerticalTabs(
         }}>
 		<ThemeProvider theme={webdsTheme}>
         <UserContext.Provider
-            value={{ packrat: packrat }}
+                    value={{ packrat: packrat, packratnumber: packratnumber, index: value}}
         >
             <Paper elevation={0}>
                         <Paper elevation={0} sx={{
@@ -257,8 +261,8 @@ export default function VerticalTabs(
                     <TabPanel value={value} index={1}>
                         <TextField id="filled-basic"
                                     label="Packrat"
-                                    value={packrat}
-                                    onChange={(e) => setPackrat(e.target.value)}
+                                    value={packratnumber}
+                                    onChange={(e) => setPackratNumber(e.target.value)}
                                     error={packratError}
                                     sx={{
                                       margin: webdsTheme.spacing(1),
@@ -268,7 +272,7 @@ export default function VerticalTabs(
                     </TabPanel>
                  </Paper>
                  <Box>
-                     <ButtonProgram title="PROGRAM" />
+                    <ButtonProgram title="PROGRAM" error={packratError}/>
                  </Box>
             </Paper>
             </UserContext.Provider>

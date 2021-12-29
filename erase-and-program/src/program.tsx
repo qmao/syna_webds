@@ -27,6 +27,7 @@ interface ButtonProps {
     alert?: any;
     onClick?: any;
     onFinish?: any;
+    error: any;
 }
 
 declare global {
@@ -34,7 +35,7 @@ declare global {
 }
 
 export default function ButtonProgram(props: ButtonProps) {
-    const { children, value, index, title, alert, ...other } = props;
+    const { children, value, index, title, alert, error,...other } = props;
     const [message, setMessage] = useState("");
     const [isAlert, setAlert] = useState(false);
     const [disable, setDisable] = useState(false);
@@ -63,40 +64,47 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
+    const go = (file: string) => {
+        setProgramStatus(true);
+        globalThis.source = new window.EventSource('/webds/reprogram');
+        console.log(globalThis.source);
+        if (globalThis.source != null) {
+            globalThis.source.addEventListener('reprogram', eventHandler, false);
+        }
+        else {
+            console.log("event source is null");
+        }
+        start_program(file)
+            .then(res => {
+                setProgramStatus(true);
+            })
+            .catch((error) => {
+                console.log(error, 'Promise error');
+                setProgramStatus(false, false, error);
+         })
+    }
+
     useEffect(() => {
+        let file: string;
 
         if (isStart) {
-            if (context.packrat.includes("PR")) {
-                //console.log("packrat exists");
-            }
-            else {
+            if (context.index == 1) {
                 console.log("download hex from packrat server");
-                start_fetch();
-            }
-
-            console.log(context.packrat);
-
-            if (context.packrat == "") {
-                setProgramStatus(false, false, "Please choose a HEX file");
+                file = context.packratnumber;
+                start_fetch(file).then(res => {
+                    go(file);
+                })
+                .catch((error) => {
+                    console.log(error, 'Promise error');
+                    setProgramStatus(false, false, error);
+                })
             }
             else {
-                setProgramStatus(true);
-                globalThis.source = new window.EventSource('/webds/reprogram');
-                console.log(globalThis.source);
-                if (globalThis.source != null) {
-                    globalThis.source.addEventListener('reprogram', eventHandler, false);
+                file = context.packrat;
+                if (file == "") {
+                    setProgramStatus(false, false, "Please choose a HEX file");
                 }
-                else {
-                    console.log("event source is null");
-                }
-                start_program()
-                    .then(res => {
-                        setProgramStatus(true);
-                    })
-                    .catch((error) => {
-                        console.log(error, 'Promise error');
-                        setProgramStatus(false, false, error);
-                    })
+                go(file);
             }
         }
     }, [isStart]);
@@ -145,8 +153,7 @@ export default function ButtonProgram(props: ButtonProps) {
         console.log(pass);
     }
 
-    const start_program = async (): Promise<ProgramResponse | undefined> => {
-        const file_name = context.packrat;
+    const start_program = async (file_name: string): Promise<ProgramResponse | undefined> => {
         const action = "start";
         const dataToSend = {
             filename: file_name,
@@ -170,18 +177,22 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
-    const start_fetch = async (): Promise<string | undefined> => {
+    const start_fetch = async (packrat: string): Promise<string | undefined> => {
+        const formData = new FormData();
+
         try {
+            console.log(packrat);
 
-            console.log("start to fetch");
-            console.log(context.packrat);
+            let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
 
-            let blob: BlobFile | undefined = DownloadBlob(context.packrat, "hex");
-
-            const formData = new FormData();
+            console.log(blob);
             formData.append("blob", blob!.content, blob!.name);
+        } catch (e) {
+            return Promise.reject((e as Error).message);
+        }
 
-            const reply = requestAPI<any>('upload', {
+        try {
+            const reply = await requestAPI<any>('packrat', {
                 body: formData,
                 method: 'POST',
             });
@@ -206,7 +217,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 flexDirection: 'row-reverse'
                     }}
             >
-                <Fab variant="extended" color="primary" disabled={disable} onClick={() => setStart(true)} sx={{ maxWidth: 145, mr: 12 }}>
+                <Fab variant="extended" color="primary" disabled={disable || error} onClick={() => setStart(true)} sx={{ maxWidth: 145, mr: 12 }}>
                     <FlashOnIcon sx={{ mr: 1 }} />
                     {title}
                 </Fab>
