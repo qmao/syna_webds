@@ -13,20 +13,22 @@ export default function DownloadBlob(packrat_id, extension)
 		serverUrl: "http://sjc1uvt-packrat01.synaptics.com:8088/service"
 	});
 
-	console.log(packratSession);
+  console.log(packratSession);
 
-	packratSession.connect();
+  packratSession.connect();
 
-	var pingResult = packratSession.ping();
-    console.log("pingResult = " + pingResult);
+  var pingResult = packratSession.ping();
+  console.log("pingResult = " + pingResult);
 
-	//still need to pass an empty auth token
-    packratSession.login("", "");
-    console.log("authToken = " + packratSession.authToken);
+  //still need to pass an empty auth token
+  packratSession.login("", "");
+  console.log("authToken = " + packratSession.authToken);
+
+  console.log(packrat_id);
 
 	var exists = packratSession.exists(packrat_id);
 	console.log(exists);
-		
+
   let fileList = packratSession.listFiles(packrat_id);
 
 	console.log(fileList);
@@ -34,18 +36,18 @@ export default function DownloadBlob(packrat_id, extension)
   var fileToDownload = fileList[0];
 	console.log(fileToDownload);
 
-    for (let i = 0; i < fileList.length; i++) {
-		console.log(i);
-		console.log(fileList[i].filename);
-        if (fileList[i].filename.endsWith(hex)) {
-            fileToDownload = fileList[i];
-			console.log(fileToDownload);
-        }
+  for (let i = 0; i < fileList.length; i++) {
+    console.log(i);
+    console.log(fileList[i].filename);
+    if (fileList[i].filename.endsWith(extension)) {
+      fileToDownload = fileList[i];
+      console.log(fileToDownload);
     }
+  }
 
-    let fileBlob = packratSession.downloadFileAsBlob(packrat_id, fileToDownload.filename);
-    console.log("fileBlob.name = " + fileBlob.name);
-    console.log("fileBlob.content = " + fileBlob.content.size);
+  let fileBlob = packratSession.downloadFileAsBlob(packrat_id, fileToDownload.filename);
+  console.log("fileBlob.name = " + fileBlob.name);
+  console.log("fileBlob.content = " + fileBlob.content.size);
 	
 	return fileBlob;
 }
@@ -149,6 +151,7 @@ PackratSession.prototype = {
                     fileBlock = this.thriftClient.next_file_block(downloadRequest.requestId);
                     completeFile += fileBlock;
                 }
+                console.log(completeFile);
                 if (null !== completeFile) {
                     console.log("file_hash = " + downloadRequest.file_hash);
                     console.log(completeFile.length);
