@@ -217,7 +217,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 flexDirection: 'row-reverse'
                     }}
             >
-                <Fab variant="extended" color="primary" disabled={disable || error} onClick={() => setStart(true)} sx={{ maxWidth: 145, mr: 12 }}>
+                <Fab variant="extended" color="primary" disabled={disable || (error && (context.index == 1))} onClick={() => setStart(true)} sx={{ maxWidth: 145, mr: 12 }}>
                     <FlashOnIcon sx={{ mr: 1 }} />
                     {title}
                 </Fab>
