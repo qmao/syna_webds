@@ -80,40 +80,45 @@ class ProgramHandler(APIHandler):
 
         except StreamClosedError:
             print("stream close error!!")
-            pass
+            raise
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self):
         print("request progress")
-
-        while True:
-            if g_stdout_handler is not None:
-                status = g_stdout_handler.get_status()
-                if status == 'start':
-                    if self._last != g_stdout_handler.get_progress():
+        try:
+            while True:
+                if g_stdout_handler is not None:
+                    status = g_stdout_handler.get_status()
+                    if status == 'start':
+                        if self._last != g_stdout_handler.get_progress():
+                            send = {
+                                "progress": g_stdout_handler.get_progress(),
+                            }
+                            yield self.publish(json.dumps(send))
+                            self._last = g_stdout_handler.get_progress()
+                    elif status != 'start' and status != 'idle':
+                        print(g_stdout_handler.get_message())
                         send = {
                             "progress": g_stdout_handler.get_progress(),
+                            "status": status,
+                            "message": g_stdout_handler.get_message()
                         }
+                        print(json.dumps(send))
                         yield self.publish(json.dumps(send))
-                        self._last = g_stdout_handler.get_progress()
-                elif status != 'start' and status != 'idle':
-                    print(g_stdout_handler.get_message())
-                    send = {
-                        "progress": g_stdout_handler.get_progress(),
-                        "status": status,
-                        "message": g_stdout_handler.get_message()
-                    }
-                    print(json.dumps(send))
-                    yield self.publish(json.dumps(send))
-                    g_stdout_handler.reset()
+                        g_stdout_handler.reset()
 
-                    self.finish(json.dumps({
-                        "data": "done"
-                    }))
-                    return
-            else:
-                yield gen.sleep(1)
+                        self.finish(json.dumps({
+                            "data": "done"
+                        }))
+                        break
+                else:
+                    yield gen.sleep(1)
+
+        except StreamClosedError:
+            message="stream closed"
+            print(message)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
 
         print("request progress finished")
 

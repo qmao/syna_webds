@@ -51,11 +51,14 @@ class ReportHandler(APIHandler):
     @tornado.gen.coroutine
     def publish(self, data):
         """Pushes data to a listener."""
-        self.set_header('content-type', 'text/event-stream')
-        self.write('event: report\n')
-        self.write('data: {}\n'.format(data))
-        self.write('\n')
-        yield self.flush()
+        try:
+            self.set_header('content-type', 'text/event-stream')
+            self.write('event: report\n')
+            self.write('data: {}\n'.format(data))
+            self.write('\n')
+            yield self.flush()
+        except StreamClosedError:
+            raise
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
@@ -94,13 +97,7 @@ class ReportHandler(APIHandler):
                   print("send sse   takes: ", time_after_send - time_after_report)
 
         except StreamClosedError:
-            print("stream close error!!")
-
-        data = {"info": 'ready to close'}
-        self.set_header('content-type', 'text/event-stream')
-        self.write('event: close\n')
-        self.write('data: {}\n'.format(data))
-        self.write('\n')
-        yield self.flush()
-
-        print("sse finished")        
+            message="stream closed"
+            print(message)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            return
