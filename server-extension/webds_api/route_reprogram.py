@@ -112,6 +112,7 @@ class ProgramHandler(APIHandler):
                             "data": "done"
                         }))
                         break
+                    yield gen.sleep(0.0001)
                 else:
                     yield gen.sleep(1)
 

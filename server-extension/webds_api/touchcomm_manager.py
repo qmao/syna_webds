@@ -27,12 +27,16 @@ class TouchcommManager(object):
             print("already connected")
 
     def disconnect(self):
-        if self._tc is not None:
-            self._tc.close()
-            self._tc = None
-            print("TouchcommManager disconnect")
-        else:
-            print("already disconnected")
+        try:
+            if self._tc is not None:
+                self._tc.close()
+                self._tc = None
+                print("TouchcommManager disconnect")
+            else:
+                print("already disconnected")
+        except BrokenPipeError:
+            print("Broken pipe")
+            pass
 
     def identify(self, auto = True):
         if auto:

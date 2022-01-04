@@ -106,36 +106,44 @@ class ReportHandler(APIHandler):
         start_time = start_time - fdiff
 
         try:
-          while True:
-              time_check = time.time()
-              if (time_check - start_time >= fdiff):
-                  start_time = time_check
-                  if debug:
-                      time_before_report = time.time()
-                  report = tc.getReport()
-                  if debug:
-                      time_after_report = time.time()
+            while True:
+                time_check = time.time()
+                if (time_check - start_time >= fdiff):
+                    start_time = time_check
+                    if debug:
+                        time_before_report = time.time()
+                    report = tc.getReport()
+                    if debug:
+                        time_after_report = time.time()
 
-                  image = report[1]['image']
-                  fcount = fcount + 1
-                  send = { "image": image, "frame": fcount }
+                    image = report[1]['image']
+                    fcount = fcount + 1
+                    send = { "image": image, "frame": fcount }
 
-                  yield self.publish(json.dumps(send, cls=NumpyEncoder))
+                    yield self.publish(json.dumps(send, cls=NumpyEncoder))
 
-                  if debug:
-                      time_after_send = time.time()
-                      if (fcount % 50) == 0:
-                          print(fcount)
-                          end_debug_time = time.time()
-                          fpsReal = ((fcount - fprev) / (end_debug_time - start_debug_time))
-                          start_debug_time = end_debug_time
-                          fprev = fcount
-                          print("FPS: ", fpsReal)
-                          print("get report takes: ", time_after_report - time_before_report)
-                          print("send sse   takes: ", time_after_send - time_after_report)
+                    if debug:
+                        time_after_send = time.time()
+                        if (fcount % 50) == 0:
+                            print(fcount)
+                            end_debug_time = time.time()
+                            fpsReal = ((fcount - fprev) / (end_debug_time - start_debug_time))
+                            start_debug_time = end_debug_time
+                            fprev = fcount
+                            print("FPS: ", fpsReal)
+                            print("get report takes: ", time_after_report - time_before_report)
+                            print("send sse   takes: ", time_after_send - time_after_report)
+                yield tornado.gen.sleep(0.0001)
 
         except StreamClosedError:
             message="stream closed"
+            print(message)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
+            return
+
+        except BrokenPipeError:
+            tc.disconnect()
+            message="Broken pipe"
             print(message)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
             return
