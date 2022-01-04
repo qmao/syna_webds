@@ -19,7 +19,7 @@ class TouchcommManager(object):
         print('Touchcomm instance:{}'.format(self))
 
         if self._tc is None:
-            self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1')
+            self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', streaming=False)
             print("TouchcommManager connect")
             self._tc.reset()
             print("TouchcommManager reset")
