@@ -236,7 +236,9 @@ const get_dimension = async (): Promise<number[]> => {
 const set_report = async (disable: number[], enable: number[]): Promise<string | undefined> => {
     const dataToSend = {
         enable: enable,
-        disable: disable
+        disable: disable,
+        fps: 20,
+        debug: true
     };
     console.log(dataToSend);
     try {

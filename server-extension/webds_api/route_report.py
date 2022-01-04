@@ -27,8 +27,14 @@ class ReportHandler(APIHandler):
         input_data = self.get_json_body()
         print(input_data)
 
-        enable = input_data["enable"]
-        disable = input_data["disable"]
+        try:
+            enable = input_data["enable"]
+        except:
+            pass
+        try:
+            disable = input_data["disable"]
+        except:
+            pass
         try:
             frameRate = input_data["fps"]
         except:
