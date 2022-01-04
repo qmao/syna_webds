@@ -9,6 +9,9 @@ from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
 import time
 
+fps = 200
+debug = True
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
@@ -26,6 +29,14 @@ class ReportHandler(APIHandler):
 
         enable = input_data["enable"]
         disable = input_data["disable"]
+        try:
+            frameRate = input_data["fps"]
+        except:
+            pass
+        try:
+            debugLog = input_data["debug"]
+        except:
+            pass
 
         try:
             tc = TouchcommManager()
@@ -37,6 +48,16 @@ class ReportHandler(APIHandler):
             for x in enable:
                 print('enable:{}'.format(x))
                 ret = tc.enableReport(x)
+
+            if frameRate is not None:
+                global fps
+                fps = frameRate
+                print('fps:{}'.format(fps))
+
+            if debugLog is not None:
+                global debug
+                debug = debugLog
+                print('debug:{}'.format(debug))
 
             data = {'data': 'done'}
 
@@ -69,32 +90,43 @@ class ReportHandler(APIHandler):
         fcount = 0
         fprev = 0
         start_time = time.time()
+        if debug:
+            start_debug_time = start_time
+
+        global fps
+        fdiff = (1/fps)
+        print (fps)
+        print (fdiff)
+        start_time = start_time - fdiff
 
         try:
           while True:
+              time_check = time.time()
+              if (time_check - start_time >= fdiff):
+                  start_time = time_check
+                  if debug:
+                      time_before_report = time.time()
+                  report = tc.getReport()
+                  if debug:
+                      time_after_report = time.time()
 
-              time_before_report = time.time()
+                  image = report[1]['image']
+                  fcount = fcount + 1
+                  send = { "image": image, "frame": fcount }
 
-              report = tc.getReport()
+                  yield self.publish(json.dumps(send, cls=NumpyEncoder))
 
-              time_after_report = time.time()
-
-              image = report[1]['image']
-              fcount = fcount + 1
-              send = { "image": image, "frame": fcount }
-              yield self.publish(json.dumps(send, cls=NumpyEncoder))
-
-              time_after_send = time.time()
-
-              if (fcount % 50) == 0:
-                  print(fcount)
-                  end_time = time.time()
-                  fps = ((fcount - fprev) / (end_time - start_time))
-                  start_time = end_time
-                  fprev = fcount
-                  print("FPS: ", fps)
-                  print("get report takes: ", time_after_report - time_before_report)
-                  print("send sse   takes: ", time_after_send - time_after_report)
+                  if debug:
+                      time_after_send = time.time()
+                      if (fcount % 50) == 0:
+                          print(fcount)
+                          end_debug_time = time.time()
+                          fpsReal = ((fcount - fprev) / (end_debug_time - start_debug_time))
+                          start_debug_time = end_debug_time
+                          fprev = fcount
+                          print("FPS: ", fpsReal)
+                          print("get report takes: ", time_after_report - time_before_report)
+                          print("send sse   takes: ", time_after_send - time_after_report)
 
         except StreamClosedError:
             message="stream closed"
