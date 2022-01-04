@@ -16,7 +16,10 @@ class ProgrammerManager(object):
 
     def program(filename):
         ### disconnect tcm if exist
-        tc = TouchcommManager()
-        tc.disconnect()
-
+        try:
+            tc = TouchcommManager()
+            tc.disconnect()
+        except:
+            print("tcm not exist")
+            pass
         return AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
