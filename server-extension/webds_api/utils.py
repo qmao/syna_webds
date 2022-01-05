@@ -53,12 +53,9 @@ class SystemHandler():
         for packrat in os.listdir(webds.PACKRAT_CACHE):
             print(packrat)
             cache_path = os.path.join(webds.PACKRAT_CACHE, packrat)
-            for fname in os.listdir(cache_path):
-                if fname.endswith('.hex'):
-                    ws_path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat)
-                    print(ws_path + " -> " + cache_path)
-                    os.symlink(cache_path, ws_path)
-                    break
+            ws_path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat)
+            print(ws_path + " -> " + cache_path)
+            os.symlink(cache_path, ws_path)
 
     def UpdateWorkspace():
         SystemHandler.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
