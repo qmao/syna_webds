@@ -91,21 +91,21 @@ class ReportHandler(APIHandler):
     @tornado.gen.coroutine
     def get(self):
         print("get report")
-
-        tc = TouchcommManager()
-        fcount = 0
-        fprev = 0
-        start_time = time.time()
-        if debug:
-            start_debug_time = start_time
-
-        global fps
-        fdiff = (1/fps)
-        print (fps)
-        print (fdiff)
-        start_time = start_time - fdiff
-
+        tc = None
         try:
+            tc = TouchcommManager()
+            fcount = 0
+            fprev = 0
+            start_time = time.time()
+            if debug:
+                start_debug_time = start_time
+
+            global fps
+            fdiff = (1/fps)
+            print (fps)
+            print (fdiff)
+            start_time = start_time - fdiff
+
             while True:
                 time_check = time.time()
                 if (time_check - start_time >= fdiff):
@@ -135,15 +135,17 @@ class ReportHandler(APIHandler):
                             print("send sse   takes: ", time_after_send - time_after_report)
                 yield tornado.gen.sleep(0.0001)
 
-        except StreamClosedError:
-            message="stream closed"
-            print(message)
+        except Exception as e:
+            ### TypeError
+            ### BrokenPipeError
+            ### StreamClosedError
+            print("Oops! get report", e.__class__, "occurred.")
+            print(e)
+            message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
-            return
 
-        except BrokenPipeError:
-            tc.disconnect()
-            message="Broken pipe"
-            print(message)
-            raise tornado.web.HTTPError(status_code=400, log_message=message)
-            return
+        finally:
+            print(tc)
+            if tc is not None:
+                print("report sse finally disconnect tc")
+                tc.disconnect()

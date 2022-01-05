@@ -27,10 +27,14 @@ class StdoutHandler(Queue):
         super().__init__()
 
     def write(self,msg):
-        if "%" in msg:
-            progress = msg[12:-1]
-            self._progress = int(progress, base=10)
-        sys.__stdout__.write(msg)
+        try:
+            if "%" in msg:
+                progress = msg[12:-1]
+                self._progress = int(progress, base=10)
+            sys.__stdout__.write(msg)
+        except Exception as e:
+            print("Oops StdoutHandler write!", e.__class__, "occurred.")
+            pass
 
     def flush(self):
         sys.__stdout__.flush()

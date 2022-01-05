@@ -35,7 +35,8 @@ class CommandHandler(APIHandler):
         try:
             tc = TouchcommManager()
             if query == 'identify':
-                info = tc.identify(False)
+                tc = TouchcommManager()
+                info = tc.identify()
                 self.finish(json.dumps(info))
                 return
             elif query == 'app-info':

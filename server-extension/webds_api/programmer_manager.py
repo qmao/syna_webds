@@ -19,7 +19,10 @@ class ProgrammerManager(object):
         try:
             tc = TouchcommManager()
             tc.disconnect()
+            tc.lock(True)
         except:
             print("tcm not exist")
             pass
-        return AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
+        finally:
+            AsicProgrammer.programHexFile(filename, communication='socket', server='127.0.0.1')
+            tc.lock(False)
