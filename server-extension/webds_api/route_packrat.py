@@ -73,18 +73,13 @@ class PackratHandler(APIHandler):
                         packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
                         print(packrat_id)
                     except:
-                        message = "PACKRAT_ID not found"
+                        message = filename + " PACKRAT_ID parse failed"
                         raise tornado.web.HTTPError(status_code=400, log_message=message)
                         return
                     if packrat_id is None:
-                        message = "PACKRAT_ID not found"
+                        message = filename + " PACKRAT_ID not found"
                         raise tornado.web.HTTPError(status_code=400, log_message=message)
                         return
-
-                if packrat_id is None:
-                    message="Invalid Hex File (PACKRAT_ID not found)"
-                    raise tornado.web.HTTPError(status_code=400, log_message=message)
-                    return
 
                 # save temp hex file in worksapce
                 with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
