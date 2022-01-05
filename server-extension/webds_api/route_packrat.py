@@ -81,17 +81,10 @@ class PackratHandler(APIHandler):
                         raise tornado.web.HTTPError(status_code=400, log_message=message)
                         return
 
-                ##check if folder already been used
-                path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, packrat_id)
-                if os.path.exists(path):
-                    message = path + " exists in workspace."
-                    print(message)
+                if packrat_id is None:
+                    message="Invalid Hex File (PACKRAT_ID not found)"
                     raise tornado.web.HTTPError(status_code=400, log_message=message)
                     return
-
-                if packrat_id is None:
-                    print("Invalid Hex File (PACKRAT_ID not found)")
-                    ##return
 
                 # save temp hex file in worksapce
                 with open(webds.WORKSPACE_TEMP_FILE, 'wb') as f:
