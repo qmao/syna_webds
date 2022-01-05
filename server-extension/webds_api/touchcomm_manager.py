@@ -20,10 +20,9 @@ class TouchcommManager(object):
 
     def connect(self):
         print("Touchcomm connect()")
-        print('Touchcomm instance:{}'.format(self))
+        ###print('Touchcomm instance:{}'.format(self))
 
         self._lock.acquire()
-        print("Touchcomm connect() lock")
         try:
             if self._tc is None:
                 self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', streaming=False)
@@ -38,7 +37,6 @@ class TouchcommManager(object):
     def disconnect(self):
         print("Touchcomm disconnect()")
         self._lock.acquire()
-        print("Touchcomm disconnect() lock")
         try:
             if self._tc is not None:
                 self._tc.close()
@@ -102,7 +100,7 @@ class TouchcommManager(object):
         try:
             data = self._tc.getAppInfo()
         except Exception as e:
-            print('Touchcomm enableReport exception:{}'.format(e))
+            print('Touchcomm getAppInfo exception:{}'.format(e))
         finally:
             self._lock.release()
         return data
