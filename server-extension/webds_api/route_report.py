@@ -143,15 +143,14 @@ class ReportHandler(APIHandler):
             pass
 
         except Exception as e:
+            print(tc)
+            if tc is not None:
+                print("report sse disconnect tc")
+                tc.disconnect()
             ### TypeError
             ### BrokenPipeError
-            ### StreamClosedError
             print("Oops! get report", e.__class__, "occurred.")
             print(e)
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
-            print(tc)
-            if tc is not None:
-                print("report sse finally disconnect tc")
-                tc.disconnect()
 
