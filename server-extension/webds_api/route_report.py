@@ -26,6 +26,8 @@ class ReportHandler(APIHandler):
     def post(self):
         input_data = self.get_json_body()
         print(input_data)
+        frameRate = None
+        debugLog = None
 
         try:
             enable = input_data["enable"]
@@ -67,9 +69,10 @@ class ReportHandler(APIHandler):
 
             data = {'data': 'done'}
 
-        except:
-            data = {'data': 'reprogram needed'}
-            print("Exception...device needs to be reprogrammed")
+        except Exception as e:
+            print(e)
+            message=str(e)
+            raise tornado.web.HTTPError(status_code=400, log_message=message)
 
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
@@ -135,6 +138,10 @@ class ReportHandler(APIHandler):
                             print("send sse   takes: ", time_after_send - time_after_report)
                 yield tornado.gen.sleep(0.0001)
 
+        except StreamClosedError:
+            print("Stream Closed!")
+            pass
+
         except Exception as e:
             ### TypeError
             ### BrokenPipeError
@@ -143,9 +150,8 @@ class ReportHandler(APIHandler):
             print(e)
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
-
-        finally:
             print(tc)
             if tc is not None:
                 print("report sse finally disconnect tc")
                 tc.disconnect()
+

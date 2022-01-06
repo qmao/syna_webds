@@ -47,9 +47,7 @@ class AboutHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-
-        print(self.request.arguments)
-
+        ##print(self.request.arguments)
         query = self.get_argument('query', None)
 
         if query == 'android-connection':
