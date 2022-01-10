@@ -12,7 +12,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
-import DownloadBlob, { BlobFile } from './packrat/packrat'
+//import * as fs from 'fs';
+//import DownloadBlob, { BlobFile } from './packrat/packrat'
 
 export interface IProgramInfo {
     filename: string;
@@ -178,28 +179,49 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     const start_fetch = async (packrat: string): Promise<string | undefined> => {
-        const formData = new FormData();
+        //const formData = new FormData();
 
         try {
             console.log(packrat);
 
-            let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
 
-            console.log(blob);
-            formData.append("blob", blob!.content, blob!.name);
-        } catch (e) {
-            return Promise.reject((e as Error).message);
-        }
+            /////let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
+            /////console.log(blob);
+            /////formData.append("blob", blob!.content, blob!.name);
 
-        try {
-            const reply = await requestAPI<any>('packrat', {
-                body: formData,
-                method: 'POST',
-            });
+            let test = await fetch('https://packrat.synaptics.com/packrat/gethex.cgi?packrat_id=2564145', {
+                //method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                //cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'include', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+            })
+                .then(res => res.blob()) // Gets the response and returns it as a blob
+                .then(function (blob) {
+                    console.log(blob.size);
+                    console.log(blob.type);
+                    var bstream = blob.stream();
+                    console.log(bstream);
 
-            console.log(reply);
+                    blob.arrayBuffer().then(buffer => console.log(buffer));
 
-            return Promise.resolve(reply);
+                    blob.text().then(text => console.log(text));
+
+                    const formData = new FormData();
+                    formData.append("blob", blob, 'test');
+
+                    const reply = requestAPI<any>('packrat', {
+                        body: formData,
+                        method: 'POST',
+                    });
+                    console.log(reply);
+
+                    return Promise.resolve(reply);
+
+                });
+
         } catch (e) {
             return Promise.reject((e as Error).message);
         }
