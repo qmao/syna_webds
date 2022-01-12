@@ -24,12 +24,10 @@ class TouchcommManager(object):
 
         self._lock.acquire()
         try:
-            if self._tc is None:
-                self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', streaming=False)
-            else:
+            if self._tc is not None:
                 version = self._tc.comm.send_and_check("version")
-                if version['content'] == 'disconnect':
-                    self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', streaming=False)
+            if self._tc is None or version['content'] == 'disconnect':
+                self._tc = TouchComm.make(protocols='report_streamer', server='127.0.0.1', streaming=False)
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))
