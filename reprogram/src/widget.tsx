@@ -1,7 +1,7 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect } from 'react';
 
-import { TextField, Box, IconButton, Paper, Fade, Typography, Stack } from '@mui/material';
+import { TextField, Box, IconButton, Paper, Fade, Stack } from '@mui/material';
 import Popper, { PopperPlacementType } from '@mui/material/Popper';
 import ButtonProgram from './program'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -9,6 +9,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ThemeProvider } from "@mui/material/styles";
 import { requestAPI } from './handler';
+
+import FileList from './filelist'
 //import { UserContext } from './context';
 import webdsTheme from './webdsTheme';
 
@@ -23,6 +25,7 @@ export default function VerticalTabs(
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [open, setOpen] = React.useState(false);
     const [placement, setPlacement] = React.useState<PopperPlacementType>();
+    const [filelist, setFileList] = React.useState(["11111","22222", "333333"]);
 
     useEffect(() => {
         if (true) {
@@ -71,6 +74,44 @@ export default function VerticalTabs(
         }
     }
 
+    const onFileDelete = (file: string, index: number) => {
+        console.log("onFileDelete:", file);
+        delete_hex(file);
+    };
+
+    const onFileSelect = (file: string) => {
+        console.log("onFileSelect:", file);
+        setPackrat(file);
+    };
+
+    const delete_hex = async (filename: string): Promise<string | undefined> => {
+        console.log("delete_hex");
+        let packrat_name = filename.split("/")
+        const dataToSend = { file: packrat_name[1] };
+
+        console.log(packrat_name);
+        console.log(dataToSend);
+
+        try {
+            const reply = await requestAPI<any>('packrat/' + packrat_name[0], {
+                body: JSON.stringify(dataToSend),
+                method: 'DELETE',
+            });
+            console.log(reply);
+            await get_hex_list().then(list => {
+                if (list!.indexOf(packrat) == -1) {
+                    setPackrat("");
+                }
+            });
+
+            return reply;
+        } catch (error) {
+            if (error) {
+                return error.message
+            }
+        }
+    }
+
     const get_hex_list = async (): Promise<string[] | undefined> => {
         console.log("get_hex_list:", event);
         try {
@@ -78,11 +119,11 @@ export default function VerticalTabs(
                 method: 'GET',
             });
             console.log(reply);
-            ////setFileList(reply['filelist']);
+            setFileList(reply['filelist']);
             return reply['filelist'];
         } catch (error) {
             console.log(error);
-            ////setFileList([]);
+            setFileList([]);
             return error.message
         }
     }
@@ -151,22 +192,22 @@ export default function VerticalTabs(
                         </IconButton>
                         {open &&
                             <div>
-                            <input
-                                accept="hex"
-                                id="icon-button-hex"
-                                onChange={handlFileChange}
-                                type="file"
-                                hidden
-                            />
-                            <label htmlFor="icon-button-hex">
-                                <IconButton component="span"
-                                    aria-label="more"
-                                    id="hex-button"
-                                    onClick={handleUpload}
-                                >
-                                    <CloudUploadIcon />
-                                </IconButton>
-                            </label>
+                                <input
+                                    accept="hex"
+                                    id="icon-button-hex"
+                                    onChange={handlFileChange}
+                                    type="file"
+                                    hidden
+                                />
+                                <label htmlFor="icon-button-hex">
+                                    <IconButton component="span"
+                                        aria-label="more"
+                                        id="hex-button"
+                                        onClick={handleUpload}
+                                    >
+                                        <CloudUploadIcon />
+                                    </IconButton>
+                                </label>
 
 
 
@@ -174,7 +215,7 @@ export default function VerticalTabs(
                                     {({ TransitionProps }) => (
                                         <Fade {...TransitionProps} timeout={350}>
                                             <Paper>
-                                                <Typography sx={{ p: 2 }}>The content of the Popper.</Typography>
+                                                <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
                                             </Paper>
                                         </Fade>
                                     )}
@@ -201,23 +242,23 @@ export default function VerticalTabs(
                         <ButtonProgram title="PROGRAM" error={packratError} />
                     </Stack>
                 </Box>
-                </ThemeProvider>
-            </div>
-            );
+            </ThemeProvider>
+        </div>
+    );
 
 }
- 
+
 /**
 * A Counter Lumino Widget that wraps a CounterComponent.
 */
 export class ShellWidget extends ReactWidget {
-/**
-* Constructs a new CounterWidget.
-*/
+    /**
+    * Constructs a new CounterWidget.
+    */
     constructor() {
         super();
         this.addClass('content-widget');
-		console.log("TabPanelUiWidget is created!!!");
+        console.log("TabPanelUiWidget is created!!!");
     }
 
     handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
