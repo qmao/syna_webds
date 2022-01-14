@@ -8,7 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ThemeProvider } from "@mui/material/styles";
-//import { requestAPI } from './handler';
+import { requestAPI } from './handler';
 //import { UserContext } from './context';
 import webdsTheme from './webdsTheme';
 
@@ -55,8 +55,73 @@ export default function VerticalTabs(
         (document.getElementById("icon-button-hex") as HTMLInputElement).value = "";
     }
 
-    const handlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handlFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event);
+
+        if (event.currentTarget.files) {
+            upload_hex(event.currentTarget.files[0])
+                .then((file) => {
+                    console.log(file);
+                    ////setLoading(false);
+                })
+                .catch(err => {
+                    ////setLoading(false);
+                    alert(err)
+                });
+        }
+    }
+
+    const get_hex_list = async (): Promise<string[] | undefined> => {
+        console.log("get_hex_list:", event);
+        try {
+            const reply = await requestAPI<any>('packrat?extension=hex', {
+                method: 'GET',
+            });
+            console.log(reply);
+            ////setFileList(reply['filelist']);
+            return reply['filelist'];
+        } catch (error) {
+            console.log(error);
+            ////setFileList([]);
+            return error.message
+        }
+    }
+
+    const upload_hex = async (file: File): Promise<string | undefined> => {
+        console.log("upload_hex:", file);
+
+
+        if (file) {
+            ////setLoading(true);
+
+            const formData = new FormData();
+            formData.append("fileToUpload", file);
+
+            console.log(formData);
+            try {
+                const reply = await requestAPI<any>('packrat', {
+                    body: formData,
+                    method: 'POST',
+                });
+
+                console.log(reply);
+
+                let filename = reply['filename'];
+                get_hex_list().then(filelist => {
+                    // set select packrat
+                    filelist!.forEach((element: any) => {
+                        if (element.includes(filename)) {
+                            setPackrat(element);
+                        }
+                    });
+                })
+                return Promise.resolve(filename);
+            } catch (error) {
+                console.log(error);
+                console.log(error.message);
+                return Promise.reject(error.message);
+            }
+        }
     }
 
     return (
@@ -89,7 +154,7 @@ export default function VerticalTabs(
                             <input
                                 accept="hex"
                                 id="icon-button-hex"
-                                onChange={handlChange}
+                                onChange={handlFileChange}
                                 type="file"
                                 hidden
                             />
