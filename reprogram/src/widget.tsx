@@ -1,22 +1,16 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect } from 'react';
 
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ButtonProgram from './program'
+import { TextField, Box, IconButton, Paper, Fade, Typography, Stack } from '@mui/material';
 import Popper, { PopperPlacementType } from '@mui/material/Popper';
-import Paper from '@mui/material/Paper';
-import Fade from '@mui/material/Fade';
-import Typography from '@mui/material/Typography';
-
-
+import ButtonProgram from './program'
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CloseIcon from '@mui/icons-material/Close';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ThemeProvider } from "@mui/material/styles";
 //import { requestAPI } from './handler';
 //import { UserContext } from './context';
 import webdsTheme from './webdsTheme';
-
 
 export default function VerticalTabs(
     props: {
@@ -46,61 +40,103 @@ export default function VerticalTabs(
     }, [packrat]);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-        setOpen(true);
-        setPlacement('right-start');
+        if (open) {
+            setAnchorEl(null);
+            setOpen(false);
+        }
+        else {
+            setAnchorEl(event.currentTarget);
+            setOpen(true);
+            setPlacement('right-start');
+        }
     };
+
+    const handleUpload = (event: React.MouseEvent<HTMLElement>) => {
+        (document.getElementById("icon-button-hex") as HTMLInputElement).value = "";
+    }
+
+    const handlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(event);
+    }
 
     return (
         <div>
             <ThemeProvider theme={webdsTheme}>
                 <Box sx={{
                     flexDirection: 'row',
-                    backgroundColor: webdsTheme.palette.background.paper,
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: "center",
-                    m: 4
+                    //alignItems: "center",
+                    mt: 4
                 }}>
-                    <IconButton
-                        aria-label="more"
-                        id="long-button"
-                        aria-controls={open ? 'long-menu' : undefined}
-                        aria-expanded={open ? 'true' : undefined}
-                        aria-haspopup="true"
-                        onClick={handleClick}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
-                        {({ TransitionProps }) => (
-                            <Fade {...TransitionProps} timeout={350}>
-                                <Paper>
-                                    <Typography sx={{ p: 2 }}>The content of the Popper.</Typography>
-                                </Paper>
-                            </Fade>
-                        )}
-                    </Popper>
+                    <Stack spacing={1} sx={{
+                        flexDirection: 'column',
+                        display: 'flex',
+                        m: 2
+                    }}>
+                        <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleClick}
+                        >
+                            {open ? <CloseIcon /> : <MoreVertIcon />}
+                        </IconButton>
+                        {open &&
+                            <div>
+                            <input
+                                accept="hex"
+                                id="icon-button-hex"
+                                onChange={handlChange}
+                                type="file"
+                                hidden
+                            />
+                            <label htmlFor="icon-button-hex">
+                                <IconButton component="span"
+                                    aria-label="more"
+                                    id="hex-button"
+                                    onClick={handleUpload}
+                                >
+                                    <CloudUploadIcon />
+                                </IconButton>
+                            </label>
 
-                    <TextField id="filled-basic"
-                        label="Packrat"
-                        value={packrat}
-                        onChange={(e) => setPackrat(e.target.value)}
-                        error={packratError}
-                        sx={{
-                            margin: webdsTheme.spacing(1),
-                            width: '25ch',
-                        }}
-                    />
+
+
+                                <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
+                                    {({ TransitionProps }) => (
+                                        <Fade {...TransitionProps} timeout={350}>
+                                            <Paper>
+                                                <Typography sx={{ p: 2 }}>The content of the Popper.</Typography>
+                                            </Paper>
+                                        </Fade>
+                                    )}
+                                </Popper>
+                            </div>
+                        }
+                    </Stack>
+
+                    <Stack spacing={1} sx={{
+                        flexDirection: 'column',
+                        display: 'flex',
+                        alignItems: "center",
+                    }}>
+                        <TextField id="filled-basic"
+                            label="Packrat"
+                            value={packrat}
+                            onChange={(e) => setPackrat(e.target.value)}
+                            error={packratError}
+                            sx={{
+                                margin: webdsTheme.spacing(1),
+                                width: '25ch',
+                            }}
+                        />
+                        <ButtonProgram title="PROGRAM" error={packratError} />
+                    </Stack>
                 </Box>
-                <Box sx={{
-                    backgroundColor: webdsTheme.palette.background.paper,
-                    display: 'flex',
-                    justifyContent: 'center',
-                }}>
-                    <ButtonProgram title="PROGRAM" error={packratError} />
-                </Box>
-            </ThemeProvider>
+                </ThemeProvider>
             </div>
             );
 
