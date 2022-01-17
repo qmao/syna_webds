@@ -14,6 +14,46 @@ import ButtonProgram from './program'
 import FileList from './filelist'
 import webdsTheme from './webdsTheme';
 
+import { green } from '@mui/material/colors';
+
+
+interface TextFieldWithProgressProps {
+    packrat: string;
+    progress: number;
+    color?: string;
+}
+
+function TextFieldWithProgress(
+    props: TextFieldWithProgressProps
+) {
+    return (
+        <Box sx={{ position: 'relative', display: 'inline-flex', mr: 1 }}>
+            <Box
+                sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'right',
+                }}
+            >
+                <Paper sx={{ bgcolor: green[200], width: (props.progress * 2.26), height: 39 }} />
+            </Box>
+
+            <TextField
+                value={props.packrat}
+                id="outlined-size-small"
+                size="small"
+                sx={{ width: '30ch' }}
+            />
+        </Box>
+    );
+}
+
+
 export default function VerticalTabs(
     props: {
         onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -25,6 +65,8 @@ export default function VerticalTabs(
     const [open, setOpen] = React.useState(false);
     const [filelist, setFileList] = React.useState([]);
     const [select, setSelect] = React.useState("");
+    const [start, setStart] = React.useState(false);
+    const [progress, setProgress] = React.useState(0);
 
     const context = useContext(UserContext);
 
@@ -89,6 +131,16 @@ export default function VerticalTabs(
         setSelect(file);
         setOpen(!open);
         console.log("onFileSelect:", file);
+    };
+
+    const onStart = (start: any) => {
+        console.log(start);
+        setStart(start);
+    };
+
+    const onProgress = (progress: number) => {
+        console.log(progress);
+        setProgress(progress);
     };
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
@@ -229,7 +281,10 @@ export default function VerticalTabs(
                             <Paper variant="outlined" sx={{m:0, p:0}}>
                                 <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} select={select}/>
                             </Paper>
-                            :
+                                :
+                            start ? 
+                            <TextFieldWithProgress packrat={packrat} progress={progress}/>
+                                :
                             <TextField id="filled-basic"
                                 value={packrat}
                                 onChange={(e) => setPackrat(e.target.value)}
@@ -240,7 +295,7 @@ export default function VerticalTabs(
                                 }}
                             />
                         }
-                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError} />
+                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError} onStart={onStart} onProgress={onProgress}/>
                     </Stack>
                 </Box>
             </ThemeProvider>

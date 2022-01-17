@@ -20,6 +20,8 @@ interface ButtonProps {
     alert?: any;
     error: any;
     list: any;
+    onStart: any;
+    onProgress: any;
 }
 
 declare global {
@@ -57,7 +59,7 @@ function CircularProgressWithLabel(
 
 
 export default function ButtonProgram(props: ButtonProps) {
-    const { children, value, index, title, alert, error, list, ...other } = props;
+    const { children, value, index, title, alert, error, list, onStart, onProgress, ...other } = props;
     const [message, setMessage] = useState("");
     const [isAlert, setAlert] = useState(false);
     const [disable, setDisable] = useState(false);
@@ -106,7 +108,13 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     useEffect(() => {
+        props.onProgress(progress);
+    }, [progress]);
+
+    useEffect(() => {
         let file: string;
+
+        props.onStart(isStart);
 
         if (isStart) {
             let cache = "PR" + context.packrat + ".hex"
