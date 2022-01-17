@@ -2,8 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 
-import { Typography, Snackbar, Alert, AlertTitle, Box } from '@mui/material';
-import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress';
+import { Snackbar, Alert, AlertTitle, Box, Typography } from '@mui/material';
 
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 
@@ -26,35 +25,6 @@ interface ButtonProps {
 
 declare global {
     var source: EventSource;
-}
-
-
-function CircularProgressWithLabel(
-    props: CircularProgressProps & { value: number },
-) {
-    return (
-        <Box sx={{ position: 'relative', display: 'inline-flex', mr: 1 }}>
-            <CircularProgress variant="determinate" {...props} />
-            <Box
-                sx={{
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Typography
-                    variant="caption"
-                    component="div"
-                    color="text.secondary"
-                >{`${Math.round(props.value)}%`}</Typography>
-            </Box>
-        </Box>
-    );
 }
 
 
@@ -182,6 +152,7 @@ export default function ButtonProgram(props: ButtonProps) {
             setSeverity('error');
             setResult("Error");
         }
+        ///qmao
         setMessage(message);
         setAlert(true);
 
@@ -256,7 +227,14 @@ export default function ButtonProgram(props: ButtonProps) {
                     onClick={() => setStart(true)}
                     sx={{ maxWidth: 145 }}>
                     { isStart ?
-                        <CircularProgressWithLabel value={progress} />:
+                        <Typography
+                                variant="caption"
+                                component="div"
+                                color="text.secondary"
+                                sx={{mr:1}}
+                        >{`${Math.round(progress)}%`}
+                        </Typography>
+                        :
                         <FlashOnIcon sx={{ mr: 1 }} />
                     }
                     { title }

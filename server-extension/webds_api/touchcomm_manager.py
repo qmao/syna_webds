@@ -112,3 +112,8 @@ class TouchcommManager(object):
             self._lock.acquire()
         else:
             self._lock.release()
+
+    def getInstance(self):
+        if self._tc is None:
+            raise Exception("Failed to initiate ReportStreamer")
+        return self._tc

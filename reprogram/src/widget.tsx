@@ -73,7 +73,7 @@ export default function VerticalTabs(
     useEffect(() => {
         console.log(packrat);
         if (packrat === '') {
-            setPackratError(false);
+            setPackratError(true);
         }
         else if (isNaN(+Number(packrat))) {
             console.log("invalid!!");
@@ -87,8 +87,14 @@ export default function VerticalTabs(
     }, [packrat]);
 
     useEffect(() => {
+
+        const fetchData = async () => {
+            const data = await get_hex_list();
+            console.log('data', data);
+        };
+
         if (open) {
-            get_hex_list();
+            fetchData();
         }
     }, [open]);
 
@@ -145,21 +151,23 @@ export default function VerticalTabs(
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
         console.log("delete_hex");
-        let packrat = filename.split(".")[0].substr(2);
+        let packratnum = filename.split(".")[0].substr(2);
         const dataToSend = { file: filename };
 
-        console.log(packrat);
+        console.log(packratnum);
         console.log(dataToSend);
 
         try {
-            const reply = await requestAPI<any>('packrat/' + packrat, {
+            const reply = await requestAPI<any>('packrat/' + packratnum, {
                 body: JSON.stringify(dataToSend),
                 method: 'DELETE',
             });
             console.log(reply);
             await get_hex_list().then(list => {
-                if (list!.indexOf(packrat) == -1) {
-                    setPackrat("");
+                if (packrat == packratnum) {
+                    if (list!.indexOf(filename) == -1) {
+                        setPackrat("");
+                    }
                 }
             });
 
@@ -229,7 +237,7 @@ export default function VerticalTabs(
                     display: 'flex',
                     justifyContent: 'center',
                     //alignItems: "center",
-                    mt: 4
+                    mt: 6
                 }}>
                     <Stack spacing={1} sx={{
                         flexDirection: 'column',
