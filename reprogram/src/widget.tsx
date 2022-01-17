@@ -3,11 +3,11 @@ import React, { useEffect, useContext } from 'react';
 import { UserContext } from './context';
 import { requestAPI } from './handler';
 
-import { TextField, Box, IconButton, Stack, Divider, Paper } from '@mui/material';
+import { TextField, Box, Stack, Divider, Paper, Avatar, Button } from '@mui/material';
 
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 
 import { ThemeProvider } from "@mui/material/styles";
 import ButtonProgram from './program'
@@ -182,37 +182,34 @@ export default function VerticalTabs(
                     <Stack spacing={1} sx={{
                         flexDirection: 'column',
                         display: 'flex',
-                        mt: 6
+                        mt: 5
                     }}>
-                        <IconButton
-                            aria-label="more"
-                            id="long-button"
-                            aria-controls={open ? 'long-menu' : undefined}
-                            aria-expanded={open ? 'true' : undefined}
-                            aria-haspopup="true"
-                            onClick={handleClick}
-                        >
-                            {open ? <CloseIcon /> : <MoreVertIcon />}
-                        </IconButton>
+                        <Button onClick={handleClick}>
+                            <Avatar sx={{ bgcolor: webdsTheme.palette.secondary.main }} variant="rounded">
+                            {open ?
+                                <CloseIcon fontSize="large"/>
+                                :
+                                <DehazeOutlinedIcon fontSize="large"/>
+                            }
+                            </Avatar>
+                        </Button>
                         {open &&
-                            <div>
-                                <input
-                                    accept=".hex"
-                                    id="icon-button-hex"
-                                    onChange={handlFileChange}
-                                    type="file"
-                                    hidden
-                                />
-                                <label htmlFor="icon-button-hex">
-                                    <IconButton component="span"
-                                        aria-label="more"
-                                        id="hex-button"
-                                        onClick={handleUpload}
-                                    >
-                                        <CloudUploadIcon />
-                                    </IconButton>
-                                </label>
-                            </div>
+                        <div>
+                            <input
+                                accept=".hex"
+                                id="icon-button-hex"
+                                onChange={handlFileChange}
+                                type="file"
+                                hidden
+                            />
+                            <label htmlFor="icon-button-hex">
+                                <Button onClick={handleUpload} component="span">
+                                    <Avatar sx={{ bgcolor: webdsTheme.palette.secondary.main }} variant="rounded">
+                                        <CloudUploadIcon fontSize="large"/>
+                                    </Avatar>
+                                </Button>
+                            </label>
+                        </div>
                         }
                     </Stack>
 
@@ -223,7 +220,9 @@ export default function VerticalTabs(
                         width: 245
                     }}>
                         <Divider>
-                            <Box sx={{ textAlign: 'center', m: 1 }}>{open ? "Hex Files" : "Packrat"}</Box>
+                            <Box sx={{ textAlign: 'center', m: 1, fontWeight: 600, fontSize: 16 }}>
+                                {open ? "Hex Files" : "Packrat"}
+                            </Box>
                         </Divider>
 
                         {open ?
@@ -235,9 +234,9 @@ export default function VerticalTabs(
                                 value={packrat}
                                 onChange={(e) => setPackrat(e.target.value)}
                                 error={packratError}
+                                size="small"
                                 sx={{
-                                    margin: webdsTheme.spacing(1),
-                                    width: '29ch',
+                                    width: '30ch',
                                 }}
                             />
                         }
