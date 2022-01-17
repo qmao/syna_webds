@@ -2,22 +2,15 @@ import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import { Typography, Snackbar, Alert, AlertTitle, Box } from '@mui/material';
+import CircularProgress, { CircularProgressProps } from '@mui/material/CircularProgress';
+
 import FlashOnIcon from '@mui/icons-material/FlashOn';
-import Box from '@mui/material/Box';
-//import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
+
 
 import Fab from '@mui/material/Fab';
 
 //import DownloadBlob, { BlobFile } from './packrat/packrat'
-
-export interface IProgramInfo {
-    filename: string;
-    type: string
-}
 
 interface ButtonProps {
     children?: React.ReactNode;
@@ -25,24 +18,52 @@ interface ButtonProps {
     value?: any;
     title?: any;
     alert?: any;
-    onClick?: any;
-    onFinish?: any;
     error: any;
+    list: any;
 }
 
 declare global {
     var source: EventSource;
 }
 
+
+function CircularProgressWithLabel(
+    props: CircularProgressProps & { value: number },
+) {
+    return (
+        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+            <CircularProgress variant="determinate" {...props} />
+            <Box
+                sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Typography
+                    variant="caption"
+                    component="div"
+                    color="text.secondary"
+                >{`${Math.round(props.value)}%`}</Typography>
+            </Box>
+        </Box>
+    );
+}
+
+
 export default function ButtonProgram(props: ButtonProps) {
-    const { children, value, index, title, alert, error,...other } = props;
+    const { children, value, index, title, alert, error, list, ...other } = props;
     const [message, setMessage] = useState("");
     const [isAlert, setAlert] = useState(false);
     const [disable, setDisable] = useState(false);
     const [severity, setSeverity] = useState<'error' | 'info' | 'success' | 'warning'>('info');
     const [result, setResult] = useState("");
     const [progress, setProgress] = React.useState(0);
-    const [buffer, setBuffer] = React.useState(0);
     const [isStart, setStart] = React.useState(false);
 
     const context = useContext(UserContext);
@@ -88,9 +109,15 @@ export default function ButtonProgram(props: ButtonProps) {
         let file: string;
 
         if (isStart) {
-            if (context.index == 1) {
+            let cache = "PR" + context.packrat + ".hex"
+            let exist = props.list.includes(cache);
+            console.log(props.list);
+            console.log(cache);
+            console.log(exist);
+
+            if (!exist) {
                 console.log("download hex from packrat server");
-                file = context.packratnumber;
+                file = context.packrat;
                 start_fetch(file).then(res => {
                     let filePath = file + "/PR" + file + '.hex';
                     go(filePath);
@@ -101,7 +128,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 })
             }
             else {
-                file = context.packrat;
+                file = context.packrat + "/" + cache;
                 if (file == "") {
                     setProgramStatus(false, false, "Please choose a HEX file");
                 }
@@ -126,7 +153,6 @@ export default function ButtonProgram(props: ButtonProps) {
             }
         }
 
-        setBuffer(0);
         setProgress(0);
         setDisable(start);
     }
@@ -179,7 +205,6 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     const start_fetch = async (packrat: string): Promise<string | undefined> => {
-        //const formData = new FormData();
 
         try {
             console.log(packrat);
@@ -215,20 +240,18 @@ export default function ButtonProgram(props: ButtonProps) {
 
     return (
         <div {...other}>
-            <Box>
-                {disable && (
-                    <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
-                )}
-            </Box>
             <Box sx={{
                 m: 1, display: 'flex',
                 flexDirection: 'row-reverse'
             }}>
-                <Fab variant="extended" color="primary" disabled={disable || (error && (context.index == 1))}
+                <Fab variant="extended" color="primary" disabled={disable || error}
                     onClick={() => setStart(true)}
                     sx={{ maxWidth: 145 }}>
-                    <FlashOnIcon sx={{ mr: 1 }} />
-                    {title}
+                    { isStart ?
+                        <CircularProgressWithLabel value={progress} />:
+                        <FlashOnIcon sx={{ mr: 1 }} />
+                    }
+                    { title }
                 </Fab>
             </Box>
 

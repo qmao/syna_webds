@@ -1,17 +1,17 @@
 import { ReactWidget } from '@jupyterlab/apputils';
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
+import { UserContext } from './context';
+import { requestAPI } from './handler';
 
 import { TextField, Box, IconButton, Stack, Divider, Paper } from '@mui/material';
-//import Popper, { PopperPlacementType } from '@mui/material/Popper';
-import ButtonProgram from './program'
+
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { ThemeProvider } from "@mui/material/styles";
-import { requestAPI } from './handler';
 
+import { ThemeProvider } from "@mui/material/styles";
+import ButtonProgram from './program'
 import FileList from './filelist'
-//import { UserContext } from './context';
 import webdsTheme from './webdsTheme';
 
 export default function VerticalTabs(
@@ -26,18 +26,21 @@ export default function VerticalTabs(
     const [filelist, setFileList] = React.useState([]);
     const [select, setSelect] = React.useState("");
 
+    const context = useContext(UserContext);
+
     useEffect(() => {
-        if (true) {
-            console.log(packrat);
-            if (packrat === '') {
-                setPackratError(false);
-            }
-            else if (isNaN(+Number(packrat))) {
-                console.log("invalid!!");
-                setPackratError(true);
-            }
-            else
-                setPackratError(false);
+        console.log(packrat);
+        if (packrat === '') {
+            setPackratError(false);
+        }
+        else if (isNaN(+Number(packrat))) {
+            console.log("invalid!!");
+            setPackratError(true);
+        }
+        else {
+            setPackratError(false);
+            context.packrat = packrat;
+            console.log(context.packrat);
         }
     }, [packrat]);
 
@@ -84,6 +87,7 @@ export default function VerticalTabs(
 
     const onFileSelect = (file: string) => {
         setSelect(file);
+        setOpen(!open);
         console.log("onFileSelect:", file);
     };
 
@@ -228,17 +232,16 @@ export default function VerticalTabs(
                             </Paper>
                             :
                             <TextField id="filled-basic"
-                                //label="Packrat"
                                 value={packrat}
                                 onChange={(e) => setPackrat(e.target.value)}
                                 error={packratError}
                                 sx={{
                                     margin: webdsTheme.spacing(1),
-                                    width: '28ch',
+                                    width: '29ch',
                                 }}
                             />
                         }
-                        <ButtonProgram title="PROGRAM" error={packratError} />
+                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError} />
                     </Stack>
                 </Box>
             </ThemeProvider>
