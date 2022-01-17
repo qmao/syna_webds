@@ -1,8 +1,8 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect } from 'react';
 
-import { TextField, Box, IconButton, Paper, Fade, Stack } from '@mui/material';
-import Popper, { PopperPlacementType } from '@mui/material/Popper';
+import { TextField, Box, IconButton, Stack, Divider, Paper } from '@mui/material';
+//import Popper, { PopperPlacementType } from '@mui/material/Popper';
 import ButtonProgram from './program'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,10 +22,9 @@ export default function VerticalTabs(
 
     const [packrat, setPackrat] = React.useState("12345678");
     const [packratError, setPackratError] = React.useState(false);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [open, setOpen] = React.useState(false);
-    const [placement, setPlacement] = React.useState<PopperPlacementType>();
-    const [filelist, setFileList] = React.useState(["11111","22222", "333333"]);
+    const [filelist, setFileList] = React.useState([]);
+    const [select, setSelect] = React.useState("");
 
     useEffect(() => {
         if (true) {
@@ -42,16 +41,20 @@ export default function VerticalTabs(
         }
     }, [packrat]);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    useEffect(() => {
         if (open) {
-            setAnchorEl(null);
-            setOpen(false);
+            get_hex_list();
         }
-        else {
-            setAnchorEl(event.currentTarget);
-            setOpen(true);
-            setPlacement('right-start');
-        }
+    }, [open]);
+
+    useEffect(() => {
+        let file = select.split(".")[0].substr(2);
+        console.log("onFileSelect:", file);
+        setPackrat(file);
+    }, [select]);
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setOpen(!open);
     };
 
     const handleUpload = (event: React.MouseEvent<HTMLElement>) => {
@@ -80,20 +83,20 @@ export default function VerticalTabs(
     };
 
     const onFileSelect = (file: string) => {
+        setSelect(file);
         console.log("onFileSelect:", file);
-        setPackrat(file);
     };
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
         console.log("delete_hex");
-        let packrat_name = filename.split("/")
-        const dataToSend = { file: packrat_name[1] };
+        let packrat = filename.split(".")[0].substr(2);
+        const dataToSend = { file: filename };
 
-        console.log(packrat_name);
+        console.log(packrat);
         console.log(dataToSend);
 
         try {
-            const reply = await requestAPI<any>('packrat/' + packrat_name[0], {
+            const reply = await requestAPI<any>('packrat/' + packrat, {
                 body: JSON.stringify(dataToSend),
                 method: 'DELETE',
             });
@@ -113,14 +116,19 @@ export default function VerticalTabs(
     }
 
     const get_hex_list = async (): Promise<string[] | undefined> => {
-        console.log("get_hex_list:", event);
         try {
             const reply = await requestAPI<any>('packrat?extension=hex', {
                 method: 'GET',
             });
             console.log(reply);
-            setFileList(reply['filelist']);
-            return reply['filelist'];
+
+            let hexlist = reply["filelist"].map((value: string) => {
+                let res = value.split("/");
+                return res[1];
+            });
+
+            setFileList(hexlist);
+            return hexlist;
         } catch (error) {
             console.log(error);
             setFileList([]);
@@ -130,7 +138,6 @@ export default function VerticalTabs(
 
     const upload_hex = async (file: File): Promise<string | undefined> => {
         console.log("upload_hex:", file);
-
 
         if (file) {
             ////setLoading(true);
@@ -148,14 +155,7 @@ export default function VerticalTabs(
                 console.log(reply);
 
                 let filename = reply['filename'];
-                get_hex_list().then(filelist => {
-                    // set select packrat
-                    filelist!.forEach((element: any) => {
-                        if (element.includes(filename)) {
-                            setPackrat(element);
-                        }
-                    });
-                })
+                get_hex_list().then(() => { setSelect(filename) });
                 return Promise.resolve(filename);
             } catch (error) {
                 console.log(error);
@@ -178,7 +178,7 @@ export default function VerticalTabs(
                     <Stack spacing={1} sx={{
                         flexDirection: 'column',
                         display: 'flex',
-                        m: 2
+                        mt: 6
                     }}>
                         <IconButton
                             aria-label="more"
@@ -193,7 +193,7 @@ export default function VerticalTabs(
                         {open &&
                             <div>
                                 <input
-                                    accept="hex"
+                                    accept=".hex"
                                     id="icon-button-hex"
                                     onChange={handlFileChange}
                                     type="file"
@@ -208,18 +208,6 @@ export default function VerticalTabs(
                                         <CloudUploadIcon />
                                     </IconButton>
                                 </label>
-
-
-
-                                <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
-                                    {({ TransitionProps }) => (
-                                        <Fade {...TransitionProps} timeout={350}>
-                                            <Paper>
-                                                <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} />
-                                            </Paper>
-                                        </Fade>
-                                    )}
-                                </Popper>
                             </div>
                         }
                     </Stack>
@@ -228,17 +216,28 @@ export default function VerticalTabs(
                         flexDirection: 'column',
                         display: 'flex',
                         alignItems: "center",
+                        width: 245
                     }}>
-                        <TextField id="filled-basic"
-                            label="Packrat"
-                            value={packrat}
-                            onChange={(e) => setPackrat(e.target.value)}
-                            error={packratError}
-                            sx={{
-                                margin: webdsTheme.spacing(1),
-                                width: '25ch',
-                            }}
-                        />
+                        <Divider>
+                            <Box sx={{ textAlign: 'center', m: 1 }}>{open ? "Hex Files" : "Packrat"}</Box>
+                        </Divider>
+
+                        {open ?
+                            <Paper variant="outlined" sx={{m:0, p:0}}>
+                                <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} select={select}/>
+                            </Paper>
+                            :
+                            <TextField id="filled-basic"
+                                //label="Packrat"
+                                value={packrat}
+                                onChange={(e) => setPackrat(e.target.value)}
+                                error={packratError}
+                                sx={{
+                                    margin: webdsTheme.spacing(1),
+                                    width: '28ch',
+                                }}
+                            />
+                        }
                         <ButtonProgram title="PROGRAM" error={packratError} />
                     </Stack>
                 </Box>
