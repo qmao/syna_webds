@@ -12,7 +12,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
-//import * as fs from 'fs';
 //import DownloadBlob, { BlobFile } from './packrat/packrat'
 
 export interface IProgramInfo {
@@ -93,7 +92,8 @@ export default function ButtonProgram(props: ButtonProps) {
                 console.log("download hex from packrat server");
                 file = context.packratnumber;
                 start_fetch(file).then(res => {
-                    go(file);
+                    let filePath = file + "/PR" + file + '.hex';
+                    go(filePath);
                 })
                 .catch((error) => {
                     console.log(error, 'Promise error');
@@ -184,31 +184,17 @@ export default function ButtonProgram(props: ButtonProps) {
         try {
             console.log(packrat);
 
-
-            /////let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
-            /////console.log(blob);
-            /////formData.append("blob", blob!.content, blob!.name);
-
-            let test = await fetch('https://packrat.synaptics.com/packrat/gethex.cgi?packrat_id=2564145', {
-                //method: 'POST', // *GET, POST, PUT, DELETE, etc.
-                mode: 'no-cors', // no-cors, *cors, same-origin
-                //cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: 'include', // include, *same-origin, omit
+            let url = 'https://packrat.synaptics.com/packrat/gethex.cgi?packrat_id=' + packrat
+            await fetch(url, {
+                //mode: 'no-cors', // no-cors, *cors, same-origin
+                //credentials: 'include', // include, *same-origin, omit
                 headers: {
                     'Content-Type': 'text/plain'
                 },
             })
                 .then(res => res.blob()) // Gets the response and returns it as a blob
                 .then(function (blob) {
-                    console.log(blob.size);
-                    console.log(blob.type);
-                    var bstream = blob.stream();
-                    console.log(bstream);
-
-                    blob.arrayBuffer().then(buffer => console.log(buffer));
-
-                    blob.text().then(text => console.log(text));
-
+                    console.log(blob)
                     const formData = new FormData();
                     formData.append("blob", blob, 'test');
 
