@@ -287,7 +287,7 @@ export default function VerticalTabs(
                         </Divider>
 
                         {open ?
-                            <Paper variant="outlined" sx={{m:0, p:0}}>
+                            <Paper variant="outlined" sx={{ m: 0, p: 0/*, minWidth: 192, minHeight: 42*/}}>
                                 <FileList list={filelist} onDelete={onFileDelete} onSelect={onFileSelect} select={select}/>
                             </Paper>
                                 :

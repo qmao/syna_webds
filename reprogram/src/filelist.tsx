@@ -1,14 +1,17 @@
 import React from 'react';
 //import webdsTheme from './webdsTheme';
 
-import IconButton from '@mui/material/IconButton';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Radio from '@mui/material/Radio';
-import Paper from '@mui/material/Paper';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import {
+    Radio,
+    Paper,
+    List,
+    ListItem,
+    ListItemIcon,
+    FormControlLabel,
+    RadioGroup,
+    IconButton,
+} from '@mui/material';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemButton from '@mui/material/ListItemButton';
 
@@ -39,7 +42,7 @@ export default function FileList(
             <RadioGroup aria-label="Hex File" name="select-hex" value={props.select} onChange={handleChange} >
             { props.list.map((value, index) => {
                 return (
-                    <Paper elevation={0} sx={(index % 2 == 1) ? { backgroundColor: '#FAFAFA' } : {}}>
+                    <Paper elevation={0} sx={(index % 2 === 1) ? { backgroundColor: '#FAFAFA' } : {}}>
                         <ListItem
                             secondaryAction={
                                 <IconButton edge="end" aria-label="delete" onClick={() => props.onDelete(value, index)}>
