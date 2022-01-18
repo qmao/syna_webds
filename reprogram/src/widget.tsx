@@ -59,8 +59,7 @@ export default function VerticalTabs(
         onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 ) {
-
-    const [packrat, setPackrat] = React.useState("12345678");
+    const [packrat, setPackrat] = React.useState("3318382");
     const [packratError, setPackratError] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [filelist, setFileList] = React.useState([]);
@@ -99,9 +98,11 @@ export default function VerticalTabs(
     }, [open]);
 
     useEffect(() => {
-        let file = select.split(".")[0].substr(2);
-        console.log("onFileSelect:", file);
-        setPackrat(file);
+        if (open) {
+            let file = select.split(".")[0].substr(2);
+            console.log("onFileSelect:", file);
+            setPackrat(file);
+        }
     }, [select]);
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {

@@ -37,7 +37,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
     console.log('JupyterLab extension reprogram is activated!');
 
     if (settingRegistry) {
-      settingRegistry
+        console.log(settingRegistry);
+        /*
+        settingRegistry
         .load(plugin.id)
         .then(settings => {
           console.log('reprogram settings loaded:', settings.composite);
@@ -45,6 +47,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         .catch(reason => {
           console.error('Failed to load settings for reprogram.', reason);
         });
+        */
     }
 
     let widget: MainAreaWidget;
