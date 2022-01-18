@@ -136,7 +136,6 @@ export default function VerticalTabs(
 
     const onFileSelect = (file: string) => {
         setSelect(file);
-        setOpen(!open);
         console.log("onFileSelect:", file);
     };
 
