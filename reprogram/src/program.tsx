@@ -183,6 +183,26 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
+    const is_intranet = async (): Promise<Boolean | undefined> => {
+        let url = 'https://packrat.synaptics.com/packrat/login.cgi'
+
+        try {
+            await fetch(url, {
+                mode: 'no-cors', // no-cors, *cors, same-origin
+                credentials: 'include', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+            })
+            return Promise.resolve(true);
+        }
+        catch (e) {
+            console.log("intranet error");
+            console.log(e);
+            return Promise.resolve(false);
+        }
+    }
+
     const start_fetch = async (packrat: string): Promise<string | undefined> => {
 
         try {
@@ -210,10 +230,15 @@ export default function ButtonProgram(props: ButtonProps) {
 
                     return Promise.resolve(reply);
 
-                });
-
+                })
         } catch (e) {
-            return Promise.reject((e as Error).message);
+            console.log(e);
+            console.log((e as Error).message);
+            let intranet = await is_intranet();
+            if (intranet)
+                return Promise.reject("Cross-Origin Requests issue. Please refer to https://confluence.synaptics.com/x/u4ovCw to disable security check.");
+            else
+                return Promise.reject("Unable to access https://packrat.synaptics.com/");
         }
     }
 
