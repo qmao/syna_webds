@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 
-import { Snackbar, Alert, AlertTitle, Box, Typography } from '@mui/material';
+import { Snackbar, Alert, AlertTitle, Box, Typography, Link } from '@mui/material';
 
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 
@@ -36,6 +36,7 @@ export default function ButtonProgram(props: ButtonProps) {
     const [severity, setSeverity] = useState<'error' | 'info' | 'success' | 'warning'>('info');
     const [result, setResult] = useState("");
     const [progress, setProgress] = React.useState(0);
+    const [link, setLink] = React.useState("");
     const [isStart, setStart] = React.useState(false);
 
     const context = useContext(UserContext);
@@ -118,6 +119,7 @@ export default function ButtonProgram(props: ButtonProps) {
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
         if (start) {
             setAlert(false);
+            setLink("");
         }
         else {
             console.log(result);
@@ -197,7 +199,6 @@ export default function ButtonProgram(props: ButtonProps) {
             return Promise.resolve(true);
         }
         catch (e) {
-            console.log("intranet error");
             console.log(e);
             return Promise.resolve(false);
         }
@@ -232,13 +233,16 @@ export default function ButtonProgram(props: ButtonProps) {
 
                 })
         } catch (e) {
-            console.log(e);
             console.log((e as Error).message);
             let intranet = await is_intranet();
-            if (intranet)
-                return Promise.reject("Cross-Origin Requests issue. Please refer to https://confluence.synaptics.com/x/u4ovCw to disable security check.");
-            else
-                return Promise.reject("Unable to access https://packrat.synaptics.com/");
+            if (intranet) {
+                setLink("https://confluence.synaptics.com/x/u4ovCw");
+                return Promise.reject("Packrat Fetch Error. Please see ");
+            }
+            else {
+                setLink("https://packrat.synaptics.com/");
+                return Promise.reject("Unable to access ");
+            }
         }
     }
 
@@ -270,6 +274,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 <Alert severity={severity} onClose={handleClose}>
                     <AlertTitle> {result} </AlertTitle>
                     {message}
+                    <Link href={link}>{link}</Link>
                 </Alert>
             </Snackbar>
         </div>
