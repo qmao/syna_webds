@@ -1,9 +1,12 @@
 import { ReactWidget } from '@jupyterlab/apputils';
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import { UserContext } from './context';
 import { requestAPI } from './handler';
 
-import { TextField, Box, Stack, Divider, Paper, Avatar, Button } from '@mui/material';
+import {
+    TextField, Box, Stack, Divider, Paper, Avatar,
+    Button, Collapse, Alert, AlertTitle, Link
+} from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -53,19 +56,26 @@ function TextFieldWithProgress(
     );
 }
 
+type SeverityType = 'error' | 'info' | 'success' | 'warning';
 
 export default function VerticalTabs(
     props: {
         onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 ) {
-    const [packrat, setPackrat] = React.useState("3318382");
-    const [packratError, setPackratError] = React.useState(false);
-    const [open, setOpen] = React.useState(false);
-    const [filelist, setFileList] = React.useState([]);
-    const [select, setSelect] = React.useState("");
-    const [start, setStart] = React.useState(false);
-    const [progress, setProgress] = React.useState(0);
+    const [packrat, setPackrat] = useState("3318382");
+    const [packratError, setPackratError] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [filelist, setFileList] = useState([]);
+    const [select, setSelect] = useState("");
+    const [start, setStart] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    const [isAlert, setAlert] = useState(false);
+    const messageRef = useRef("");
+    const severityRef = useRef<SeverityType>('info');
+    const resultRef = useRef("");
+    const linkRef = React.useRef("");
 
     const context = useContext(UserContext);
 
@@ -147,6 +157,20 @@ export default function VerticalTabs(
     const onProgress = (progress: number) => {
         console.log(progress);
         setProgress(progress);
+    };
+
+    const onMessage = (severity: SeverityType, message: string, link: string) => {
+        messageRef.current = message;
+        severityRef.current = severity;
+        resultRef.current = severity.toUpperCase();
+        linkRef.current = link;
+
+        console.log(severityRef.current);
+        console.log(messageRef.current);
+        console.log(resultRef.current);
+        console.log(linkRef.current);
+
+        setAlert(true);
     };
 
     const delete_hex = async (filename: string): Promise<string | undefined> => {
@@ -232,6 +256,14 @@ export default function VerticalTabs(
     return (
         <div>
             <ThemeProvider theme={webdsTheme}>
+                <Collapse in={isAlert}>
+                    <Alert severity={severityRef.current} onClose={() => setAlert(false)}>
+                        <AlertTitle> {resultRef.current} </AlertTitle>
+                        {messageRef.current}
+                        <Link href={linkRef.current}>{linkRef.current}</Link>
+                    </Alert>
+                </Collapse>
+
                 <Box sx={{
                     flexDirection: 'row',
                     display: 'flex',
@@ -303,7 +335,8 @@ export default function VerticalTabs(
                                 }}
                             />
                         }
-                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError} onStart={onStart} onProgress={onProgress}/>
+                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError}
+                            onStart={onStart} onProgress={onProgress} onMessage={onMessage} />
                     </Stack>
                 </Box>
             </ThemeProvider>

@@ -1,8 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 
-import { Snackbar, Alert, AlertTitle, Box, Typography, Link } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 
@@ -21,6 +21,7 @@ interface ButtonProps {
     list: any;
     onStart: any;
     onProgress: any;
+    onMessage: any;
 }
 
 declare global {
@@ -29,17 +30,13 @@ declare global {
 
 
 export default function ButtonProgram(props: ButtonProps) {
-    const { children, value, index, title, alert, error, list, onStart, onProgress, ...other } = props;
-    const [message, setMessage] = useState("");
-    const [isAlert, setAlert] = useState(false);
+    const { children, value, index, title, alert, error, list, onStart, onProgress, onMessage, ...other } = props;
     const [disable, setDisable] = useState(false);
-    const [severity, setSeverity] = useState<'error' | 'info' | 'success' | 'warning'>('info');
-    const [result, setResult] = useState("");
     const [progress, setProgress] = React.useState(0);
-    const [link, setLink] = React.useState("");
     const [isStart, setStart] = React.useState(false);
 
     const context = useContext(UserContext);
+    const link = useRef("");
 
     interface ProgramResponse {
         status: string;
@@ -118,8 +115,7 @@ export default function ButtonProgram(props: ButtonProps) {
 
     const setProgramStatus = (start: boolean, status?: boolean, result?: string) => {
         if (start) {
-            setAlert(false);
-            setLink("");
+            link.current = "";
         }
         else {
             console.log(result);
@@ -137,26 +133,10 @@ export default function ButtonProgram(props: ButtonProps) {
         setDisable(start);
     }
 
-    const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setAlert(false);
-    };
-
     const show_result = (pass: boolean, message: string) => {
         console.log("pass:", pass);
-        if (pass) {
-            setSeverity('success');
-            setResult("Success");
-        }
-        else {
-            setSeverity('error');
-            setResult("Error");
-        }
-        ///qmao
-        setMessage(message);
-        setAlert(true);
+
+        onMessage(pass ? "success" : "error", message, link.current);
 
         console.log(pass);
     }
@@ -236,11 +216,11 @@ export default function ButtonProgram(props: ButtonProps) {
             console.log((e as Error).message);
             let intranet = await is_intranet();
             if (intranet) {
-                setLink("https://confluence.synaptics.com/x/u4ovCw");
+                link.current = "https://confluence.synaptics.com/x/u4ovCw";
                 return Promise.reject("Packrat Fetch Error. Please see ");
             }
             else {
-                setLink("https://packrat.synaptics.com/");
+                link.current = "https://packrat.synaptics.com/";
                 return Promise.reject("Unable to access ");
             }
         }
@@ -269,14 +249,6 @@ export default function ButtonProgram(props: ButtonProps) {
                     { title }
                 </Fab>
             </Box>
-
-            <Snackbar open={isAlert} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} >
-                <Alert severity={severity} onClose={handleClose}>
-                    <AlertTitle> {result} </AlertTitle>
-                    {message}
-                    <Link href={link}>{link}</Link>
-                </Alert>
-            </Snackbar>
         </div>
     );
 }
