@@ -19,6 +19,7 @@ import webdsTheme from './webdsTheme';
 
 import { green } from '@mui/material/colors';
 
+const PACKRAT_WIDTH=225
 
 interface TextFieldWithProgressProps {
     packrat: string;
@@ -40,17 +41,17 @@ function TextFieldWithProgress(
                     position: 'absolute',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'right',
+                    justifyContent: 'left',
                 }}
             >
-                <Paper sx={{ bgcolor: green[200], width: (props.progress * 2.26), height: 39 }} />
+                <Paper sx={{ bgcolor: green[200], width: (props.progress * PACKRAT_WIDTH / 100), height: 39}} />
             </Box>
 
             <TextField
                 value={props.packrat}
                 id="outlined-size-small"
                 size="small"
-                sx={{ width: '30ch' }}
+                sx={{ width: PACKRAT_WIDTH }}
             />
         </Box>
     );
@@ -331,7 +332,7 @@ export default function VerticalTabs(
                                 error={packratError}
                                 size="small"
                                 sx={{
-                                    width: '30ch',
+                                    width: PACKRAT_WIDTH,
                                 }}
                             />
                         }
