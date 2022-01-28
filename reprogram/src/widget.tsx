@@ -153,6 +153,7 @@ export default function VerticalTabs(
     const onStart = (start: any) => {
         console.log(start);
         setStart(start);
+        setOpen(false);
     };
 
     const onProgress = (progress: number) => {
