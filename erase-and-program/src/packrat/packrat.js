@@ -28,6 +28,9 @@ export default function DownloadBlob(packrat_id, extension)
 
 	var exists = packratSession.exists(packrat_id);
 	console.log(exists);
+  if (!exists) {
+    throw "Packrat not exists";
+  }
 
   let fileList = packratSession.listFiles(packrat_id);
 
@@ -142,7 +145,7 @@ PackratSession.prototype = {
         //eval("debugger;");
         if (this.authToken && this.thriftClient) {
             console.log("Requesting download...");
-            let downloadRequest = this.thriftClient.request_download(packratId, filename, this.authToken);
+            let downloadRequest = this.thriftClient.request_download(packratId, filename, this.authToken, DEFAULT_BLOCKSIZE);
             if (downloadRequest) {
                 console.log("Starting download for packratId: " + packratId + ": " + filename + "");
                 var fileBlock = this.thriftClient.next_file_block(downloadRequest.requestId);
@@ -959,6 +962,7 @@ var Packrat_request_download_args = function(args) {
   this.packratId = null;
   this.filename = null;
   this.auth_token = null;
+  this.blockSize = null;
   if (args) {
     if (args.packratId !== undefined && args.packratId !== null) {
       this.packratId = args.packratId;
@@ -968,6 +972,9 @@ var Packrat_request_download_args = function(args) {
     }
     if (args.auth_token !== undefined && args.auth_token !== null) {
       this.auth_token = new AuthToken(args.auth_token);
+    }
+    if (args.blockSize !== undefined && args.blockSize !== null) {
+      this.blockSize = args.blockSize;
     }
   }
 };
@@ -1004,6 +1011,13 @@ Packrat_request_download_args.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 5:
+      if (ftype == Thrift.Type.I32) {
+        this.blockSize = input.readI32().value;
+      } else {
+        input.skip(ftype);
+      }
+      break;      
       default:
         input.skip(ftype);
     }
@@ -1030,6 +1044,11 @@ Packrat_request_download_args.prototype.write = function(output) {
     this.auth_token.write(output);
     output.writeFieldEnd();
   }
+  if (this.blockSize !== null && this.blockSize !== undefined) {
+    output.writeFieldBegin('blockSize', Thrift.Type.I32, 5);
+    output.writeI32(this.blockSize);
+    output.writeFieldEnd();
+  }  
   output.writeFieldStop();
   output.writeStructEnd();
   return;
@@ -3683,18 +3702,19 @@ PackratClient.prototype.send_logout = function(auth_token, callback) {
   }
 };
 
-PackratClient.prototype.request_download = function(packratId, filename, auth_token, callback) {
-  this.send_request_download(packratId, filename, auth_token, callback); 
+PackratClient.prototype.request_download = function(packratId, filename, auth_token, blockSize, callback) {
+  this.send_request_download(packratId, filename, auth_token, blockSize, callback); 
   if (!callback) {
     return this.recv_request_download();
   }
 };
 
-PackratClient.prototype.send_request_download = function(packratId, filename, auth_token, callback) {
+PackratClient.prototype.send_request_download = function(packratId, filename, auth_token, blockSize, callback) {
   var params = {
     packratId: packratId,
     filename: filename,
-    auth_token: auth_token
+    auth_token: auth_token,
+    blockSize: blockSize
   };
   var args = new Packrat_request_download_args(params);
   try {
@@ -7264,9 +7284,9 @@ FileInfo.prototype.write = function(output) {
 
 var PORT = 9091;
 var JSON_PORT = 9092;
-var DEFAULT_BLOCKSIZE = 1024;
+var DEFAULT_BLOCKSIZE = 10458576;
 var INVALID_PACKRAT_ID = 16777215;
-var API_VERSION = '2.0.15';
+var API_VERSION = '2.0.17';
 
 
 

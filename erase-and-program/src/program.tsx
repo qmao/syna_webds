@@ -12,7 +12,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import Fab from '@mui/material/Fab';
 
-//import DownloadBlob, { BlobFile } from './packrat/packrat'
+import DownloadBlob, { BlobFile } from './packrat/packrat'
 
 export interface IProgramInfo {
     filename: string;
@@ -179,39 +179,34 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     const start_fetch = async (packrat: string): Promise<string | undefined> => {
-        //const formData = new FormData();
+        const formData = new FormData();
 
         try {
             console.log(packrat);
 
-            let url = 'https://packrat.synaptics.com/packrat/gethex.cgi?packrat_id=' + packrat
-            await fetch(url, {
-                //mode: 'no-cors', // no-cors, *cors, same-origin
-                //credentials: 'include', // include, *same-origin, omit
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-            })
-                .then(res => res.blob()) // Gets the response and returns it as a blob
-                .then(function (blob) {
-                    console.log(blob)
-                    const formData = new FormData();
-                    formData.append("blob", blob, 'test');
+            let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
 
-                    const reply = requestAPI<any>('packrat', {
-                        body: formData,
-                        method: 'POST',
-                    });
-                    console.log(reply);
+            console.log(blob);
+            formData.append("blob", blob!.content, blob!.name);
+        } catch (e) {
+            console.log(e);
+            return Promise.reject(e);
+        }
 
-                    return Promise.resolve(reply);
+        try {
+            const reply = await requestAPI<any>('packrat', {
+                body: formData,
+                method: 'POST',
+            });
 
-                });
+            console.log(reply);
 
+            return Promise.resolve(reply);
         } catch (e) {
             return Promise.reject((e as Error).message);
         }
     }
+
 
     return (
         <div {...other}>
