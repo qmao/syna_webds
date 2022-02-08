@@ -31,6 +31,7 @@ class TouchcommManager(object):
 
         except Exception as e:
             print('Touchcomm connect exception:{}'.format(e))
+            self._tc = None
 
         finally:
             self._lock.release()
