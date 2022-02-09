@@ -9,7 +9,7 @@ from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
 import time
 
-fps = 200
+fps = 300
 debug = True
 
 class NumpyEncoder(json.JSONEncoder):
@@ -119,19 +119,20 @@ class ReportHandler(APIHandler):
                     if debug:
                         time_after_report = time.time()
 
-                    image = report[1]['image']
                     fcount = fcount + 1
-                    send = { "image": image, "frame": fcount }
+                    if report[0] == 'delta' or report[0] == 'raw':
+                        report[1]['image'] = report[1]['image'].tolist()
+                    send = { "report": report, "frame": fcount }
 
                     yield self.publish(json.dumps(send, cls=NumpyEncoder))
 
+
                     if debug:
-                        time_after_send = time.time()
                         if (fcount % 50) == 0:
                             print(fcount)
-                            end_debug_time = time.time()
-                            fpsReal = ((fcount - fprev) / (end_debug_time - start_debug_time))
-                            start_debug_time = end_debug_time
+                            time_after_send = time.time()
+                            fpsReal = ((fcount - fprev) / (time_after_send - start_debug_time))
+                            start_debug_time = time_after_send
                             fprev = fcount
                             print("FPS: ", fpsReal)
                             print("get report takes: ", time_after_report - time_before_report)
