@@ -1,8 +1,8 @@
 import { ReactWidget } from '@jupyterlab/apputils';
-import React /*, { useEffect, useContext, useState, useRef }*/ from 'react';
+import React, { useEffect, useRef/*, useContext, useState */} from 'react';
 
 //import { UserContext } from './context';
-//import { requestAPI } from './handler';
+import { requestAPI } from './handler';
 
 import {
     MenuItem, InputLabel, Stack, Collapse, Slider, Paper,
@@ -29,8 +29,67 @@ const PROTOCOL=["Auto Scan", "I2C", "SPI", "PHONE"]
 //const PROTOCOL_Phone = ["phone1", "phone2"]
 
 
+interface ConnectionSettings {
+    action: string;
+    value?: string;
+}
+
+async function ResetDefault() {
+    await Post({action: "reset"})
+}
+
+async function UpdateSettings() {
+    await Post({ action: "update", value: "{1111111111}" })
+}
+
+const Post = async (dataToSend: ConnectionSettings): Promise<string | undefined> => {
+    try {
+        const reply = await requestAPI<any>('settings/connection', {
+            body: JSON.stringify(dataToSend),
+            method: 'POST',
+        });
+        console.log(reply);
+        return Promise.resolve(reply);
+    } catch (e) {
+        console.error(
+            `Error on POST ${dataToSend}.\n${e}`
+        );
+        return Promise.reject((e as Error).message);
+    }
+}
+
+const Get = async (section: string): Promise<string | undefined> => {
+    try {
+        let url = 'settings/connection?query=' + section;
+
+        const reply = await requestAPI<any>(url, {
+            method: 'GET',
+        });
+        console.log(reply);
+        return Promise.resolve(reply);
+    } catch (e) {
+        console.error(
+            `Error on GET.\n${e}`
+        );
+        return Promise.reject((e as Error).message);
+    }
+}
+
 function SelectSpiMode() {
     const [mode, setMode] = React.useState('');
+    const jsonCustomRef = useRef("");
+    const jsonDefaultRef = useRef("");
+
+    useEffect(() => {
+        const fetchData = async (section: string) => {
+            const data = await Get(section);
+            console.log('data', data);
+        };
+
+        fetchData("default").then(data => { jsonDefaultRef.current = JSON.stringify(data) });
+        fetchData("custom").then(data => { jsonCustomRef.current = JSON.stringify(data) });
+
+    }, []);
 
     const handleChange = (event: SelectChangeEvent) => {
         setMode(event.target.value);
@@ -217,10 +276,10 @@ export default function VerticalTabs()
                     <SelectAttn />
 
                     <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                        <Fab color="primary" aria-label="reset">
+                        <Fab color="primary" aria-label="reset" onClick={() => ResetDefault()}>
                             <RefreshIcon />
                         </Fab>
-                        <Fab variant="extended" color="primary" aria-label="connect">
+                        <Fab variant="extended" color="primary" aria-label="connect" onClick={() => UpdateSettings()}>
                             Connect
                         </Fab>
                     </Box>

@@ -10,6 +10,7 @@ from .route_about        import AboutHandler
 from .route_filesystem   import FilesystemHandler
 from .route_command      import CommandHandler
 from .route_report       import ReportHandler
+from .route_settings     import SettingsHandler
 
 def setup_handlers(web_app):
     host_pattern = ".*$"
@@ -30,6 +31,8 @@ def setup_handlers(web_app):
 
     report_pattern = url_path_join(base_url, "webds", "report")
 
+    settings_pattern = url_path_join(base_url, "webds", "settings/" + '(.*)?' + '(.*)')
+
     handlers = [
                 (general_pattern, GeneralHandler),
                 (reprogram_pattern, ProgramHandler),
@@ -38,6 +41,7 @@ def setup_handlers(web_app):
                 (filesystem_pattern, FilesystemHandler),
                 (command_pattern, CommandHandler),
                 (report_pattern, ReportHandler),
+                (settings_pattern, SettingsHandler),
                ]
 
     web_app.add_handlers(host_pattern, handlers)
