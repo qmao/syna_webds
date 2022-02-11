@@ -8,10 +8,10 @@ import {
     MenuItem, InputLabel, Stack, Collapse, Paper,
     Typography, TextField,
     FormControl,
-    Fab,
     Box,
-    Button
-    //Divider, Chip
+    Button,
+    Alert, AlertTitle,
+    Chip
 } from '@mui/material';
 
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -36,7 +36,7 @@ const Post = async (dataToSend: ConnectionSettings): Promise<string | undefined>
             method: 'POST',
         });
         console.log(reply);
-        return Promise.resolve(reply);
+        return Promise.resolve(JSON.stringify(reply));
     } catch (e) {
         console.error(
             `Error on POST ${dataToSend}.\n${e}`
@@ -185,11 +185,13 @@ function SelectSpiSpeed(
     );
 }
 
+type SeverityType = 'error' | 'info' | 'success' | 'warning';
+
 export default function ConnectionWidget()
 {
     //const context = useContext(UserContext);
     const [interfaces, setInterfaces] = React.useState([]);
-    const [protocol, setProtocol] = React.useState("auto");
+    const [protocol, setProtocol] = React.useState('auto');
     const [isI2c, setI2c] = React.useState(false);
     const [isSpi, setSpi] = React.useState(false);
     const [showProtocol, setShowProtocol] = React.useState(false);
@@ -202,6 +204,11 @@ export default function ConnectionWidget()
     const [speed, setSpeed] = React.useState<number>(SPI_SPEED_DEFAULT);
     const [speedError, setSpeedError] = useState(false);
 
+    const [isAlert, setAlert] = useState(false);
+    const [message, setMessage] = useState('');
+    const [severity, setSeverity] = useState<SeverityType>('info');
+
+    const [info, setInfo] = useState<string[]>([]);
     //const [isPower, setPower] = React.useState(true);
     //const [isAttn, setAttn] = React.useState(true);
 
@@ -379,14 +386,41 @@ export default function ConnectionWidget()
         await getJson();
     }
 
-    async function UpdateSettings() {
+    function UpdateSettings() {
         console.log(context);
-        await Post({ action: "update", value: context })
+        Post({ action: "update", value: context }).then(result => {
+            console.log(result);
+
+            let list: string[] = [];
+            let jobj = JSON.parse(result!);
+
+            Object.keys(jobj).forEach(key => {
+                console.log(key, jobj[key]);
+                list.push(key + " " + jobj[key].toString());
+            })
+            setInfo(list);
+            setAlert(true);
+            setSeverity('info');
+        }).catch(result => {
+            setMessage(result);
+        })
     }
 
     return (
         <div>
             <ThemeProvider theme={webdsTheme}>
+                <Collapse in={isAlert}>
+                    <Alert severity={severity} onClose={() => setAlert(false)}>
+                        <AlertTitle> Result </AlertTitle>
+                        {
+                            info.map((value) => {
+                            return (
+                                <Chip label={value} />
+                            );
+                            })}
+                        { message }
+                    </Alert>
+                </Collapse>
                 <Stack spacing={1} sx={{
                     flexDirection: 'column',
                     display: 'flex',
@@ -447,9 +481,9 @@ export default function ConnectionWidget()
                         <Button color="primary" variant="outlined" onClick={() => ResetDefault()}>
                             Reset Settings
                         </Button>
-                        <Fab variant="extended" color="primary" aria-label="connect" onClick={() => UpdateSettings()}>
+                        <Button color="primary" variant="outlined" onClick={() => UpdateSettings()}>
                             Connect
-                        </Fab>
+                        </Button>
                     </Box>
                 </Stack>
             </ThemeProvider>

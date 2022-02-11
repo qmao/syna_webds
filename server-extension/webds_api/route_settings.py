@@ -5,7 +5,7 @@ import json
 
 from . import webds
 from .utils import FileHandler
-
+from .touchcomm_manager import TouchcommManager
 
 class ConnectionSettings:
     @staticmethod
@@ -87,5 +87,27 @@ class SettingsHandler(APIHandler):
             elif action == "update":
                 ConnectionSettings.setValue('custom', input_data["value"])
 
-        data = json.loads("{}")
+                ### touchcomm use new settings
+                tc = TouchcommManager()
+                tc.disconnect()
+                tc.connect()
+                obj = tc.getInstance()
+
+                protocol = obj.comm.get_interface()
+                data["interface"] = protocol
+                if protocol == "i2c":
+                    data["i2cAddr"] = obj.comm.i2cAddr
+                elif protocol == "spi":
+                    data["spiMode"] = obj.comm.spiMode
+                    data["speed"] = obj.comm.speed
+
+                data["useAttn"] = obj.comm.useAttn
+                data["vdd"] = obj.comm.vdd
+                data["vddtx"] = obj.comm.vddtx
+                data["vled"] = obj.comm.vled
+                data["vpu"] = obj.comm.vpu
+                data["streaming"] = obj.comm.streaming
+
+                print(data)
+
         self.finish(data)
