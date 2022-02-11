@@ -9,11 +9,11 @@ import {
     Typography, TextField,
     FormControl,
     Fab,
-    Box
+    Box,
+    Button
     //Divider, Chip
 } from '@mui/material';
 
-import RefreshIcon from '@mui/icons-material/Refresh';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
@@ -22,18 +22,11 @@ import webdsTheme from './webdsTheme';
 
 const I2C_ADDR_WIDTH = 150
 const SPI_SPEED_WIDTH = 150
+const SPI_SPEED_DEFAULT = 5000
 
 interface ConnectionSettings {
     action: string;
-    value?: string;
-}
-
-async function ResetDefault() {
-    await Post({action: "reset"})
-}
-
-async function UpdateSettings() {
-    await Post({ action: "update", value: "{1111111111}" })
+    value?: any;
 }
 
 const Post = async (dataToSend: ConnectionSettings): Promise<string | undefined> => {
@@ -71,7 +64,7 @@ const Get = async (section: string): Promise<string | undefined> => {
 
 function SelectSpiMode(
     props: {
-        mode: string;
+        mode: string | number;
         handleChange: (e: SelectChangeEvent) => void;
     }){
 
@@ -88,10 +81,10 @@ function SelectSpiMode(
 
             <Select
                 id="connection-select-spi"
-                value={props.mode}
+                value={props.mode.toString()}
                 onChange={props.handleChange}
             >
-                <MenuItem value="">
+                <MenuItem value={-1}>
                     <em>Auto</em>
                 </MenuItem>
                 {[0,1,2,3].map((value) => {
@@ -106,7 +99,7 @@ function SelectSpiMode(
 
 function SelectAttn(
     props: {
-        attn: string;
+        attn: string | number;
         handleChange: (e: SelectChangeEvent) => void;
     }) {
 
@@ -117,11 +110,11 @@ function SelectAttn(
                 <Select
                     labelId="connection-select-spi-mode"
                     id="connection-select-spi"
-                    value={props.attn}
+                    value={props.attn.toString()}
                     onChange={props.handleChange}
                 >
-                    <MenuItem value={"1"}>Interrupt</MenuItem>
-                    <MenuItem value={"0"}>Polling</MenuItem>
+                    <MenuItem value={1}>Interrupt</MenuItem>
+                    <MenuItem value={0}>Polling</MenuItem>
                 </Select>
             </FormControl>
         </div>
@@ -130,7 +123,7 @@ function SelectAttn(
 
 function SelectI2cAddr(
     props: {
-        addr: string;
+        addr: number;
         error: boolean;
         handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     }) {
@@ -162,7 +155,7 @@ function SelectI2cAddr(
 
 function SelectSpiSpeed(
     props: {
-        speed: string;
+        speed: number;
         error: boolean;
         handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     }) {
@@ -195,19 +188,18 @@ function SelectSpiSpeed(
 export default function ConnectionWidget()
 {
     //const context = useContext(UserContext);
-    const [interfaces, setInterfaces] = React.useState(["i2c", "spi", "phone"]);
-    const [protocol, setProtocol] = React.useState("i2c");
+    const [interfaces, setInterfaces] = React.useState([]);
+    const [protocol, setProtocol] = React.useState("auto");
     const [isI2c, setI2c] = React.useState(false);
     const [isSpi, setSpi] = React.useState(false);
     const [showProtocol, setShowProtocol] = React.useState(false);
 
-    const [mode, setMode] = React.useState('');
-    const [attn, setAttn] = React.useState("0");
-    const [addr, setAddr] = React.useState('30');
+    const [mode, setMode] = React.useState<string | number>(-1);
+    const [attn, setAttn] = React.useState<string | number>(0);
+    const [addr, setAddr] = React.useState<number>(30);
     const [addrError, setAddrError] = React.useState(false);
 
-
-    const [speed, setSpeed] = React.useState('30');
+    const [speed, setSpeed] = React.useState<number>(SPI_SPEED_DEFAULT);
     const [speedError, setSpeedError] = useState(false);
 
     //const [isPower, setPower] = React.useState(true);
@@ -224,11 +216,20 @@ export default function ConnectionWidget()
     }, []);
 
     useEffect(() => {
-        setProtocol(interfaces[0]);
         console.log("[interfaces]");
-        context.interfaces = interfaces;
         console.log(context.interfaces);
     }, [interfaces]);
+
+    useEffect(() => {
+        console.log("[protocol]");
+        if (protocol == "auto") {
+            context.interfaces = interfaces;
+        }
+        else {
+            context.interfaces = [protocol];
+        }
+        console.log(context.interfaces);
+    }, [protocol]);
 
     useEffect(() => {
         console.log("[mode]");
@@ -238,9 +239,9 @@ export default function ConnectionWidget()
 
     useEffect(() => {
         console.log("[attn]");
-        if (attn == "0")
+        if (attn == 0)
             context.attn = false;
-        else if (attn == "1")
+        else if (attn == 1)
             context.attn = true;
         console.log(context.attn);
     }, [attn]);
@@ -249,18 +250,15 @@ export default function ConnectionWidget()
         console.log("[addr]");
         console.log(addr);
 
-        if (addr === '') {
-            setAddrError(true);
-        }
-        else if (isNaN(+Number(addr))) {
+        if (isNaN(+addr)) {
             console.log("invalid!!");
             setAddrError(true);
         }
         else {
-            if (Number(addr) > 128)
-                setAddr('128');
-            else if (Number(addr) < 0)
-                setAddr('0');
+            if (addr > 128)
+                setAddr(128);
+            else if (addr < 0)
+                setAddr(0);
             setAddrError(false);
 
             context.i2cAddr = Number(addr);
@@ -269,19 +267,16 @@ export default function ConnectionWidget()
     }, [addr]);
 
     useEffect(() => {
-        console.log("[addr]");
+        console.log("[speed]");
         console.log(speed);
 
-        if (speed === '') {
-            setSpeedError(true);
-        }
-        else if (isNaN(+Number(speed))) {
+        if (isNaN(+speed)) {
             console.log("invalid!!");
             setSpeedError(true);
         }
         else {
-            if (Number(speed) < 0)
-                setSpeed('0');
+            if (speed < 0)
+                setSpeed(0);
             setSpeedError(false);
 
             context.spiSpeed = Number(speed);
@@ -302,6 +297,10 @@ export default function ConnectionWidget()
         let jsonCustomString = JSON.stringify(data);
 
         let jsonDefault = JSON.parse(jsonDefaultString);
+
+        let jinterfaces = jsonDefault['interfaces'];
+        setInterfaces(jinterfaces);
+
         let jsonCustom = JSON.parse(jsonCustomString);
         let jsonMerge = Object.assign(jsonDefault, jsonCustom);
         console.log(jsonMerge);
@@ -316,17 +315,26 @@ export default function ConnectionWidget()
         console.log(jprotocol);
         console.log(ji2cAddr);
         console.log(jspiMode);
-        console.log(jspiSpeed);
         console.log(jattn);
 
-        setInterfaces(jprotocol);
-        setAddr(ji2cAddr.toString());
-        setMode(jspiMode.toString());
-        setSpeed(jspiSpeed.toString());
-        if (jattn)
-            setAttn("1");
+        if (jprotocol.length > 1)
+            setProtocol("auto");
         else
-            setAttn("0");
+            setProtocol(jprotocol[0]);
+
+        setAddr(ji2cAddr);
+        setMode(jspiMode);
+
+        if (jspiSpeed != null)
+            setSpeed(jspiSpeed);
+        else
+            setSpeed(SPI_SPEED_DEFAULT);
+
+        setSpeed(jspiSpeed);
+        if (jattn)
+            setAttn(1);
+        else
+            setAttn(0);
     };
 
     const handleChange = (event: SelectChangeEvent<typeof protocol>) => {
@@ -359,12 +367,22 @@ export default function ConnectionWidget()
     };
 
     const handleI2cAddrChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setAddr(event.target.value);
+        setAddr(Number(event.target.value));
     };
 
     const handleSpeedChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setSpeed(event.target.value);
+        setSpeed(Number(event.target.value));
     };
+
+    async function ResetDefault() {
+        await Post({ action: "reset" })
+        await getJson();
+    }
+
+    async function UpdateSettings() {
+        console.log(context);
+        await Post({ action: "update", value: context })
+    }
 
     return (
         <div>
@@ -386,6 +404,7 @@ export default function ConnectionWidget()
                                 onChange={handleChange}
                                 value={protocol}
                             >
+                                <MenuItem value={"auto"}>Auto Scan</MenuItem>
                                 {interfaces.map((value) => {
                                     return (
                                         <MenuItem value={value}>{value}</MenuItem>
@@ -425,9 +444,9 @@ export default function ConnectionWidget()
                     <SelectAttn handleChange={handleAttnChange} attn={attn}/>
 
                     <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                        <Fab color="primary" aria-label="reset" onClick={() => ResetDefault()}>
-                            <RefreshIcon />
-                        </Fab>
+                        <Button color="primary" variant="outlined" onClick={() => ResetDefault()}>
+                            Reset Settings
+                        </Button>
                         <Fab variant="extended" color="primary" aria-label="connect" onClick={() => UpdateSettings()}>
                             Connect
                         </Fab>

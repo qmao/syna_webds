@@ -17,20 +17,23 @@ class ConnectionSettings:
                 print(key, ":", data[key])
                 return data[key]
             else:
-                print("nnnnnnnnn")
+                print(key, " value not found")
                 return json.loads("{}")
 
     @staticmethod
     def setValue(key, value):
         with open(webds.CONNECTION_SETTINGS_FILE) as json_file:
             data = json.load(json_file)
+
         if key in data:
-            data[key] = value
-            with open(webds.CONNECTION_SETTINGS_FILE, 'w') as json_file:      
-                json.dump(data, json_file)
+            print(key, " found")
         else:
-            print("nnnnnnnnn")
-        
+            print("key not found. create new")
+
+        data[key] = value
+        with open(webds.CONNECTION_SETTINGS_FILE, 'w') as json_file:
+            json.dump(data, json_file)
+
     @staticmethod
     def deleteObject(obj):
         with open(webds.CONNECTION_SETTINGS_FILE) as json_file:
@@ -40,7 +43,7 @@ class ConnectionSettings:
             with open(webds.CONNECTION_SETTINGS_FILE, 'w') as json_file:      
                 json.dump(data, json_file)
         else:
-            print(obj, " not exist");  
+            print(obj, " not exist");
 
 
 class SettingsHandler(APIHandler):
@@ -50,13 +53,13 @@ class SettingsHandler(APIHandler):
     @tornado.web.authenticated
     def get(self, subpath: str = "", cluster_id: str = ""):
         print(self.request)
-        print(subpath)        
+        print(subpath)
         print(self.request.arguments)
         query = self.get_argument('query', None)
         print(query)
 
         data = json.loads("{}")
-        
+
         if subpath == 'connection':
             argument = self.get_argument('query', None)
             print(argument)
@@ -70,9 +73,9 @@ class SettingsHandler(APIHandler):
     @tornado.web.authenticated
     def post(self, subpath: str = "", cluster_id: str = ""):
         print(self.request)
-        
+
         data = json.loads("{}")
-        
+
         if subpath == 'connection':
             input_data = self.get_json_body()
             print(input_data)
@@ -86,5 +89,3 @@ class SettingsHandler(APIHandler):
 
         data = json.loads("{}")
         self.finish(data)
-    
-
