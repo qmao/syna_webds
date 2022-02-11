@@ -225,6 +225,7 @@ export default function ConnectionWidget()
     useEffect(() => {
         console.log("[interfaces]");
         console.log(context.interfaces);
+        context.interfaces = interfaces;
     }, [interfaces]);
 
     useEffect(() => {
@@ -402,7 +403,10 @@ export default function ConnectionWidget()
             setAlert(true);
             setSeverity('info');
         }).catch(result => {
+            console.log(result);
             setMessage(result);
+            setSeverity('error');
+            setAlert(true);
         })
     }
 
@@ -412,13 +416,13 @@ export default function ConnectionWidget()
                 <Collapse in={isAlert}>
                     <Alert severity={severity} onClose={() => setAlert(false)}>
                         <AlertTitle> Result </AlertTitle>
-                        {
+                        {  severity == 'info' &&
                             info.map((value) => {
                             return (
                                 <Chip label={value} />
                             );
                             })}
-                        { message }
+                        {severity == 'error' && message }
                     </Alert>
                 </Collapse>
                 <Stack spacing={1} sx={{

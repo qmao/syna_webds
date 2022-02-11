@@ -88,26 +88,31 @@ class SettingsHandler(APIHandler):
                 ConnectionSettings.setValue('custom', input_data["value"])
 
                 ### touchcomm use new settings
-                tc = TouchcommManager()
-                tc.disconnect()
-                tc.connect()
-                obj = tc.getInstance()
+                try:
+                    tc = TouchcommManager()
+                    tc.disconnect()
+                    tc.connect()
+                    obj = tc.getInstance()
 
-                protocol = obj.comm.get_interface()
-                data["interface"] = protocol
-                if protocol == "i2c":
-                    data["i2cAddr"] = obj.comm.i2cAddr
-                elif protocol == "spi":
-                    data["spiMode"] = obj.comm.spiMode
-                    data["speed"] = obj.comm.speed
+                    protocol = obj.comm.get_interface()
+                    data["interface"] = protocol
+                    if protocol == "i2c":
+                        data["i2cAddr"] = obj.comm.i2cAddr
+                    elif protocol == "spi":
+                        data["spiMode"] = obj.comm.spiMode
+                        data["speed"] = obj.comm.speed
 
-                data["useAttn"] = obj.comm.useAttn
-                data["vdd"] = obj.comm.vdd
-                data["vddtx"] = obj.comm.vddtx
-                data["vled"] = obj.comm.vled
-                data["vpu"] = obj.comm.vpu
-                data["streaming"] = obj.comm.streaming
+                    data["useAttn"] = obj.comm.useAttn
+                    data["vdd"] = obj.comm.vdd
+                    data["vddtx"] = obj.comm.vddtx
+                    data["vled"] = obj.comm.vled
+                    data["vpu"] = obj.comm.vpu
+                    data["streaming"] = obj.comm.streaming
 
-                print(data)
+                    print(data)
+                except Exception as error:
+                    print(error)
+                    message=str(error)
+                    raise tornado.web.HTTPError(status_code=400, log_message=message)
 
         self.finish(data)
