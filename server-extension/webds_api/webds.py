@@ -6,4 +6,4 @@ WORKSPACE_CACHE_DIR = WORKSPACE + '/.cache'
 WORKSPACE_TEMP_FILE = WORKSPACE_CACHE_DIR + '/temp.cache'
 
 # connection settings
-CONNECTION_SETTINGS_FILE = '/home/pi/jupyter/workspace/connection_params.json'
+CONNECTION_SETTINGS_FILE = '/usr/local/syna/lib/python/touchcomm/connection_params.json'
