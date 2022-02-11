@@ -97,13 +97,34 @@ class ReportHandler(APIHandler):
         tc = None
         try:
             tc = TouchcommManager()
+            global fps
+            step = 1 / fps
+            report_count = 0
+            t0 = time.time()
+            t00 = t0
+            while True:
+                t1 = time.time()
+                if (t1 - t00 >= step):
+                    t00 = t1
+                    report = tc.getReport()
+                    report_count += 1
+                    if report[0] == 'delta' or report[0] == 'raw':
+                        report[1]['image'] = report[1]['image'].tolist()
+                    send = {"report": report, "frame": report_count}
+                    yield self.publish(json.dumps(send, cls=NumpyEncoder))
+                if (t1 - t0 >= 1):
+                    t0 = t1
+                    print(str(report_count) + ' fps', flush = True)
+                    report_count = 0
+                yield tornado.gen.sleep(0.0001)
+
             fcount = 0
             fprev = 0
             start_time = time.time()
             if debug:
                 start_debug_time = start_time
 
-            global fps
+            # global fps
             fdiff = (1/fps)
             print (fps)
             print (fdiff)
@@ -119,25 +140,28 @@ class ReportHandler(APIHandler):
                     if debug:
                         time_after_report = time.time()
 
+                    # image = report[1]['image']
                     fcount = fcount + 1
                     if report[0] == 'delta' or report[0] == 'raw':
                         report[1]['image'] = report[1]['image'].tolist()
+                    # send = { "image": image, "frame": fcount }
                     send = { "report": report, "frame": fcount }
 
                     yield self.publish(json.dumps(send, cls=NumpyEncoder))
 
-
                     if debug:
+                        time_after_send = time.time()
                         if (fcount % 50) == 0:
                             print(fcount)
-                            time_after_send = time.time()
-                            fpsReal = ((fcount - fprev) / (time_after_send - start_debug_time))
-                            start_debug_time = time_after_send
+                            end_debug_time = time.time()
+                            fpsReal = ((fcount - fprev) / (end_debug_time - start_debug_time))
+                            start_debug_time = end_debug_time
                             fprev = fcount
                             print("FPS: ", fpsReal)
                             print("get report takes: ", time_after_report - time_before_report)
                             print("send sse   takes: ", time_after_send - time_after_report)
                 yield tornado.gen.sleep(0.0001)
+
 
         except StreamClosedError:
             print("Stream Closed!")
