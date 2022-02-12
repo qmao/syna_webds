@@ -235,6 +235,21 @@ export default function ConnectionWidget()
             context.interfaces = [protocol];
         }
         console.log(context.interfaces);
+
+        let i2c = false;
+        let spi = false;
+
+        if (protocol == "i2c") {
+            i2c = true;
+            spi = false;
+        }
+        else if (protocol == "spi") {
+            i2c = false;
+            spi = true;
+        }
+        setI2c(i2c);
+        setSpi(spi);
+        setShowProtocol(i2c || spi);
     }, [protocol]);
 
     useEffect(() => {
@@ -348,25 +363,10 @@ export default function ConnectionWidget()
         }
     };
 
+
     const handleChange = (event: SelectChangeEvent<typeof protocol>) => {
         console.log(event.target.value);
         setProtocol(event.target.value);
-        let i2c = false;
-        let spi = false;
-
-        if (event.target.value == "i2c") {
-            i2c = true;
-            spi = false;
-        }
-        else if (event.target.value == "spi") {
-            i2c = false;
-            spi = true;
-        }
-
-        setProtocol(event.target.value);
-        setI2c(i2c);
-        setSpi(spi);
-        setShowProtocol(i2c || spi);
     };
 
     const handleSpiModeChange = (event: SelectChangeEvent) => {
