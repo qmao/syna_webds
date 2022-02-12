@@ -11,9 +11,11 @@ import {
     Box,
     Button,
     Alert, AlertTitle,
-    Chip
+    Chip,
+    Backdrop
 } from '@mui/material';
 
+import CircularProgress from '@mui/material/CircularProgress';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
@@ -209,12 +211,8 @@ export default function ConnectionWidget()
     const [severity, setSeverity] = useState<SeverityType>('info');
 
     const [info, setInfo] = useState<string[]>([]);
-    //const [isPower, setPower] = React.useState(true);
-    //const [isAttn, setAttn] = React.useState(true);
+    const [load, setLoad] = React.useState(false);
 
-    //const jsonCustomRef = useRef("");
-    //const jsonDefaultRef = useRef("");
-    //const jsonMergeRef = useRef({});
 
     const context = useContext(UserContext);
 
@@ -299,50 +297,55 @@ export default function ConnectionWidget()
             return data;
         };
 
-        let data = await fetchData("default");
-        let jsonDefaultString = JSON.stringify(data);
-        data = await fetchData("custom");
-        let jsonCustomString = JSON.stringify(data);
+        try {
+            let data = await fetchData("default");
+            let jsonDefaultString = JSON.stringify(data);
+            data = await fetchData("custom");
+            let jsonCustomString = JSON.stringify(data);
 
-        let jsonDefault = JSON.parse(jsonDefaultString);
+            let jsonDefault = JSON.parse(jsonDefaultString);
 
-        let jinterfaces = jsonDefault['interfaces'];
-        setInterfaces(jinterfaces);
+            let jinterfaces = jsonDefault['interfaces'];
+            setInterfaces(jinterfaces);
 
-        let jsonCustom = JSON.parse(jsonCustomString);
-        let jsonMerge = Object.assign(jsonDefault, jsonCustom);
-        console.log(jsonMerge);
-        //jsonMergeRef.current = jsonMerge;
+            let jsonCustom = JSON.parse(jsonCustomString);
+            let jsonMerge = Object.assign(jsonDefault, jsonCustom);
+            console.log(jsonMerge);
+            //jsonMergeRef.current = jsonMerge;
 
-        let jprotocol = jsonMerge['interfaces'];
-        let ji2cAddr = jsonMerge['i2cAddr'];
-        let jspiMode = jsonMerge['spiMode'];
-        let jspiSpeed = jsonMerge['speed'];
-        let jattn = jsonMerge['useAttn'];
+            let jprotocol = jsonMerge['interfaces'];
+            let ji2cAddr = jsonMerge['i2cAddr'];
+            let jspiMode = jsonMerge['spiMode'];
+            let jspiSpeed = jsonMerge['speed'];
+            let jattn = jsonMerge['useAttn'];
 
-        console.log(jprotocol);
-        console.log(ji2cAddr);
-        console.log(jspiMode);
-        console.log(jattn);
+            console.log(jprotocol);
+            console.log(ji2cAddr);
+            console.log(jspiMode);
+            console.log(jattn);
 
-        if (jprotocol.length > 1)
-            setProtocol("auto");
-        else
-            setProtocol(jprotocol[0]);
+            if (jprotocol.length > 1)
+                setProtocol("auto");
+            else
+                setProtocol(jprotocol[0]);
 
-        setAddr(ji2cAddr);
-        setMode(jspiMode);
+            setAddr(ji2cAddr);
+            setMode(jspiMode);
 
-        if (jspiSpeed != null)
+            if (jspiSpeed != null)
+                setSpeed(jspiSpeed);
+            else
+                setSpeed(SPI_SPEED_DEFAULT);
+
             setSpeed(jspiSpeed);
-        else
-            setSpeed(SPI_SPEED_DEFAULT);
-
-        setSpeed(jspiSpeed);
-        if (jattn)
-            setAttn(1);
-        else
-            setAttn(0);
+            if (jattn)
+                setAttn(1);
+            else
+                setAttn(0);
+        }
+        catch(error) {
+            showError(error);
+        }
     };
 
     const handleChange = (event: SelectChangeEvent<typeof protocol>) => {
@@ -382,32 +385,51 @@ export default function ConnectionWidget()
         setSpeed(Number(event.target.value));
     };
 
-    async function ResetDefault() {
-        await Post({ action: "reset" })
-        await getJson();
+    function ResetDefault() {
+        setLoad(true);
+        setAlert(false);
+        Post({ action: "reset" })
+            .then(async result => {
+                await getJson();
+                setLoad(false);
+            })
+            .catch(error => {
+                showError(error);
+                setLoad(false);
+            })
+    }
+
+    function showError(result: string) {
+        setMessage(result);
+        setSeverity('error');
+        setAlert(true);
     }
 
     function UpdateSettings() {
+        setLoad(true);
+        setAlert(false);
         console.log(context);
-        Post({ action: "update", value: context }).then(result => {
-            console.log(result);
+        Post({ action: "update", value: context })
+            .then(result => {
+                console.log(result);
 
-            let list: string[] = [];
-            let jobj = JSON.parse(result!);
+                let list: string[] = [];
+                let jobj = JSON.parse(result!);
 
-            Object.keys(jobj).forEach(key => {
-                console.log(key, jobj[key]);
-                list.push(key + " " + jobj[key].toString());
+                Object.keys(jobj).forEach(key => {
+                    console.log(key, jobj[key]);
+                    list.push(key + " " + jobj[key].toString());
+                })
+                setInfo(list);
+                setAlert(true);
+                setSeverity('info');
+                setLoad(false);
             })
-            setInfo(list);
-            setAlert(true);
-            setSeverity('info');
-        }).catch(result => {
-            console.log(result);
-            setMessage(result);
-            setSeverity('error');
-            setAlert(true);
-        })
+            .catch(error => {
+                console.log(error);
+                showError(error);
+                setLoad(false);
+            })
     }
 
     return (
@@ -490,6 +512,15 @@ export default function ConnectionWidget()
                         </Button>
                     </Box>
                 </Stack>
+
+                <div>
+                    <Backdrop
+                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                        open={load}
+                    >
+                        <CircularProgress color="inherit" />
+                    </Backdrop>
+                </div>
             </ThemeProvider>
         </div>
     );

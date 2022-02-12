@@ -6,6 +6,7 @@ import json
 from . import webds
 from .utils import FileHandler
 from .touchcomm_manager import TouchcommManager
+from os.path import exists
 
 class ConnectionSettings:
     @staticmethod
@@ -45,7 +46,6 @@ class ConnectionSettings:
         else:
             print(obj, " not exist");
 
-
 class SettingsHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
@@ -61,6 +61,13 @@ class SettingsHandler(APIHandler):
         data = json.loads("{}")
 
         if subpath == 'connection':
+            ### check json file exists
+            if not exists(webds.CONNECTION_SETTINGS_FILE):
+                error = str(webds.CONNECTION_SETTINGS_FILE) +  ' not found'
+                print(error)
+                message=str(error)
+                raise tornado.web.HTTPError(status_code=400, log_message=message)
+
             argument = self.get_argument('query', None)
             print(argument)
             if argument == 'default':
@@ -77,6 +84,13 @@ class SettingsHandler(APIHandler):
         data = json.loads("{}")
 
         if subpath == 'connection':
+            ### check json file exists
+            if not exists(webds.CONNECTION_SETTINGS_FILE):
+                error = str(webds.CONNECTION_SETTINGS_FILE) +  'not found'
+                print(error)
+                message=str(error)
+                raise tornado.web.HTTPError(status_code=400, log_message=message)
+
             input_data = self.get_json_body()
             print(input_data)
 
