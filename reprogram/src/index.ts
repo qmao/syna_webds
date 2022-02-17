@@ -88,8 +88,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
       category: category
     });
 
-    let tracker = new WidgetTracker<MainAreaWidget>({ namespace: 'webds' });
-    restorer.restore(tracker, { command, name: () => 'webds' });
+    let tracker = new WidgetTracker<MainAreaWidget>({ namespace: 'webds_reprogram' });
+    restorer.restore(tracker, { command, name: () => 'webds_reprogram' });
   }
 };
 
