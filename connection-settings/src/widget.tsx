@@ -261,10 +261,10 @@ export default function ConnectionWidget()
     useEffect(() => {
         console.log("[attn]");
         if (attn == 0)
-            context.attn = false;
+            context.useAttn = false;
         else if (attn == 1)
-            context.attn = true;
-        console.log(context.attn);
+            context.useAttn = true;
+        console.log(context.useAttn);
     }, [attn]);
 
     useEffect(() => {
@@ -300,9 +300,9 @@ export default function ConnectionWidget()
                 setSpeed(0);
             setSpeedError(false);
 
-            context.spiSpeed = Number(speed);
+            context.speed = Number(speed);
         }
-        console.log(context.spiSpeed);
+        console.log(context.speed);
     }, [speed]);
 
     const getJson = async () => {
