@@ -9,7 +9,8 @@ import FlashOnIcon from '@mui/icons-material/FlashOn';
 
 import Fab from '@mui/material/Fab';
 
-//import DownloadBlob, { BlobFile } from './packrat/packrat'
+import DownloadBlob, { BlobFile } from './packrat/packrat'
+
 
 interface ButtonProps {
     children?: React.ReactNode;
@@ -165,64 +166,32 @@ export default function ButtonProgram(props: ButtonProps) {
         }
     }
 
-    const is_intranet = async (): Promise<Boolean | undefined> => {
-        let url = 'https://packrat.synaptics.com/packrat/login.cgi'
-
-        try {
-            await fetch(url, {
-                mode: 'no-cors', // no-cors, *cors, same-origin
-                credentials: 'include', // include, *same-origin, omit
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-            })
-            return Promise.resolve(true);
-        }
-        catch (e) {
-            console.log(e);
-            return Promise.resolve(false);
-        }
-    }
-
     const start_fetch = async (packrat: string): Promise<string | undefined> => {
+        const formData = new FormData();
 
         try {
             console.log(packrat);
 
-            let url = 'https://packrat.synaptics.com/packrat/gethex.cgi?packrat_id=' + packrat
-            await fetch(url, {
-                //mode: 'no-cors', // no-cors, *cors, same-origin
-                //credentials: 'include', // include, *same-origin, omit
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-            })
-                .then(res => res.blob()) // Gets the response and returns it as a blob
-                .then(function (blob) {
-                    console.log(blob)
-                    const formData = new FormData();
-                    formData.append("blob", blob, 'test');
+            let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
 
-                    const reply = requestAPI<any>('packrat', {
-                        body: formData,
-                        method: 'POST',
-                    });
-                    console.log(reply);
-
-                    return Promise.resolve(reply);
-
-                })
+            console.log(blob);
+            formData.append("blob", blob!.content, blob!.name);
         } catch (e) {
-            console.log((e as Error).message);
-            let intranet = await is_intranet();
-            if (intranet) {
-                link.current = "https://confluence.synaptics.com/x/u4ovCw";
-                return Promise.reject("Packrat Fetch Error. Please see ");
-            }
-            else {
-                link.current = "https://packrat.synaptics.com/";
-                return Promise.reject("Unable to access ");
-            }
+            console.log(e);
+            return Promise.reject(e);
+        }
+
+        try {
+            const reply = await requestAPI<any>('packrat', {
+                body: formData,
+                method: 'POST',
+            });
+
+            console.log(reply);
+
+            return Promise.resolve(reply);
+        } catch (e) {
+            return Promise.reject((e as Error).message);
         }
     }
 
