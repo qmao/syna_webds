@@ -10,7 +10,7 @@ export class BlobFile {
 export default function DownloadBlob(packrat_id, extension)
 {
 	let packratSession = new PackratSession({
-		serverUrl: "http://sjc1uvt-packrat01.synaptics.com:8088/service"
+		serverUrl: " http://packrat.synaptics.com:8090/service"
 	});
 
   console.log(packratSession);
