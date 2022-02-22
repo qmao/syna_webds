@@ -7,3 +7,4 @@ WORKSPACE_TEMP_FILE = WORKSPACE_CACHE_DIR + '/temp.cache'
 
 # connection settings
 CONNECTION_SETTINGS_FILE = '/usr/local/syna/lib/python/touchcomm/connection_params.json'
+CONNECTION_SETTINGS_FILE_TEMP = WORKSPACE_CACHE_DIR + 'connection_params.json'

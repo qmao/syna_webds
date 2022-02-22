@@ -4,7 +4,7 @@ import os
 import json
 
 from . import webds
-from .utils import FileHandler
+from .utils import FileHandler, SystemHandler
 from .touchcomm_manager import TouchcommManager
 from os.path import exists
 
@@ -32,8 +32,7 @@ class ConnectionSettings:
             print("key not found. create new")
 
         data[key] = value
-        with open(webds.CONNECTION_SETTINGS_FILE, 'w') as json_file:
-            json.dump(data, json_file)
+        ConnectionSettings.updateConnectionJsonFile(data)
 
     @staticmethod
     def deleteObject(obj):
@@ -41,10 +40,18 @@ class ConnectionSettings:
             data = json.load(json_file)
         if obj in data:
             del data[obj]
-            with open(webds.CONNECTION_SETTINGS_FILE, 'w') as json_file:      
-                json.dump(data, json_file)
+            ConnectionSettings.updateConnectionJsonFile(data)
         else:
             print(obj, " not exist");
+
+    @staticmethod
+    def updateConnectionJsonFile(data):
+        with open(webds.CONNECTION_SETTINGS_FILE_TEMP, 'w') as json_file:
+            json.dump(data, json_file)
+        SystemHandler.CallSysCommand(['chmod', '644', webds.CONNECTION_SETTINGS_FILE_TEMP])
+        SystemHandler.CallSysCommand(['chown', 'root:root', webds.CONNECTION_SETTINGS_FILE_TEMP])
+        SystemHandler.CallSysCommand(['mv', webds.CONNECTION_SETTINGS_FILE_TEMP, webds.CONNECTION_SETTINGS_FILE])
+
 
 class SettingsHandler(APIHandler):
     # The following decorator should be present on all verb methods (head, get, post,
