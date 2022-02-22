@@ -25,6 +25,9 @@ import webdsTheme from './webdsTheme';
 const I2C_ADDR_WIDTH = 150
 const SPI_SPEED_WIDTH = 150
 const SPI_SPEED_DEFAULT = 5000
+const I2C_ADDR_DEFAULT = 128
+const SPI_MODE_DEFAULT = -1
+
 
 interface ConnectionSettings {
     action: string;
@@ -230,6 +233,8 @@ export default function ConnectionWidget()
         console.log("[protocol]");
         if (protocol == "auto") {
             context.interfaces = interfaces;
+            setAddr(I2C_ADDR_DEFAULT);
+            setMode(SPI_MODE_DEFAULT);
         }
         else {
             context.interfaces = [protocol];
