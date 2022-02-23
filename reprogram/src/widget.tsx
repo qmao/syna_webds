@@ -152,6 +152,8 @@ export default function VerticalTabs(
 
     const onStart = (start: any) => {
         console.log(start);
+        if (start)
+            setAlert(false);
         setStart(start);
         setOpen(false);
     };
