@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { UserContext } from './context';
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 
 import IconButton from '@mui/material/IconButton';
 import RadioGroup from '@mui/material/RadioGroup';

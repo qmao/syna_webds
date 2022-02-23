@@ -2,14 +2,10 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { requestAPI } from './handler';
 import { UserContext } from './context';
 
-import { Box, Typography } from '@mui/material';
-
-import FlashOnIcon from '@mui/icons-material/FlashOn';
-
-
-import Fab from '@mui/material/Fab';
-
+import { Box, Typography, Button } from '@mui/material';
 import DownloadBlob, { BlobFile } from './packrat/packrat'
+import { ThemeProvider } from "@mui/material/styles";
+import webdsTheme from './webds_theme';
 
 
 interface ButtonProps {
@@ -197,14 +193,16 @@ export default function ButtonProgram(props: ButtonProps) {
 
     return (
         <div {...other}>
+            <ThemeProvider theme={webdsTheme}>
             <Box sx={{
-                m: 1, display: 'flex',
-                flexDirection: 'row-reverse'
+                display: 'flex',
+                flexDirection: 'row-reverse',
+                '& > :not(style)': { m: 1 }
             }}>
-                <Fab variant="extended" color="primary" disabled={disable || error}
+                <Button disabled={disable || error}
                     onClick={() => setStart(true)}
-                    sx={{ maxWidth: 145 }}>
-                    { isStart ?
+                    sx={{ width: 180 }}>
+                    { isStart &&
                         <Typography
                                 variant="caption"
                                 component="div"
@@ -212,12 +210,11 @@ export default function ButtonProgram(props: ButtonProps) {
                                 sx={{mr:1}}
                         >{`${Math.round(progress)}%`}
                         </Typography>
-                        :
-                        <FlashOnIcon sx={{ mr: 1 }} />
                     }
                     { title }
-                </Fab>
-            </Box>
+                </Button>
+                </Box>
+            </ThemeProvider>
         </div>
     );
 }

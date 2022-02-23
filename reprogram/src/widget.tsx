@@ -15,7 +15,7 @@ import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 import { ThemeProvider } from "@mui/material/styles";
 import ButtonProgram from './program'
 import FileList from './filelist'
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 
 import { green } from '@mui/material/colors';
 
@@ -283,8 +283,8 @@ export default function VerticalTabs(
                         display: 'flex',
                         mt: 5
                     }}>
-                        <Button onClick={handleClick}>
-                            <Avatar sx={{ bgcolor: webdsTheme.palette.secondary.main }} variant="rounded">
+                        <Button variant="text" onClick={handleClick}>
+                            <Avatar sx={{ bgcolor: webdsTheme.palette.primary.light }} variant="rounded">
                             {open ?
                                 <CloseIcon fontSize="large"/>
                                 :
@@ -302,8 +302,8 @@ export default function VerticalTabs(
                                 hidden
                             />
                             <label htmlFor="icon-button-hex">
-                                <Button onClick={handleUpload} component="span">
-                                    <Avatar sx={{ bgcolor: webdsTheme.palette.secondary.main }} variant="rounded">
+                                <Button variant="text" onClick={handleUpload} component="span">
+                                    <Avatar sx={{ bgcolor: webdsTheme.palette.primary.light }} variant="rounded">
                                         <CloudUploadIcon fontSize="large"/>
                                     </Avatar>
                                 </Button>
@@ -342,7 +342,7 @@ export default function VerticalTabs(
                                 }}
                             />
                         }
-                        <ButtonProgram title="PROGRAM" list={filelist} error={packratError}
+                        <ButtonProgram title="Program" list={filelist} error={packratError}
                             onStart={onStart} onProgress={onProgress} onMessage={onMessage} />
                     </Stack>
                 </Box>

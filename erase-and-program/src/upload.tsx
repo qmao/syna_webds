@@ -4,7 +4,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import BackupIcon from '@material-ui/icons/Backup';
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 import {
   ThemeProvider,
 } from "@mui/material/styles";

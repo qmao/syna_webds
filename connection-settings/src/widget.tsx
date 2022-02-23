@@ -20,7 +20,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
 import { ThemeProvider } from "@mui/material/styles";
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 
 const I2C_ADDR_WIDTH = 150
 const SPI_SPEED_WIDTH = 150

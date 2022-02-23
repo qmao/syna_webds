@@ -17,7 +17,7 @@ import FileList from './filelist'
 import ButtonProgram from './program'
 import UploadButtons from './upload'
 
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 
 
 interface TabPanelProps {
