@@ -80,6 +80,15 @@ export default function VerticalTabs(
 
     const context = useContext(UserContext);
 
+    const fetchData = async () => {
+        const data = await get_hex_list();
+        console.log('data', data);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     useEffect(() => {
         console.log(packrat);
         if (packrat === '') {
@@ -97,12 +106,6 @@ export default function VerticalTabs(
     }, [packrat]);
 
     useEffect(() => {
-
-        const fetchData = async () => {
-            const data = await get_hex_list();
-            console.log('data', data);
-        };
-
         if (open) {
             fetchData();
         }
