@@ -480,7 +480,7 @@ export default function ConnectionWidget()
                     </div>
 
                     <Collapse in={showProtocol}>
-                        <Paper variant="outlined" square>
+                        <Paper variant="outlined" square sx={{ ml: 1 }}>
                             <Stack spacing={1} sx={{
                                 flexDirection: 'column',
                                 display: 'flex',
