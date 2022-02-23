@@ -23,7 +23,7 @@ class SystemHandler():
             print("No need to call with sudo")
         else:
             print("We're not root.")
-            command = ['sudo'] + command + ['']
+            command = ['sudo'] + command
 
         print(command)
         result = subprocess.run(command, capture_output=True, text=True)
@@ -45,6 +45,15 @@ class SystemHandler():
                     file_path = os.path.join(webds.WORKSPACE_PACKRAT_DIR, f)
                     if os.path.islink(file_path):
                         os.unlink(file_path)
+
+                ### symlink has been moved to ./Packrat/Cache
+                ### clean up old symlink in ./Packrat
+                ### can remove these code in the future
+                for f in os.listdir(webds.WORKSPACE_PACKRAT_DIR + "/.."):
+                    file_path = os.path.join(webds.WORKSPACE_PACKRAT_DIR + "/..", f)
+                    if os.path.islink(file_path):
+                        os.unlink(file_path)
+
             except OSError as e:
                 print("Error: %s - %s." % (e.filename, e.strerror))
         else:
