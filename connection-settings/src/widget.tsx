@@ -23,10 +23,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import webdsTheme from './webds_theme';
 
 const I2C_ADDR_WIDTH = 150
-const SPI_SPEED_WIDTH = 150
-const SPI_SPEED_DEFAULT = 5000
-const I2C_ADDR_DEFAULT = 128
-const SPI_MODE_DEFAULT = -1
+const SPEED_WIDTH = 150
+const SPEED_AUTO_SCAN = 0
+const I2C_ADDR_AUTO_SCAN = 128
+const SPI_MODE_AUTO_SCAN = -1
 
 
 interface ConnectionSettings {
@@ -183,7 +183,7 @@ function SelectSpiSpeed(
                 type="number"
                 size="small"
                 sx={{
-                    width: SPI_SPEED_WIDTH,
+                    width: SPEED_WIDTH,
                 }}
             />
         </Stack>
@@ -206,7 +206,7 @@ export default function ConnectionWidget()
     const [addr, setAddr] = React.useState<number>(30);
     const [addrError, setAddrError] = React.useState(false);
 
-    const [speed, setSpeed] = React.useState<number>(SPI_SPEED_DEFAULT);
+    const [speed, setSpeed] = React.useState<number>(SPEED_AUTO_SCAN);
     const [speedError, setSpeedError] = useState(false);
 
     const [isAlert, setAlert] = useState(false);
@@ -233,8 +233,9 @@ export default function ConnectionWidget()
         console.log("[protocol]");
         if (protocol == "auto") {
             context.interfaces = interfaces;
-            setAddr(I2C_ADDR_DEFAULT);
-            setMode(SPI_MODE_DEFAULT);
+            setAddr(I2C_ADDR_AUTO_SCAN);
+            setMode(SPI_MODE_AUTO_SCAN);
+            setSpeed(SPEED_AUTO_SCAN);
         }
         else {
             context.interfaces = [protocol];
@@ -276,19 +277,13 @@ export default function ConnectionWidget()
         console.log("[addr]");
         console.log(addr);
 
-        if (isNaN(+addr)) {
-            console.log("invalid!!");
-            setAddrError(true);
-        }
-        else {
-            if (addr > 128)
-                setAddr(128);
-            else if (addr < 0)
-                setAddr(0);
-            setAddrError(false);
+        if (addr > 128)
+            setAddr(128);
+        else if (addr < 0)
+            setAddr(0);
+        setAddrError(false);
 
-            context.i2cAddr = Number(addr);
-        }
+        context.i2cAddr = Number(addr);
         console.log(context.i2cAddr);
     }, [addr]);
 
@@ -296,17 +291,13 @@ export default function ConnectionWidget()
         console.log("[speed]");
         console.log(speed);
 
-        if (isNaN(+speed)) {
-            console.log("invalid!!");
-            setSpeedError(true);
+        if (speed == SPEED_AUTO_SCAN) {
+            context.speed = null;
         }
         else {
-            if (speed < 0)
-                setSpeed(0);
-            setSpeedError(false);
-
-            context.speed = Number(speed);
+            context.speed = speed;
         }
+        setSpeedError(false);
         console.log(context.speed);
     }, [speed]);
 
@@ -352,12 +343,11 @@ export default function ConnectionWidget()
             setAddr(ji2cAddr);
             setMode(jspiMode);
 
-            if (jspiSpeed != null)
-                setSpeed(jspiSpeed);
+            if (jspiSpeed == null)
+                setSpeed(SPEED_AUTO_SCAN);
             else
-                setSpeed(SPI_SPEED_DEFAULT);
+                setSpeed(jspiSpeed);
 
-            setSpeed(jspiSpeed);
             if (jattn)
                 setAttn(1);
             else
