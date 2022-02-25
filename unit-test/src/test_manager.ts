@@ -4,6 +4,7 @@ import { TestGetList } from './test/test_get_list'
 import { TestDownloadFile } from './test/test_download_file';
 import { TestProgram } from './test/test_program';
 import { TestBase } from './test/test_base';
+import { TestUploadPackrat } from './test/test_upload_packrat';
 
 
 interface test_descriptor
@@ -29,6 +30,7 @@ export class TestManager {
 		this._class_list.push(TestGetList);
 		this._class_list.push(TestDownloadFile);
 		this._class_list.push(TestProgram);
+		this._class_list.push(TestUploadPackrat);
 
 
 		// TBC: load from config file
@@ -37,7 +39,8 @@ export class TestManager {
 			{ title: 'GetList', parameter: { extension: 'img' }},
 			{ title: 'DownloadFile', parameter: { packrat: "3080091", file: "PR3080091.hex" }},
 			{ title: 'DownloadFile', parameter: { packrat: "1234567", file: "PR1234567.hex" }},
-			{ title: 'Program', parameter: { packrat: "3080091" }}
+			{ title: 'Program', parameter: { packrat: "3080091" }},
+			{ title: 'UploadPackrat', parameter: { packrat: "11223344" }}
 		]
 
 		// create test instance with own parameter

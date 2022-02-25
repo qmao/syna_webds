@@ -171,7 +171,7 @@ export default function ButtonProgram(props: ButtonProps) {
             let blob: BlobFile | undefined = DownloadBlob(packrat, "hex");
 
             console.log(blob);
-            formData.append("blob", blob!.content, blob!.name);
+            formData.append("blob", blob!.content, "PR" + packrat + ".hex");
         } catch (e) {
             console.log(e);
             return Promise.reject(e);

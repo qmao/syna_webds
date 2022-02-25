@@ -69,9 +69,12 @@ class PackratHandler(APIHandler):
                 print(filename)
 
                 if packrat_id is None:
+                # user upload a hex file from local drive
                     try:
                         packrat_id = HexFile.GetSymbolValue("PACKRAT_ID", body.decode('utf-8'))
                         print(packrat_id)
+                        filename = "PR" + packrat_id + ".hex"
+                        print("new file name:" + filename)
                     except:
                         message = filename + " PACKRAT_ID parse failed"
                         raise tornado.web.HTTPError(status_code=400, log_message=message)
@@ -88,18 +91,17 @@ class PackratHandler(APIHandler):
                 # move temp hex to packrat cache
                 path = os.path.join(webds.PACKRAT_CACHE, packrat_id)
                 SystemHandler.CallSysCommand(['mkdir','-p', path])
-                packrat_filename="PR" + packrat_id + ".hex"
-                file_path = os.path.join(path, packrat_filename)
+                file_path = os.path.join(path, filename)
                 print(file_path)
 
                 SystemHandler.CallSysCommand(['mv', webds.WORKSPACE_TEMP_FILE, file_path])
                 data = json.loads("{}")
                 try:
                     SystemHandler.UpdateWorkspace()
-                    data["filename"] = packrat_filename
+                    data["filename"] = file_path
                     print(data)
                     self.finish(json.dumps(data))
                 except FileExistsError:
-                    message = file_path + " exists. Create softlink failed."
+                    message = file_path + " exists."
                     print(message)
                     raise tornado.web.HTTPError(status_code=400, log_message=message)
