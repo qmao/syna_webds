@@ -98,7 +98,7 @@ class PackratHandler(APIHandler):
                 data = json.loads("{}")
                 try:
                     SystemHandler.UpdateWorkspace()
-                    data["filename"] = file_path
+                    data["filename"] = filename
                     print(data)
                     self.finish(json.dumps(data))
                 except FileExistsError:

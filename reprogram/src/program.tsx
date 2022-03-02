@@ -192,30 +192,30 @@ export default function ButtonProgram(props: ButtonProps) {
     }
 
     return (
-        <div {...other}>
-            <ThemeProvider theme={webdsTheme}>
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row-reverse',
-                '& > :not(style)': { m: 1 }
-            }}>
-                <Button disabled={disable || error}
-                    onClick={() => setStart(true)}
-                    sx={{ width: 180 }}>
-                    { isStart &&
+        <ThemeProvider theme={webdsTheme}>
+            <div {...other}>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse'
+                }}>
+                    <Button disabled={disable || error}
+                        onClick={() => setStart(true)}
+                        sx={{ width: 180 }}>
+                        { isStart &&
                         <Typography
-                                variant="caption"
-                                component="div"
-                                color="text.secondary"
-                                sx={{mr:1}}
-                        >{`${Math.round(progress)}%`}
+                            variant="caption"
+                            component="div"
+                            color="text.secondary"
+                            sx={{mr:1}}
+                        >
+                        {`${Math.round(progress)}%`}
                         </Typography>
-                    }
-                    { title }
-                </Button>
+                        }
+                        { title }
+                    </Button>
                 </Box>
-            </ThemeProvider>
-        </div>
+            </div>
+        </ThemeProvider>
     );
 }
 
