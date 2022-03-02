@@ -200,7 +200,7 @@ export default function ButtonProgram(props: ButtonProps) {
                 }}>
                     <Button disabled={disable || error}
                         onClick={() => setStart(true)}
-                        sx={{ width: 180 }}>
+                        sx={{ width: 150, mt: 1 }}>
                         { isStart &&
                         <Typography
                             variant="caption"
