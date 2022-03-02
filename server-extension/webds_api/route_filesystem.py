@@ -3,7 +3,7 @@ from jupyter_server.base.handlers import APIHandler
 import os
 import json
 from . import webds
-from .utils import SystemHandler
+from .utils import SystemHandler, FileHandler
 
 
 def save(files, location):
@@ -27,9 +27,8 @@ class FilesystemHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def post(self):
-
         print(self.request.arguments)
-        
+
         location = self.request.arguments['location'][0].decode("utf-8")
         print(location)
 
@@ -53,3 +52,21 @@ class FilesystemHandler(APIHandler):
         data = {'data': 'done'}
         self.set_header('content-type', 'application/json')
         self.finish(json.dumps(data))
+
+
+
+class FilesystemHandler(APIHandler):
+    @tornado.web.authenticated
+    def get(self):
+        print(self.request.arguments)
+        folder = self.get_argument('dir', None)
+
+        print(folder)
+        if folder is not None:
+            try:
+                data = FileHandler.GetTree(folder)
+            except Exception as e:
+                raise tornado.web.HTTPError(status_code=400, log_message=str(e))
+        else:
+            data = json.loads("{}")
+        self.finish(data)
