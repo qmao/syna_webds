@@ -9,6 +9,8 @@ from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
 from .report_manager import ReportManager
 import time
+from copy import deepcopy
+
 
 fps = 300
 debug = True
@@ -110,7 +112,7 @@ class ReportHandler(APIHandler):
                 if (t1 - t00 >= step):
                     t00 = t1
                     data = manager.getReport()
-                    report = data
+                    report = deepcopy(data)
                     if report[0] == 'delta' or report[0] == 'raw':
                         report[1]['image'] = report[1]['image'].tolist()
                         report_count += 1

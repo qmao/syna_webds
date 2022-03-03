@@ -46,7 +46,6 @@ class ReportManager(object):
     def getReport(self):
         ###self._lock.acquire()
         data = self._report
-        self._report = ('timeout', None)
         ###self._lock.release()
         return data
             
