@@ -85,11 +85,11 @@ class TouchcommManager(object):
             self._lock.release()
         return data
 
-    def getReport(self):
+    def getReport(self, timeout=3):
         data = {}
         self._lock.acquire()
         try:
-            data = self._tc.getReport()
+            data = self._tc.getReport(timeout)
         except Exception as e:
             print('Touchcomm getReport exception:{}'.format(e))
         finally:

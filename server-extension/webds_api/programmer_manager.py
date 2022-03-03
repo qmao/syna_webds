@@ -12,7 +12,7 @@ class ProgrammerManager(object):
         return cls._instance
 
     def __init__(self):
-        printf("ProgrammerManager singleton object is created")
+        print("ProgrammerManager singleton object is created")
 
     def program(filename):
         ### disconnect tcm if exist

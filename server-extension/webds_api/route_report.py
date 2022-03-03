@@ -7,6 +7,7 @@ import numpy as np
 from . import webds
 from .utils import SystemHandler
 from .touchcomm_manager import TouchcommManager
+from .report_manager import ReportManager
 import time
 
 fps = 300
@@ -94,9 +95,11 @@ class ReportHandler(APIHandler):
     @tornado.gen.coroutine
     def get(self):
         print("get report")
-        tc = None
+
+        manager = None
         try:
-            tc = TouchcommManager()
+            manager = ReportManager()
+            manager.setState(True)
             global fps
             step = 1 / fps
             report_count = 0
@@ -106,10 +109,11 @@ class ReportHandler(APIHandler):
                 t1 = time.time()
                 if (t1 - t00 >= step):
                     t00 = t1
-                    report = tc.getReport()
-                    report_count += 1
+                    data = manager.getReport()
+                    report = data
                     if report[0] == 'delta' or report[0] == 'raw':
                         report[1]['image'] = report[1]['image'].tolist()
+                        report_count += 1
                     send = {"report": report, "frame": report_count}
                     yield self.publish(json.dumps(send, cls=NumpyEncoder))
                 if (t1 - t0 >= 1):
@@ -123,10 +127,6 @@ class ReportHandler(APIHandler):
             pass
 
         except Exception as e:
-            print(tc)
-            if tc is not None:
-                print("report sse disconnect tc")
-                tc.disconnect()
             ### TypeError
             ### BrokenPipeError
             print("Oops! get report", e.__class__, "occurred.")
@@ -134,3 +134,7 @@ class ReportHandler(APIHandler):
             message=str(e)
             raise tornado.web.HTTPError(status_code=400, log_message=message)
 
+        finally:
+            if manager:
+                print("Finally stop report manager")
+                manager.setState(False)
