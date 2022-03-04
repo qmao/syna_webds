@@ -14,6 +14,7 @@ class ReportManager(object):
     _thread = None
     _report = ('timeout', None)
     _frame_count = 0
+    _state = 'stop'
     ###_lock = Lock()
 
     def __new__(cls, *args, **kwargs):
@@ -31,6 +32,9 @@ class ReportManager(object):
         try:
             tc = TouchcommManager()
             while getattr(t, "do_run", True):
+                if self._state == 'pause':
+                    sleep(0.1)
+                    continue
                 ###self._lock.acquire()
                 self._report = tc.getReport(1)
                 if self._report != ('timeout', None):
@@ -50,6 +54,7 @@ class ReportManager(object):
     def reset(self):
         self._report = ('timeout', None)
         self._frame_count = 0
+        self._state = 'stop'
 
     def getReport(self):
         ###self._lock.acquire()
@@ -59,13 +64,14 @@ class ReportManager(object):
             
     def setState(self, state):
         print("Set state:", state)
-        if state:
+        self._state = state
+        if self._state is 'start':
             if self._counter is 0:
                 print("Create Report Thread")
                 self._thread = threading.Thread(target=self.doit, args=("task",))
                 self._thread.start()
             self._counter += 1
-        else:
+        elif self._state is 'stop':
             if self._counter > 0:
                 self._counter -= 1
                 if self._counter is 0:

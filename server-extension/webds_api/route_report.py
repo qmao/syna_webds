@@ -50,6 +50,9 @@ class ReportHandler(APIHandler):
             pass
 
         try:
+            manager = ReportManager()
+            manager.setState('pause')
+
             tc = TouchcommManager()
 
             for x in disable:
@@ -59,6 +62,8 @@ class ReportHandler(APIHandler):
             for x in enable:
                 print('enable:{}'.format(x))
                 ret = tc.enableReport(x)
+
+            manager.setState('resume')
 
             if frameRate is not None:
                 global fps
@@ -102,7 +107,7 @@ class ReportHandler(APIHandler):
         frame_count = 0
         try:
             manager = ReportManager()
-            manager.setState(True)
+            manager.setState('start')
             global fps
             step = 1 / fps
             report_count = 0
@@ -144,4 +149,4 @@ class ReportHandler(APIHandler):
         finally:
             if manager:
                 print("Finally stop report manager")
-                manager.setState(False)
+                manager.setState('stop')
