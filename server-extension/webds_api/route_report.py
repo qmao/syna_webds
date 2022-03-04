@@ -121,8 +121,8 @@ class ReportHandler(APIHandler):
                         send = {"report": report, "frame": report_count}
                         yield self.publish(json.dumps(send, cls=NumpyEncoder))
                         frame_count = data[1]
-                    ##else:
-                    ##    print("******SKIP")
+                    else:
+                        yield self.publish(json.dumps({}, cls=NumpyEncoder))
                 if (t1 - t0 >= 1):
                     t0 = t1
                     print(str(report_count) + ' fps', flush = True)
