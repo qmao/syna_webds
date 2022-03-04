@@ -122,7 +122,7 @@ class ReportHandler(APIHandler):
                         report = deepcopy(data[0])
                         if report[0] == 'delta' or report[0] == 'raw':
                             report[1]['image'] = report[1]['image'].tolist()
-                            report_count += 1
+                        report_count += 1
                         send = {"report": report, "frame": report_count}
                         yield self.publish(json.dumps(send, cls=NumpyEncoder))
                         frame_count = data[1]
