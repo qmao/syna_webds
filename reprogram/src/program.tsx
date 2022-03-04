@@ -199,6 +199,8 @@ export default function ButtonProgram(props: ButtonProps) {
                     flexDirection: 'row-reverse'
                 }}>
                     <Button disabled={disable || error}
+                        color="primary"
+                        variant="contained"
                         onClick={() => setStart(true)}
                         sx={{ width: 150, mt: 1 }}>
                         { isStart &&

@@ -111,10 +111,11 @@ function SelectAttn(
     return (
         <div>
             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="connection-select-spi-mode">Attn</InputLabel>
+                <InputLabel id="connection-select-spi-label">Attn</InputLabel>
                 <Select
-                    labelId="connection-select-spi-mode"
+                    labelId="connection-select-spi-label"
                     id="connection-select-spi"
+                    label="Attn"
                     value={props.attn.toString()}
                     onChange={props.handleChange}
                 >
@@ -454,7 +455,7 @@ export default function ConnectionWidget()
                             <InputLabel id="connection-helper-label">Protocol</InputLabel>
                             <Select
                                 labelId="connection-helper-label"
-                                id="connection-select"
+                                id="connection-helper"
                                 label="Protocol"
                                 onChange={handleChange}
                                 value={protocol}
@@ -499,10 +500,10 @@ export default function ConnectionWidget()
                     <SelectAttn handleChange={handleAttnChange} attn={attn}/>
 
                     <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                        <Button color="primary" variant="outlined" onClick={() => ResetDefault()}>
+                        <Button color="primary" variant="contained" onClick={() => ResetDefault()}>
                             Reset Settings
                         </Button>
-                        <Button color="primary" variant="outlined" onClick={() => UpdateSettings()}>
+                        <Button color="primary" variant="contained" onClick={() => UpdateSettings()}>
                             Connect
                         </Button>
                     </Box>
