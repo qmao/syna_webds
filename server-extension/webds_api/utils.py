@@ -36,7 +36,7 @@ class SystemHandler():
     def UpdateWorkSpaceCache():
         os.makedirs(webds.WORKSPACE_CACHE_DIR, exist_ok=True)
 
-    def UpdateHexLink():
+    def UpdatePackratLink():
         if os.path.exists(webds.WORKSPACE_PACKRAT_DIR):
             try:
                 print(webds.WORKSPACE_PACKRAT_DIR)
@@ -68,7 +68,7 @@ class SystemHandler():
 
     def UpdateWorkspace():
         SystemHandler.CallSysCommand(['mkdir','-p', webds.PACKRAT_CACHE])
-        SystemHandler.UpdateHexLink()
+        SystemHandler.UpdatePackratLink()
         SystemHandler.UpdateWorkSpaceCache()
 
 class HexFile():
@@ -121,6 +121,7 @@ class FileHandler():
 
     def GetTree(path):
         try:
+            SystemHandler.UpdatePackratLink()
             if not os.path.exists(path):
                 raise Exception(path + " not exist")
             d = {'name': os.path.basename(path)}
