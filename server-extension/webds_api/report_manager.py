@@ -35,6 +35,7 @@ class ReportManager(object):
                 ###self._lock.release()
                 sleep(0.0001)
                 ###print ("working on %s" % self._counter)
+            _report = ('timeout', None)
             print("Stopping as you wish.")
         except Exception as e:
             print(tc)
