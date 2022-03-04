@@ -99,6 +99,7 @@ class ReportHandler(APIHandler):
         print("get report")
 
         manager = None
+        frame_count = 0
         try:
             manager = ReportManager()
             manager.setState(True)
@@ -112,12 +113,16 @@ class ReportHandler(APIHandler):
                 if (t1 - t00 >= step):
                     t00 = t1
                     data = manager.getReport()
-                    report = deepcopy(data)
-                    if report[0] == 'delta' or report[0] == 'raw':
-                        report[1]['image'] = report[1]['image'].tolist()
-                        report_count += 1
-                    send = {"report": report, "frame": report_count}
-                    yield self.publish(json.dumps(send, cls=NumpyEncoder))
+                    if frame_count != data[1]:
+                        report = deepcopy(data[0])
+                        if report[0] == 'delta' or report[0] == 'raw':
+                            report[1]['image'] = report[1]['image'].tolist()
+                            report_count += 1
+                        send = {"report": report, "frame": report_count}
+                        yield self.publish(json.dumps(send, cls=NumpyEncoder))
+                        frame_count = data[1]
+                    ##else:
+                    ##    print("******SKIP")
                 if (t1 - t0 >= 1):
                     t0 = t1
                     print(str(report_count) + ' fps', flush = True)

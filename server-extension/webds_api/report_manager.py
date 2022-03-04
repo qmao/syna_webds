@@ -13,6 +13,7 @@ class ReportManager(object):
     _counter = 0
     _thread = None
     _report = ('timeout', None)
+    _frame_count = 0
     ###_lock = Lock()
 
     def __new__(cls, *args, **kwargs):
@@ -32,10 +33,12 @@ class ReportManager(object):
             while getattr(t, "do_run", True):
                 ###self._lock.acquire()
                 self._report = tc.getReport(1)
+                if self._report != ('timeout', None):
+                    self._frame_count += 1
                 ###self._lock.release()
                 sleep(0.0001)
                 ###print ("working on %s" % self._counter)
-            _report = ('timeout', None)
+            self.reset()
             print("Stopping as you wish.")
         except Exception as e:
             print(tc)
@@ -44,11 +47,15 @@ class ReportManager(object):
                 tc.disconnect()
             raise
 
+    def reset(self):
+        self._report = ('timeout', None)
+        self._frame_count = 0
+
     def getReport(self):
         ###self._lock.acquire()
         data = self._report
         ###self._lock.release()
-        return data
+        return data, self._frame_count
             
     def setState(self, state):
         print("Set state:", state)
