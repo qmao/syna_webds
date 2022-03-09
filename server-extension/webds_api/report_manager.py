@@ -13,7 +13,7 @@ class ReportManager(object):
     _counter = 0
     _thread = None
     _report = ('timeout', None)
-    _frame_count = 0
+    _frame_count = 1
     _state = 'stop'
     ###_lock = Lock()
 
@@ -53,7 +53,7 @@ class ReportManager(object):
 
     def reset(self):
         self._report = ('timeout', None)
-        self._frame_count = 0
+        self._frame_count = 1
         self._state = 'stop'
 
     def getReport(self):
